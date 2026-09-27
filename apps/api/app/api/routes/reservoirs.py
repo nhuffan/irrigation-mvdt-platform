@@ -1,6 +1,7 @@
 from typing import Annotated
+from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from geoalchemy2.functions import ST_X, ST_Y
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,14 +16,8 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "",
-    response_model=list[ReservoirResponse],
-)
-def get_reservoirs(
-    db: Annotated[Session, Depends(get_db)],
-) -> list[ReservoirResponse]:
-    stmt = select(
+def reservoir_query():
+    return select(
         Reservoir.id,
         Reservoir.code,
         Reservoir.name,
@@ -32,8 +27,25 @@ def get_reservoirs(
         Reservoir.description,
         ST_X(Reservoir.location).label("longitude"),
         ST_Y(Reservoir.location).label("latitude"),
-    ).order_by(Reservoir.name)
+    )
 
-    rows = db.execute(stmt).mappings().all()
 
+@router.get("", response_model=list[ReservoirResponse])
+def get_reservoirs(db: Annotated[Session, Depends(get_db)]) -> list[ReservoirResponse]:
+    rows = db.execute(reservoir_query().order_by(Reservoir.name)).mappings().all()
     return [ReservoirResponse(**row) for row in rows]
+
+
+@router.get("/{reservoir_id}", response_model=ReservoirResponse)
+def get_reservoir(
+    reservoir_id: UUID,
+    db: Annotated[Session, Depends(get_db)],
+) -> ReservoirResponse:
+    row = (
+        db.execute(reservoir_query().where(Reservoir.id == reservoir_id))
+        .mappings()
+        .one_or_none()
+    )
+    if row is None:
+        raise HTTPException(status_code=404, detail="Reservoir not found")
+    return ReservoirResponse(**row)
