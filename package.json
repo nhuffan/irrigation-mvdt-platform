@@ -1,0 +1,17 @@
+{
+  "name": "irrigation-mvdt-platform",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --dir apps/web dev",
+    "dev:api": "cd apps/api && uv run fastapi dev app/main.py",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "db:migrate": "cd apps/api && uv run alembic upgrade head",
+    "db:seed": "docker compose exec -T db psql -v ON_ERROR_STOP=1 -U mvdt -d mvdt < database/seed.sql",
+    "lint:web": "pnpm --dir apps/web lint",
+    "lint:api": "cd apps/api && uv run ruff check .",
+    "build:web": "pnpm --dir apps/web build"
+  },
+  "packageManager": "pnpm@11.19.0"
+}

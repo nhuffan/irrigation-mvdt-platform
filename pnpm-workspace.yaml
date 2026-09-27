@@ -1,0 +1,6 @@
+packages:
+  - "apps/web"
+
+allowBuilds:
+  unrs-resolver: true
+  sharp: true

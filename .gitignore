@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Local DB / Docker
+postgres_data/
+
+# GIS temporary/export files
+gis/raw/*
+!gis/raw/.gitkeep
+
+# User uploads
+storage/
+
+apps/web/public/maplibre/
