@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { ReservoirAssets } from "@/components/asset/reservoir-assets";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiError, getReservoir } from "@/lib/api";
@@ -67,6 +69,15 @@ export default async function ReservoirPage({
           <p className="muted mt-3">{reservoir.description}</p>
         </section>
       )}
+      <Suspense
+        fallback={
+          <section className="panel mt-10" role="status">
+            Loading reservoir assets…
+          </section>
+        }
+      >
+        <ReservoirAssets reservoir={reservoir} />
+      </Suspense>
     </main>
   );
 }

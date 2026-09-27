@@ -11,7 +11,8 @@
     "db:seed": "docker compose exec -T db psql -v ON_ERROR_STOP=1 -U mvdt -d mvdt < database/seed.sql",
     "lint:web": "pnpm --dir apps/web lint",
     "lint:api": "cd apps/api && uv run ruff check .",
-    "build:web": "pnpm --dir apps/web build"
+    "build:web": "pnpm --dir apps/web build",
+    "db:seed:assets": "cd apps/api && uv run python -m scripts.seed_dev"
   },
   "packageManager": "pnpm@11.19.0"
 }

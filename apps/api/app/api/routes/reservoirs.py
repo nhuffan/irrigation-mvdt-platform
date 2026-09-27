@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.db.session import get_db
 from app.models.reservoir import Reservoir
+from app.schemas.asset import AssetResponse
 from app.schemas.reservoir import ReservoirResponse
+from app.services.asset_service import list_assets
 
 router = APIRouter(
     prefix="/reservoirs",
@@ -49,3 +51,12 @@ def get_reservoir(
     if row is None:
         raise HTTPException(status_code=404, detail="Reservoir not found")
     return ReservoirResponse(**row)
+
+
+@router.get("/{reservoir_id}/assets", response_model=list[AssetResponse])
+def get_reservoir_assets(
+    reservoir_id: UUID, db: Annotated[Session, Depends(get_db)]
+) -> list[AssetResponse]:
+    if db.scalar(select(Reservoir.id).where(Reservoir.id == reservoir_id)) is None:
+        raise HTTPException(status_code=404, detail="Reservoir not found")
+    return list_assets(db, reservoir_id)

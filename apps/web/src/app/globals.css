@@ -342,3 +342,83 @@ dd {
     left: 12px;
   }
 }
+
+.asset-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #dce5df;
+  border-radius: 12px;
+  background: white;
+}
+.asset-table {
+  width: 100%;
+  min-width: 760px;
+  text-align: left;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.asset-table thead {
+  background: #edf3ef;
+  color: #52675c;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.asset-table th,
+.asset-table td {
+  padding: 18px;
+  vertical-align: top;
+  border-bottom: 1px solid #e6ece8;
+}
+.asset-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.asset-table tbody tr:hover {
+  background: #f6faf7;
+}
+.asset-code {
+  display: block;
+  font-weight: 400;
+  color: #698078;
+  font-size: 11px;
+  margin-top: 7px;
+}
+.asset-map-canvas {
+  width: 100%;
+  height: 440px;
+}
+.asset-legend {
+  bottom: 32px;
+}
+.legend-line {
+  width: 16px;
+  height: 3px;
+  background: #0369a1;
+}
+.legend-polygon {
+  width: 12px;
+  height: 10px;
+  border: 2px solid #6d28d9;
+  background: #c4b5fd;
+}
+.asset-locate-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.locate-button {
+  cursor: pointer;
+  border: 1px solid #c9d8cf;
+  border-radius: 6px;
+  background: white;
+  padding: 8px 12px;
+  font-size: 11px;
+  color: #285441;
+}
+.locate-button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+.locate-button:hover:enabled {
+  background: #e9f2ec;
+}

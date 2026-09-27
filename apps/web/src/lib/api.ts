@@ -1,3 +1,4 @@
+import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
 
 const API_BASE_URL =
@@ -5,7 +6,7 @@ const API_BASE_URL =
 
 export class ApiError extends Error {
   constructor(public status: number) {
-    super(`Reservoir API returned ${status}`);
+    super(`Data API returned ${status}`);
   }
 }
 
@@ -24,4 +25,11 @@ export function getReservoirs(): Promise<Reservoir[]> {
 
 export function getReservoir(id: string): Promise<Reservoir> {
   return request(`/reservoirs/${encodeURIComponent(id)}`);
+}
+
+export function getReservoirAssets(id: string): Promise<Asset[]> {
+  return request(`/reservoirs/${encodeURIComponent(id)}/assets`);
+}
+export function getAsset(id: string): Promise<Asset> {
+  return request(`/assets/${encodeURIComponent(id)}`);
 }
