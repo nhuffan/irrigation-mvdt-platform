@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+import { AssetOm } from "./asset-om";
 import Link from "next/link";
 import { getAsset, getReservoir } from "@/lib/api";
 import type { Asset } from "@/types/asset";
@@ -54,17 +56,13 @@ export async function AssetDetail({ asset }: { asset: Asset }) {
         </section>
         <section className="panel">
           <p className="eyebrow">Information readiness</p>
-          <h2>Data & condition</h2>
+          <h2>Data readiness</h2>
           <dl className="detail-list">
             <div>
               <dt>Data status</dt>
               <dd>
                 <AssetStatus status={asset.data_status} />
               </dd>
-            </div>
-            <div>
-              <dt>Condition status</dt>
-              <dd>{asset.condition_status ?? "Not assessed"}</dd>
             </div>
             <div>
               <dt>Description</dt>
@@ -83,6 +81,15 @@ export async function AssetDetail({ asset }: { asset: Asset }) {
             "Technical information has not been recorded."}
         </p>
       </section>
+      <Suspense
+        fallback={
+          <section className="panel mt-6" role="status">
+            Loading technical information and O&M histories…
+          </section>
+        }
+      >
+        <AssetOm assetId={asset.id} />
+      </Suspense>
       <section className="mt-10">
         <div className="section-heading">
           <div>
@@ -92,15 +99,6 @@ export async function AssetDetail({ asset }: { asset: Asset }) {
           <span className="muted text-sm">WGS 84 · EPSG:4326</span>
         </div>
         <AssetMap reservoir={reservoir} assets={[asset]} />
-      </section>
-      <section className="panel mt-8">
-        <p className="eyebrow">Operations & maintenance</p>
-        <h2>O&M</h2>
-        <ul className="muted mt-4 space-y-2">
-          <li>Inspection — Not implemented in Stage 2</li>
-          <li>Repair — Not implemented in Stage 2</li>
-          <li>Maintenance — Not implemented in Stage 2</li>
-        </ul>
       </section>
     </>
   );

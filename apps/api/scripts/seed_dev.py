@@ -7,6 +7,7 @@ from geoalchemy2.functions import ST_X, ST_Y
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 
+from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.asset import Asset
 from app.models.asset_category import AssetCategory
@@ -15,6 +16,8 @@ from app.services.asset_service import validate_parent
 
 
 def seed(reservoir_code: str) -> int:
+    if settings.app_env != "development":
+        raise ValueError("Development seed is disabled outside development")
     with SessionLocal.begin() as db:
         row = db.execute(
             select(
@@ -114,4 +117,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(
         f"Created {seed(args.reservoir_code)} development assets; reservoir maturity unchanged."
+    )
+
+    from scripts.seed_om import seed_om
+
+    print(
+        f"Created {seed_om(args.reservoir_code)} synthetic O&M records; all remain UNVERIFIED."
     )

@@ -19,4 +19,6 @@
 - `README.md` chỉ giữ lệnh chạy ngắn gọn và kết quả theo `Stage 0 output`, `Stage 1 output`, ...; không sao chép guideline hay viết nhật ký setup chi tiết.
 - Dữ liệu seed chỉ dùng development, không được mô tả là dữ liệu nghiên cứu đã xác minh. Không hard-code logic theo tên hồ.
 
-- Sau khi hoàn thành **mỗi stage**, bắt buộc thêm/cập nhật mục `Stage N output` trong `README.md` theo mẫu Stage 0/1: chức năng đã chạy, route/API/schema mới, kết quả kiểm tra và giới hạn còn lại. Không đánh dấu hoàn tất hoặc gửi kết luận cuối trước khi cập nhật. Giữ output stage trước và chỉ ghi kết quả đã xác minh, không chép lại kế hoạch.
+- Sau khi hoàn thành **mỗi stage**, bắt buộc thêm/cập nhật mục `Stage N output` trong `README.md` theo mẫu Stage 0/1/2: chức năng đã chạy, route/API/schema mới, kết quả kiểm tra và giới hạn còn lại. Không đánh dấu hoàn tất hoặc gửi kết luận cuối trước khi cập nhật. Giữ output stage trước và chỉ ghi kết quả đã xác minh, không chép lại kế hoạch.
+
+- Với O&M: giữ nguyên dữ liệu thiếu và các giá trị conflict; current condition chỉ lấy record VERIFIED mới nhất. Không dùng seed development làm bằng chứng nghiên cứu.

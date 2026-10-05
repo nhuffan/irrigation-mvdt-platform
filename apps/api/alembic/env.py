@@ -19,7 +19,17 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from app.core.config import settings
 from app.db.base import Base
-from app.models import asset, asset_category, reservoir  # noqa: F401
+from app.models import (  # noqa: F401
+    asset,
+    asset_category,
+    asset_condition,
+    asset_technical_attribute,
+    data_source,
+    inspection,
+    maintenance_record,
+    repair,
+    reservoir,
+)
 
 config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))
 target_metadata = Base.metadata

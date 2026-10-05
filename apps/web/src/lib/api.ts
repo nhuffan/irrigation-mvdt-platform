@@ -1,3 +1,9 @@
+import type { TechnicalAttribute } from "@/types/technical-attribute";
+import type { Condition } from "@/types/condition";
+import type { Inspection } from "@/types/inspection";
+import type { Repair } from "@/types/repair";
+import type { Maintenance } from "@/types/maintenance";
+import type { TimelineEvent } from "@/types/timeline";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
 
@@ -32,4 +38,34 @@ export function getReservoirAssets(id: string): Promise<Asset[]> {
 }
 export function getAsset(id: string): Promise<Asset> {
   return request(`/assets/${encodeURIComponent(id)}`);
+}
+
+export function getAssetTechnical(id: string): Promise<TechnicalAttribute[]> {
+  return request(`/assets/${encodeURIComponent(id)}/technical`);
+}
+
+export function getAssetConditions(id: string): Promise<Condition[]> {
+  return request(`/assets/${encodeURIComponent(id)}/conditions`);
+}
+
+export function getAssetInspections(id: string): Promise<Inspection[]> {
+  return request(`/assets/${encodeURIComponent(id)}/inspections`);
+}
+
+export function getAssetRepairs(id: string): Promise<Repair[]> {
+  return request(`/assets/${encodeURIComponent(id)}/repairs`);
+}
+
+export function getAssetMaintenance(id: string): Promise<Maintenance[]> {
+  return request(`/assets/${encodeURIComponent(id)}/maintenance`);
+}
+
+export function getAssetTimeline(id: string): Promise<TimelineEvent[]> {
+  return request(`/assets/${encodeURIComponent(id)}/timeline`);
+}
+
+export function getAssetCurrentCondition(
+  id: string,
+): Promise<Condition | null> {
+  return request(`/assets/${encodeURIComponent(id)}/current-condition`);
 }
