@@ -5,6 +5,7 @@ import type {
   Popup as LibrePopup,
   LngLatLike,
 } from "maplibre-gl";
+import { getAssetModelLinks } from "@/lib/api";
 import { geometryPositions } from "@/lib/asset-geometry";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
@@ -96,6 +97,22 @@ export function AssetMap({
           link.textContent = "View Asset →";
           link.href = `/assets/${encodeURIComponent(asset.id)}`;
           content.append(link);
+          void getAssetModelLinks(asset.id)
+            .then((links) => {
+              if (disposed || !links.length) return;
+              const target = links[0];
+              const threeD = document.createElement("a");
+              threeD.textContent = "View in 3D →";
+              threeD.href = `/reservoirs/${asset.reservoir_id}/3d?model=${target.model_id}&object=${encodeURIComponent(target.object_key)}`;
+              threeD.style.display = "block";
+              content.append(threeD);
+            })
+            .catch(() => {
+              if (disposed) return;
+              const unavailable = document.createElement("p");
+              unavailable.textContent = "3D links could not be loaded.";
+              content.append(unavailable);
+            });
           popup = new Popup({ maxWidth: "300px", offset: 12 })
             .setLngLat(coordinate)
             .setDOMContent(content)

@@ -18,18 +18,6 @@ export function MvdtReadiness({
       <p className="muted mt-4">
         {maturity?.description ?? "This level has not been classified."}
       </p>
-      {level >= 3 && (
-        <div className="mt-6 border-t border-slate-200 pt-4">
-          <p className="text-sm font-semibold">Future modules</p>
-          <p className="muted mt-2 text-sm">
-            Document storage · 3D integration
-          </p>
-          <p className="muted mt-2 text-sm">
-            These modules are planned for later stages and are not available
-            yet.
-          </p>
-        </div>
-      )}
     </section>
   );
 }

@@ -33,3 +33,7 @@ gis/raw/*
 storage/
 
 apps/web/public/maplibre/
+
+!apps/api/app/storage/
+!apps/api/app/storage/*.py
+apps/web/public/cesium/

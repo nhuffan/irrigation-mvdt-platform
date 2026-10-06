@@ -12,7 +12,8 @@
     "lint:web": "pnpm --dir apps/web lint",
     "lint:api": "cd apps/api && uv run ruff check .",
     "build:web": "pnpm --dir apps/web build",
-    "db:seed:assets": "cd apps/api && uv run python -m scripts.seed_dev"
+    "db:seed:assets": "cd apps/api && uv run python -m scripts.seed_dev",
+    "db:seed:media": "cd apps/api && uv run python -m scripts.seed_media"
   },
   "packageManager": "pnpm@11.19.0"
 }

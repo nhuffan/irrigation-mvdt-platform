@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { DataSource, VerificationStatus } from "@/types/data-source";
 export function VerificationBadge({ status }: { status: VerificationStatus }) {
   return (
@@ -52,6 +53,9 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
           <dd>{source.notes ?? "Not available"}</dd>
         </div>
       </dl>
+      <Link className="text-link" href={`/data-sources/${source.id}/documents`}>
+        Open documents →
+      </Link>
     </details>
   );
 }

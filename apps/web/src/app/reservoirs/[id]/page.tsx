@@ -34,6 +34,9 @@ export default async function ReservoirPage({
         </div>
         <span className="level-badge">MVDT Level {reservoir.mvdt_level}</span>
       </div>
+      <Link className="text-link" href={`/reservoirs/${id}/3d`}>
+        Open 3D models →
+      </Link>
       <div className="registry-grid">
         <MvdtReadiness
           level={reservoir.mvdt_level}

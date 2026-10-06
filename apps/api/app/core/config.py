@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    storage_root: Path = Path(__file__).resolve().parents[4] / "storage"
+
     app_name: str = "MVDT API"
     app_env: str = "development"
 

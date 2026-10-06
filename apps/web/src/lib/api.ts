@@ -69,3 +69,34 @@ export function getAssetCurrentCondition(
 ): Promise<Condition | null> {
   return request(`/assets/${encodeURIComponent(id)}/current-condition`);
 }
+
+export function getAssetDocuments(
+  id: string,
+): Promise<import("@/types/media").DocumentRecord[]> {
+  return request(`/assets/${encodeURIComponent(id)}/documents`);
+}
+export function getSourceDocuments(
+  id: string,
+): Promise<import("@/types/media").DocumentRecord[]> {
+  return request(`/data-sources/${encodeURIComponent(id)}/documents`);
+}
+export function getDocument(
+  id: string,
+): Promise<import("@/types/media").DocumentRecord> {
+  return request(`/documents/${encodeURIComponent(id)}`);
+}
+export function getModels(
+  id: string,
+): Promise<import("@/types/media").ModelRecord[]> {
+  return request(`/reservoirs/${encodeURIComponent(id)}/models`);
+}
+export function getModelLinks(
+  id: string,
+): Promise<import("@/types/media").ModelAssetLink[]> {
+  return request(`/models/${encodeURIComponent(id)}/asset-links`);
+}
+export function getAssetModelLinks(
+  id: string,
+): Promise<import("@/types/media").ModelAssetLink[]> {
+  return request(`/assets/${encodeURIComponent(id)}/model-links`);
+}

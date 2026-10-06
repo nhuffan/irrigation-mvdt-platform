@@ -27,6 +27,7 @@ from app.models import (  # noqa: F401
     data_source,
     inspection,
     maintenance_record,
+    media,
     repair,
     reservoir,
 )

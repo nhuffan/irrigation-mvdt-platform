@@ -42,6 +42,18 @@ Next.js · FastAPI · PostgreSQL/PostGIS · MapLibre. Hướng dẫn AI duy nh�
 - Chưa kiểm tra trực quan hoặc tương tác browser trong phiên này vì công cụ browser không khả dụng. Chưa có CRUD, upload/document storage, authentication, 3D hoặc SCADA.
 - Xóa asset cascade các record O&M; nguồn đang được tham chiếu và reservoir có nguồn được bảo vệ bằng RESTRICT. Import sau này phải gọi `validate_source_link` để kiểm tra source cùng reservoir; ràng buộc cùng reservoir này hiện ở service, không ở database.
 
+## Stage 4 output
+
+- Thêm `documents`, `models`, `model_asset_links` và migration Alembic. Composite FK chặn model–asset khác reservoir, object key duy nhất trong model; kiểm tra tọa độ, scale và verification. Xóa model/asset chỉ cascade mapping; nguồn còn document/model được bảo vệ bằng RESTRICT.
+- Storage adapter local dùng `STORAGE_ROOT` (mặc định `storage/` tại root, không commit file). Import document theo source code, tính SHA-256, idempotent theo source + checksum và phục hồi blob bị mất khi import lại. Không expose storage key/path trong API; chặn traversal/symlink thoát storage.
+- API `GET /api/v1/data-sources/{id}/documents`, `/documents/{id}`, `/documents/{id}/content`, `/assets/{id}/documents`; metadata file mất trả 410, unknown 404, UUID sai 422. Content hỗ trợ Range; loại ngoài PDF/raster image buộc download với `nosniff`.
+- Asset Detail có Documents; O&M source → Open documents → `/documents/[id]` với preview PDF/PNG/JPEG/WebP/GIF, metadata/checksum và download. Next content proxy cùng origin hỗ trợ streaming/Range, giữ trạng thái lỗi; lỗi tải file khác trạng thái rỗng.
+- API `/reservoirs/{id}/models`, `/models/{id}`, `/models/{id}/content`, `/models/{id}/asset-links`, `/assets/{id}/model-links`. Route `/reservoirs/[id]/3d` dùng CesiumJS 1.146.0 self-host, chỉ tải tại route 3D, không cần Cesium ion/token. Có chọn model, placement/provenance, reset camera, chọn/clear object và panel asset + current VERIFIED condition + latest inspection/maintenance.
+- GIS popup và Asset Detail có View in 3D khi có mapping; deep link theo model/object key. Picking lấy glTF node name qua adapter đã pin version; mọi thông tin asset được resolve từ Asset ID/API. Model LOCAL chưa có placement và format chưa hỗ trợ hiển thị lỗi rõ ràng; prototype hiện render GLB self-contained, chưa có pipeline 3D Tiles hoặc BIM/CAD conversion.
+- Seed `pnpm db:seed:media`: 2 synthetic files (PDF/PNG), 1 GLB nhỏ với 3 object–asset mappings và 1 object không liên kết. Tất cả UNVERIFIED, MANUAL_PLACEMENT tại tọa độ tham chiếu hồ; không phải công trình khảo sát hay kết quả nghiên cứu. Seed chạy lại giữ số lượng record; không đổi maturity của reservoir.
+- Kiểm tra đạt: 84 integration tests PostGIS, 8 tests picking adapter, Ruff, ESLint, TypeScript, production build, Alembic schema check. Live HTTP xác nhận PDF/image checksum, Range proxy, GLB node mapping, metadata/navigation, empty states và HTTP 404. **Chưa xác nhận trực quan** PDF/image preview, WebGL render, xoay/zoom/click và clear selection vì công cụ browser không kết nối trong phiên này; Stage 4 còn bước nghiệm thu browser/manual theo guideline.
+- Chưa có public upload/CRUD, authentication, SCADA/IoT, AI extraction hoặc BIM authoring. Files được giữ lại khi xóa metadata; chưa có garbage collection. Core Asset/O&M/verification tiếp tục ở PostgreSQL.
+
 ## Chạy local
 
 Từ root, với Docker Desktop đang chạy và dependencies/env đã được cấu hình:
@@ -51,6 +63,7 @@ pnpm db:up
 pnpm db:migrate
 pnpm db:seed
 pnpm db:seed:assets  # development assets + O&M; mặc định reservoir DT001
+pnpm db:seed:media   # development PDF/PNG/GLB; chạy sau assets seed
 pnpm dev:api  # terminal 1
 pnpm dev:web  # terminal 2
 ```
@@ -64,9 +77,12 @@ Dừng frontend/API bằng Ctrl+C; `pnpm db:down` dừng database và giữ volu
 pnpm lint:api
 pnpm lint:web
 pnpm build:web
+pnpm --dir apps/web test:media
 cd apps/api && uv run python -m pytest -q
 ```
 
 API tests cần local PostGIS đã migrate; dữ liệu test được rollback.
 
 Seed cho reservoir khác: `cd apps/api && uv run python -m scripts.seed_dev --reservoir-code <CODE>`. Chỉ chạy trên database development.
+
+Import document: `cd apps/api && uv run python -m scripts.import_documents --source-code <SOURCE_CODE> --file <PATH> --document-code <CODE>`. File không được commit; khi triển khai cần backup cả database và storage.

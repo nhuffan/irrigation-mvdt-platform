@@ -13,7 +13,9 @@ export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
         </div>
         <span className="muted">{assets.length} records</span>
       </div>
-      <AssetMap reservoir={reservoir} assets={assets} />
+      <div id="asset-gis">
+        <AssetMap reservoir={reservoir} assets={assets} />
+      </div>
       <div className="mt-6">
         <AssetRegistry assets={assets} />
       </div>

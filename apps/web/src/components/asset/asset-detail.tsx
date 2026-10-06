@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { AssetMedia } from "./asset-media";
 import { AssetOm } from "./asset-om";
 import Link from "next/link";
 import { getAsset, getReservoir } from "@/lib/api";
@@ -89,6 +90,9 @@ export async function AssetDetail({ asset }: { asset: Asset }) {
         }
       >
         <AssetOm assetId={asset.id} />
+      </Suspense>
+      <Suspense fallback={<p role="status">Loading documents and 3D links…</p>}>
+        <AssetMedia assetId={asset.id} reservoirId={asset.reservoir_id} />
       </Suspense>
       <section className="mt-10">
         <div className="section-heading">
