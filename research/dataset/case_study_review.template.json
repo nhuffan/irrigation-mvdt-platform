@@ -1,0 +1,54 @@
+{
+  "dataset_version": "DT-R1",
+  "reviewed_by": "",
+  "reviewed_at": "",
+  "study_boundary_reference": "",
+  "eligible_source_types": [],
+  "checks": {
+    "study_boundary": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "target_inventory": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "maim": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "source_authority": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "asset_identity": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "geometry": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "dev_separation": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "checkpoint_a": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "checkpoint_b": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "checkpoint_c": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    },
+    "checkpoint_d": {
+      "status": "PENDING",
+      "evidence_reference": ""
+    }
+  },
+  "base_scope_sha256": ""
+}

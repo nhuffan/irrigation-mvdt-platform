@@ -189,6 +189,17 @@ def observation(workflow, time, success="1"):
         "dataset_version": "TEST",
         "participant_id": "P1",
         "task_id": "T1",
+        "task_version": "TEST-TASK-V1",
+        "participant_group": "DOMAIN_STAFF",
+        "start_time": "2026-10-06T00:00:00+00:00",
+        "end_time": (
+            __import__("datetime").datetime(
+                2026, 10, 6, tzinfo=__import__("datetime").timezone.utc
+            )
+            + __import__("datetime").timedelta(
+                seconds=float(time) if str(time) not in ("nan", "inf", "-1") else 1
+            )
+        ).isoformat(),
         "workflow": workflow,
         "completion_time_seconds": str(time),
         "success": success,
@@ -221,13 +232,15 @@ def test_questionnaire_missing_and_sample_size():
     r = {
         "dataset_version": "TEST",
         "participant_id": "P1",
+        "participant_group": "DOMAIN_STAFF",
         "evidence_reference": "test",
         "Q1": "5",
         "Q2": "NA",
     }
     result = summarize_usability([r])
     assert result[0]["mean"] == 5 and result[0]["sample_std_dev"] is None
-    assert len(result) == 1
+    assert len(result) == 8
+    assert result[1]["n"] == 0 and result[1]["mean"] is None
     with pytest.raises(ValueError):
         summarize_usability([r, r])
     r["Q1"] = "6"

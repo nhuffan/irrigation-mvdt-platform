@@ -153,6 +153,7 @@ def capture(db, scope, storage):
         entry["usable_geometry"] = bool(geom and valid)
         category = db.get(AssetCategory, a.category_id)
         entry["category_name"] = category.name
+        entry["category_code"] = category.code
         data["assets"].append(entry)
     for kind in KINDS:
         records = select_ids(db, RECORD_TYPES[kind][0], scope["record_ids"][kind])

@@ -72,7 +72,12 @@ def validate_scope(scope):
     for code, exceptions in scope.get("not_applicable", {}).items():
         if (
             code not in scope["target_asset_codes"]
-            or not set(exceptions) <= set(scope["maim_required"])
+            or not set(exceptions)
+            <= set(
+                scope.get("maim_required_by_asset", {}).get(code, [])
+                if scope.get("metric_spec_version") == "STAGE-5B-v1"
+                else scope["maim_required"]
+            )
             or not all(isinstance(v, str) and v.strip() for v in exceptions.values())
         ):
             raise ValueError(
@@ -90,6 +95,13 @@ def validate_scope(scope):
         raise ValueError("Included reservoirs must be explicitly listed")
     for value in scope["reservoir_ids"]:
         UUID(value)
+    spec = scope.get("metric_spec_version", "STAGE-5A-v1")
+    if spec not in ("STAGE-5A-v1", "STAGE-5B-v1"):
+        raise ValueError("Unknown metric specification")
+    if spec == "STAGE-5B-v1":
+        from scripts.prepare_empirical_scope import validate_compiled_scope
+
+        validate_compiled_scope(scope)
     return scope
 
 

@@ -44,3 +44,6 @@ research/dataset/batches/
 research/evaluation/observations/
 research/evaluation/results/
 research/evaluation/screenshots/
+
+research/evaluation/import_batches/
+research/dataset/reviewed/

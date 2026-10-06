@@ -15,7 +15,7 @@
     "db:seed:assets": "cd apps/api && uv run python -m scripts.seed_dev",
     "db:seed:media": "cd apps/api && uv run python -m scripts.seed_media",
     "research:audit": "cd apps/api && uv run python -m scripts.audit_research_readiness --output ../../research/evaluation/readiness_audit.json",
-    "test:research": "cd apps/api && uv run python -m pytest tests/test_research.py -q"
+    "test:research": "cd apps/api && uv run python -m pytest tests/test_research.py tests/test_empirical.py -q"
   },
   "packageManager": "pnpm@11.19.0"
 }

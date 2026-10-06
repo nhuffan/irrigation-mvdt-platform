@@ -19,3 +19,5 @@ uv run python -m scripts.export_research_results --retrieval ../../research/eval
 ```
 
 Blank templates export header-only result tables with NOT_COLLECTED status, not zero scores or fabricated improvement.
+
+Stage 5B observations require `task_version`, `participant_group` (DOMAIN_STAFF/RESEARCH_TEAM), and timezone-aware `start_time`/`end_time`. Timing must match completion seconds within one second. Versions and cohorts are never paired or pooled. Record workflow order and timeouts in the session evidence. See [Stage 5B protocol](stage5b_protocol.md).

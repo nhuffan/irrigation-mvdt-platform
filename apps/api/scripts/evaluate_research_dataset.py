@@ -26,6 +26,14 @@ def has_value(r):
 
 
 def evaluate(s):
+    if s["scope"].get("metric_spec_version") == "STAGE-5B-v1":
+        from scripts.evaluate_empirical_dataset import evaluate_empirical
+
+        return evaluate_empirical(s)
+    return evaluate_legacy(s)
+
+
+def evaluate_legacy(s):
     scope = s["scope"]
     assets = s["assets"]
     verified = [a for a in assets if a["data_status"] == "VERIFIED"]
@@ -166,6 +174,7 @@ def evaluate(s):
     metrics["source_date_known"] = ratio(known_dates, len(s["sources"]))
     return {
         "dataset_version": scope["dataset_version"],
+        "metric_spec_version": "STAGE-5A-v1",
         "metrics": metrics,
         "completeness_summary": {
             "mean": statistics.mean(values) if values else None,
@@ -213,6 +222,10 @@ def main():
                 raise ValueError("Frozen file checksum mismatch")
     result = evaluate(snapshot)
     result["snapshot_sha256"] = sha
+    if result["metric_spec_version"] == "STAGE-5B-v1":
+        result["limitations"].append(
+            "Stage 5B coverage uses approved targets and per-asset eligibility; do not pool with Stage 5A denominators."
+        )
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "evaluation_results.json").write_text(
         json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + "\n"
@@ -256,6 +269,39 @@ def main():
         snapshot["sources"],
         ["source_code", "title", "source_type", "source_date", "verification_status"],
     )
+    if result["metric_spec_version"] == "STAGE-5B-v1":
+        write_csv(
+            args.output / "current_conditions.csv",
+            result["current_conditions"],
+            [
+                "asset_code",
+                "record_id",
+                "condition_date",
+                "condition_status",
+                "source_id",
+            ],
+        )
+        write_csv(
+            args.output / "geometry_review.csv",
+            result["geometry_review"],
+            [
+                "asset_code",
+                "expected_geometry_type",
+                "actual_geometry_type",
+                "usable",
+                "issue",
+            ],
+        )
+        write_csv(
+            args.output / "technical_requirements.csv",
+            result["technical_requirements"],
+            ["asset_code", "attribute_key", "expected_unit", "available"],
+        )
+        write_csv(
+            args.output / "conflict_review_summary.csv",
+            result["conflict_review_summary"],
+            ["status", "groups"],
+        )
     for name, keys in {
         "om_coverage": [
             "conditions_coverage",

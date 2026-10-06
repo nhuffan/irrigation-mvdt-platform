@@ -22,3 +22,5 @@ Open questions:
 - What should be improved before operational deployment?
 
 Store responses in a copy of `templates/usability_observations.csv` under `observations/`. Each row needs an evidence reference. Quote comments only with appropriate participant consent and pseudonymous attribution. No questionnaire results have been collected by this implementation.
+
+For Stage 5B, record `participant_group` as DOMAIN_STAFF or RESEARCH_TEAM. Export cohorts separately; all-missing items have n=0 and null statistics. Use the pseudonymous participant profile template and preserve consent evidence outside Git.
