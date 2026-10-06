@@ -16,9 +16,16 @@
 
 - Chỉ duy trì một file hướng dẫn AI: `AGENTS.md` tại root. Không tạo file AI riêng cho frontend/backend.
 - Trước khi sửa Next.js, đọc tài liệu tương ứng tại `apps/web/node_modules/next/dist/docs/`. Next.js đã cấu hình `agentRules: false` để không tự sinh file hướng dẫn con.
-- `README.md` chỉ giữ lệnh chạy ngắn gọn và kết quả theo `Stage 0 output`, `Stage 1 output`, ...; không sao chép guideline hay viết nhật ký setup chi tiết.
+- `README.md` chỉ giữ giới thiệu project, lệnh chạy/kiểm tra và liên kết tài liệu. Không ghi stage output trong README; không sao chép guideline hay viết nhật ký setup chi tiết.
+- Tất cả stage output được lưu chung trong `STAGE_OUTPUTS.md` tại root, theo các mục `Stage 0 output`, `Stage 1 output`, ...; đây là tài liệu kết quả, không phải file hướng dẫn AI thứ hai.
 - Dữ liệu seed chỉ dùng development, không được mô tả là dữ liệu nghiên cứu đã xác minh. Không hard-code logic theo tên hồ.
 
-- Sau khi hoàn thành **mỗi stage**, bắt buộc thêm/cập nhật mục `Stage N output` trong `README.md` theo mẫu Stage 0/1/2: chức năng đã chạy, route/API/schema mới, kết quả kiểm tra và giới hạn còn lại. Không đánh dấu hoàn tất hoặc gửi kết luận cuối trước khi cập nhật. Giữ output stage trước và chỉ ghi kết quả đã xác minh, không chép lại kế hoạch.
+- Sau khi hoàn thành **mỗi stage**, bắt buộc thêm/cập nhật mục `Stage N output` trong `STAGE_OUTPUTS.md` theo mẫu các stage trước: chức năng đã chạy, route/API/schema mới, kết quả kiểm tra và giới hạn còn lại. Không đánh dấu hoàn tất hoặc gửi kết luận cuối trước khi cập nhật. Giữ output stage trước và chỉ ghi kết quả đã xác minh, không chép lại kế hoạch.
 
 - Với O&M: giữ nguyên dữ liệu thiếu và các giá trị conflict; current condition chỉ lấy record VERIFIED mới nhất. Không dùng seed development làm bằng chứng nghiên cứu.
+
+## Git workflow
+
+- Làm việc, commit và push trực tiếp lên `main`. Không tạo branch riêng theo stage hoặc feature trừ khi người dùng yêu cầu rõ ràng.
+- Trước khi sửa, kiểm tra working tree và đồng bộ remote; giữ nguyên thay đổi đang có của người dùng. Trước khi push, chạy các kiểm tra phù hợp và cập nhật `STAGE_OUTPUTS.md` khi hoàn thành stage.
+- Không force-push hoặc viết lại lịch sử `main`.
