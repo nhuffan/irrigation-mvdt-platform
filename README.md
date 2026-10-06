@@ -4,6 +4,8 @@ Next.js · FastAPI · PostgreSQL/PostGIS · MapLibre · CesiumJS. Hướng dẫn
 
 Kết quả các stage: [STAGE_OUTPUTS.md](STAGE_OUTPUTS.md).
 
+Nghiên cứu: [dataset/import/freeze](research/dataset/README.md) · [evaluation protocol](research/evaluation/protocol.md).
+
 ## Chạy local
 
 Từ root, với Docker Desktop đang chạy và dependencies/env đã được cấu hình:

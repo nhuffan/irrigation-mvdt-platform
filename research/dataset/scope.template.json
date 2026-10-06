@@ -1,0 +1,33 @@
+{
+  "dataset_version": "DT-R1",
+  "data_origin": "RESEARCH",
+  "reviewed_by": "",
+  "inventory_reference": "",
+  "as_of_date": "",
+  "reservoir_ids": [],
+  "target_asset_codes": [],
+  "source_codes": [],
+  "expected_document_source_codes": [],
+  "three_d_asset_codes": [],
+  "maim_required": [
+    "identity",
+    "category",
+    "spatial",
+    "technical",
+    "condition",
+    "inspection",
+    "maintenance",
+    "source"
+  ],
+  "not_applicable": {},
+  "record_ids": {
+    "technical": [],
+    "conditions": [],
+    "inspections": [],
+    "repairs": [],
+    "maintenance": [],
+    "documents": [],
+    "models": [],
+    "model_asset_links": []
+  }
+}

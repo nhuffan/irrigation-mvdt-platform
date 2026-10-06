@@ -13,7 +13,9 @@
     "lint:api": "cd apps/api && uv run ruff check .",
     "build:web": "pnpm --dir apps/web build",
     "db:seed:assets": "cd apps/api && uv run python -m scripts.seed_dev",
-    "db:seed:media": "cd apps/api && uv run python -m scripts.seed_media"
+    "db:seed:media": "cd apps/api && uv run python -m scripts.seed_media",
+    "research:audit": "cd apps/api && uv run python -m scripts.audit_research_readiness --output ../../research/evaluation/readiness_audit.json",
+    "test:research": "cd apps/api && uv run python -m pytest tests/test_research.py -q"
   },
   "packageManager": "pnpm@11.19.0"
 }

@@ -37,3 +37,10 @@ apps/web/public/maplibre/
 !apps/api/app/storage/
 !apps/api/app/storage/*.py
 apps/web/public/cesium/
+
+# Research evidence may contain source documents or participant data
+research/dataset/frozen/
+research/dataset/batches/
+research/evaluation/observations/
+research/evaluation/results/
+research/evaluation/screenshots/

@@ -1,0 +1,30 @@
+{
+  "audited_at": "2026-10-06T06:33:18.713371+00:00",
+  "purpose": "IMPLEMENTATION_READINESS_ONLY",
+  "database_counts_including_development": {
+    "reservoirs": 2,
+    "assets": 4,
+    "sources": 1,
+    "documents": 2,
+    "models": 1,
+    "model_asset_links": 3,
+    "technical": 4,
+    "conditions": 2,
+    "inspections": 2,
+    "repairs": 1,
+    "maintenance": 2
+  },
+  "research_prefix_asset_candidates": 0,
+  "development_prefix_assets": 4,
+  "unclassified_prefix_assets": 0,
+  "approved_dataset_status": "NOT_ASSESSED_BY_THIS_AUDIT",
+  "declared_dataset_status": "NOT_FROZEN",
+  "research_metrics": null,
+  "required_evidence": [
+    "Approved Phase 1 target inventory and MAIM",
+    "Reviewed explicit research scope",
+    "Browser/manual acceptance evidence",
+    "Observed baseline and MVDT retrieval sessions",
+    "Actual participant questionnaires"
+  ]
+}
