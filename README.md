@@ -1,8 +1,6 @@
 # Irrigation MVDT Platform
 
-Next.js · FastAPI · PostgreSQL/PostGIS · MapLibre · CesiumJS. Hướng dẫn AI duy nhất: [AGENTS.md](AGENTS.md).
-
-Kết quả các stage: [STAGE_OUTPUTS.md](STAGE_OUTPUTS.md).
+Next.js · FastAPI · PostgreSQL/PostGIS · MapLibre · CesiumJS.
 
 Nghiên cứu: [dataset/import/freeze](research/dataset/README.md) · [evaluation protocol](research/evaluation/protocol.md).
 
