@@ -83,3 +83,16 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - CLI chạy với template thực tế trả NOT_READY (45 blockers), không sinh compiled scope; lưu `research/evaluation/stage5b_readiness.json`. `version.json` vẫn NOT_FROZEN. Browser tool không kết nối được; functional matrix vẫn NOT_TESTED, không có screenshot/visual acceptance mới.
 - Còn cần: approved Phase 1 inventory, nguồn/GIS/O&M thật, review MAIM/geometry/3D, nghiệm thu browser, import/freeze và lưu archive, paired baseline–MVDT sessions, questionnaire/feedback, bảng/hình và kết luận từ observations thực tế. Chưa có cơ sở khẳng định hiệu quả retrieval hoặc usability.
 - Không khởi chạy service/container mới trong task. API, web và PostGIS do người dùng chạy sẵn được giữ nguyên.
+
+
+## Stage 5B-DB output
+
+- Hoàn thành **B01A** theo khuyến nghị cuối guideline: nạp 4 RS category và 16 candidate sources vào reservoir DT001 hiện hữu. Không nạp 4 target assets; B01B chờ review danh tính, inclusion và geometry. Không thêm technical/O&M/geometry/document/model giả.
+- Tất cả 16 nguồn giữ UNVERIFIED; owner/authority chưa biết giữ NULL. Source date thiếu ngày hoặc là khoảng thời gian giữ NULL, nguyên văn nằm trong notes. Không suy diễn file_name từ title; file_available trong CSV chỉ là thông tin draft, không phải kiểm tra file thực tế.
+- Thêm `scripts.prepare_initial_research_batch`: đọc ba CSV, kiểm tra code/liên kết/boolean, tạo batch chỉ category/source, lưu hash đầu vào và UUID map ổn định (gồm asset UUID dự trữ). Không ghi đè output; retry dùng lại batch cũ. `reviewed_by` ghi rõ Codex chỉ review chuyển đổi cấu trúc, không phải domain approval.
+- Ba draft giữ nguyên byte trong `research/dataset/reviewed/`; batch/logs/UUIDs và báo cáo verification tại `research/dataset/batches/B01A/`, đều private/gitignored. Bổ sung ignore evidence directory. Hướng dẫn tại `research/dataset/initial_loading.md`.
+- Dry-run 20 dòng DRY_RUN, hash khớp và DB rollback; apply 20 dòng IMPORTED; chạy lại trong transaction cho 20 dòng UNCHANGED. Category tổng 5→9, source tổng 1→17; asset vẫn 4 DEV, các bảng O&M/media không đổi. Reservoir giữ data_status MVDT_AVAILABLE, mvdt_level 3 như trước task, không nâng maturity.
+- API TestClient kiểm tra thành công cả 16 nguồn và reservoir asset endpoint; chưa có RS asset hiển thị vì B01A không insert asset. Không mở web/API server hoặc tuyên bố nghiệm thu browser.
+- Sửa reader của empirical scope để chấp nhận UTF-8 BOM trong CSV cung cấp. Kiểm tra bằng các draft thực tế trả NOT_READY, không sinh compiled scope hoặc freeze DT-R1. Domain review, source authority và functional acceptance vẫn pending.
+- **134 backend/integration tests đạt**, Ruff/format đạt; một deprecation warning Starlette hiện hữu. Không đổi schema, không cần migration. Stage 5B thực nghiệm chưa hoàn tất.
+- Đã dừng PostGIS do task khởi động; giữ nguyên volume chứa B01A. Không có API/web service được task khởi chạy.

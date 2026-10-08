@@ -31,3 +31,5 @@ Freeze uses a read-only REPEATABLE READ transaction, explicit record membership 
 Batches, frozen source documents, participant observations, screenshots and generated result folders are gitignored. Back them up in an approved research evidence repository. Do not commit participant identities or proprietary source files. Update `version.json` only after actual reviewed freeze, including the snapshot SHA-256 and evidence archive reference.
 
 For Stage 5B, use the [empirical review and metric protocol](../evaluation/stage5b_protocol.md) to compile the reviewed scope before freeze. The Stage 5A scope template alone does not enforce Stage 5B checkpoints.
+
+For the initial unverified categories/source load, see [B01A workflow](initial_loading.md).

@@ -38,7 +38,7 @@ FIELDS = {
 
 
 def read_rows(path):
-    with Path(path).open(newline="") as handle:
+    with Path(path).open(encoding="utf-8-sig", newline="") as handle:
         return list(csv.DictReader(handle))
 
 
