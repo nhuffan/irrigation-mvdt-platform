@@ -96,3 +96,16 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Sửa reader của empirical scope để chấp nhận UTF-8 BOM trong CSV cung cấp. Kiểm tra bằng các draft thực tế trả NOT_READY, không sinh compiled scope hoặc freeze DT-R1. Domain review, source authority và functional acceptance vẫn pending.
 - **134 backend/integration tests đạt**, Ruff/format đạt; một deprecation warning Starlette hiện hữu. Không đổi schema, không cần migration. Stage 5B thực nghiệm chưa hoàn tất.
 - Đã dừng PostGIS do task khởi động; giữ nguyên volume chứa B01A. Không có API/web service được task khởi chạy.
+
+
+## Stage 5B-B01B output
+
+- Đã nạp **4 RS asset** bằng UUID dự trữ B01A, với data_status REGISTERED, parent NULL và geometry NULL. Identity/inclusion trong controlled inventory dựa trên xác nhận review/duyệt tài liệu Drive/local của người dùng trong task; lưu nguyên văn declaration và context riêng tư. Không diễn giải thành asset data VERIFIED hoặc approval mọi empirical checkpoint.
+- Thêm `scripts.prepare_reviewed_asset_batch`: offline compiler kiểm tra RS/UUID, inclusion true/false, identity VERIFIED, canonical name/category/parent, evidence liên quan đúng asset/purpose, physical-file evidence, reviewer/timezone, hierarchy cycle và parent order. Không ghi DB/đè output/tự nâng trạng thái. Xuất batch, input hashes, review manifest và verification report.
+- Geometry NULL cần NOT_AVAILABLE/rationale/survey_grade=false. Optional geometry_geojson cần CRS/provenance/review; dùng Shapely kiểm tra topology, finite 2D lon/lat, kiểu geometry và closed polygon. Thêm dependency Shapely đã khóa trong uv.lock; không đổi schema/API/UI.
+- Bảo toàn bản cũ trước cập nhật source/evidence inventory trong private reviewed/. Tách logical source khỏi evidence file, bổ sung 21 leaf PDF XL5, tổng manifest 40 mục. Drive xác nhận locator ba PDF đập và SKP; AI xem trang đầu EVID-DAM-001 và đọc text báo cáo đầu vào, không tuyên bố đã xem mọi PDF/đã render SKP. Review user-declared và AI inspection coverage lưu tách biệt.
+- Giữ initial MAIM, không tự tạo technical key/unit. Tạo B02 candidate queue với một REFERENCE transcription chưa xác minh; chưa import technical/O&M. Source inventory mới không âm thầm overwrite 16 source B01A trong DB; owner/authority và quan hệ revision còn cần hoàn thiện.
+- Dry-run 4 dòng rollback và hash khớp; apply 4 dòng. DB asset tổng 4→8 (4 DEV + 4 RS); bốn asset detail và reservoir-list API đạt, retry cho 4 UNCHANGED. Các bảng source/O&M/media và reservoir data_status/mvdt_level giữ nguyên. Audit/logs tại private batches/B01B/.
+- **157 backend/integration tests đạt**, gồm 23 tests mới cho B01B; Ruff đạt. Một deprecation warning Starlette hiện hữu. Không có browser acceptance mới.
+- Compiler B01B đạt READY_TO_IMPORT; empirical scope vẫn NOT_READY vì source authority, acceptance và các checkpoint sau chưa hoàn thành. Không tạo DT-R1. Hướng dẫn ở `research/dataset/reviewed_asset_loading.md`.
+- Đã dừng PostGIS và Docker Desktop do task khởi chạy, giữ nguyên database volume. Không khởi chạy API/web server.

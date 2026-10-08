@@ -33,3 +33,5 @@ Batches, frozen source documents, participant observations, screenshots and gene
 For Stage 5B, use the [empirical review and metric protocol](../evaluation/stage5b_protocol.md) to compile the reviewed scope before freeze. The Stage 5A scope template alone does not enforce Stage 5B checkpoints.
 
 For the initial unverified categories/source load, see [B01A workflow](initial_loading.md).
+
+For reviewed asset identities and optional geometry, see [B01B workflow](reviewed_asset_loading.md).
