@@ -109,3 +109,18 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - **157 backend/integration tests đạt**, gồm 23 tests mới cho B01B; Ruff đạt. Một deprecation warning Starlette hiện hữu. Không có browser acceptance mới.
 - Compiler B01B đạt READY_TO_IMPORT; empirical scope vẫn NOT_READY vì source authority, acceptance và các checkpoint sau chưa hoàn thành. Không tạo DT-R1. Hướng dẫn ở `research/dataset/reviewed_asset_loading.md`.
 - Đã dừng PostGIS và Docker Desktop do task khởi chạy, giữ nguyên database volume. Không khởi chạy API/web server.
+
+
+## Stage 5B-B02 output
+
+**Trạng thái: công cụ và lượt trích xuất đầu tiên đã triển khai; field review/import dữ liệu thật còn pending.** Không coi approval bộ tài liệu B01B là approval tự động cho các giá trị B02 mới.
+
+- Thêm `scripts.prepare_reviewed_om_batch`: compiler offline cho technical/conditions/inspections/repairs/maintenance; chỉ chọn VERIFIED candidates có reviewer/timestamp, approved RS target, source/evidence linkage và locator cụ thể. Không inference current condition, không ghi DB, không đổi verification source/maturity.
+- Technical dùng dictionary key/label/unit chính xác, explicit number/text, giữ zero và chặn NaN/Infinity/missing placeholder. O&M yêu cầu full event date, payload fields theo schema và event basis; chặn date range/thiếu description hoặc inspection thiếu nội dung. MONITORING/MODEL_OUTPUT/REFERENCE không tự trở thành O&M.
+- UUIDv5 theo asset UUID + type + candidate ID, persist map; sửa giá trị giữ ID để importer chặn overwrite. Conflict candidates giữ riêng và báo nhóm cần review. Xuất input hashes, review manifest, provenance record→candidate→evidence→source→Drive/page, id_map và verification report. Batch rỗng hoặc chưa duyệt chỉ xuất report, không tạo import JSON.
+- Trích xuất ban đầu có 6 candidates: 3 technical từ EVID-IN-001 trang 2–3, 1 inspection từ biên bản XL5 trang 1–3 và 2 references. Tất cả REVIEW_PENDING, không phải kết quả đo hiện trạng. Có dictionary đề xuất cho 3 giá trị; MAIM technical vẫn false, chưa áp đặt yêu cầu mới. Chưa review toàn bộ archive; không kết luận O&M không tồn tại chỉ vì chưa nhập.
+- Đã xem trực quan các trang báo cáo nguồn, bản vẽ và biên bản XL5; biên bản ghi kiểm tra/điều chỉnh thiết kế, không được chuyển thành completed repair. Candidate inspection cần review liên kết asset vì phạm vi đầu mối/XL5 rộng. Bản review cụ thể lưu private `reviewed/B02-review.md`; bản gốc trước migration candidate schema được archive.
+- **197 backend/integration tests đạt**, gồm 40 B02 tests. Tests dùng synthetic fixture/rollback kiểm tra cả 5 loại qua DB/API, idempotency, overwrite rejection, source linkage, timeline và current-condition. Ruff/format đạt; deprecation warning Starlette hiện hữu.
+- Chạy compiler trên dữ liệu thật cho cả 5 loại: NO_VERIFIED_CANDIDATES, không sinh batch giả. Audit 28 API responses cho 4 RS assets đạt; research technical/O&M vẫn 0 và current-condition null. Không có import/apply B02 thật, không mở rộng record allowlist. Reservoir vẫn MVDT_AVAILABLE/level 3. Báo cáo riêng tư tại batches/B02/verification_report.json.
+- Còn cần duyệt từng giá trị/event đã trích xuất, tiếp tục kiểm tra hồ sơ chưa đọc, quyết định dictionary/MAIM rồi dry-run/apply các batch có dữ liệu đã duyệt. Stage 5B vẫn NOT_READY; chưa có browser acceptance hoặc DT-R1 freeze. Hướng dẫn tại `research/dataset/reviewed_om_loading.md`.
+- Đã dừng PostGIS và Docker Desktop do task khởi chạy, giữ nguyên volume; không khởi chạy API/web server.

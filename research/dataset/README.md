@@ -35,3 +35,5 @@ For Stage 5B, use the [empirical review and metric protocol](../evaluation/stage
 For the initial unverified categories/source load, see [B01A workflow](initial_loading.md).
 
 For reviewed asset identities and optional geometry, see [B01B workflow](reviewed_asset_loading.md).
+
+For field-level technical/O&M candidates and import, see [B02 workflow](reviewed_om_loading.md).
