@@ -124,3 +124,17 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Chạy compiler trên dữ liệu thật cho cả 5 loại: NO_VERIFIED_CANDIDATES, không sinh batch giả. Audit 28 API responses cho 4 RS assets đạt; research technical/O&M vẫn 0 và current-condition null. Không có import/apply B02 thật, không mở rộng record allowlist. Reservoir vẫn MVDT_AVAILABLE/level 3. Báo cáo riêng tư tại batches/B02/verification_report.json.
 - Còn cần duyệt từng giá trị/event đã trích xuất, tiếp tục kiểm tra hồ sơ chưa đọc, quyết định dictionary/MAIM rồi dry-run/apply các batch có dữ liệu đã duyệt. Stage 5B vẫn NOT_READY; chưa có browser acceptance hoặc DT-R1 freeze. Hướng dẫn tại `research/dataset/reviewed_om_loading.md`.
 - Đã dừng PostGIS và Docker Desktop do task khởi chạy, giữ nguyên volume; không khởi chạy API/web server.
+
+
+## Stage 5B-B02-R output
+
+- Review đủ 6 candidate ban đầu: **3 VERIFIED ở L2, 3 KEEP_AS_REFERENCE ở L1**; không có L3 hoặc domain-expert attestation. AI kiểm tra source/semantic được ghi riêng với user declaration B01B và automated validation.
+- Ba technical được đối chiếu báo cáo với bản vẽ tường tâm giai đoạn II; label làm rõ component/phạm vi lịch sử, unit m và datum chưa xác định. Không nhầm với chiều dài toàn đập/cao trình đỉnh đập hoặc model input/output. Giữ stable attribute keys; dictionary được chấp nhận cho các trường đã review.
+- Biên bản XL5 được phân loại lại thành REFERENCE vì phục vụ điều chỉnh thiết kế và phạm vi nhiều công trình; không nhập INSPECTION/REPAIR. Hai context references còn lại được giữ. Bản gốc, payload và lịch sử quyết định nằm trong private input archive, không xóa candidate.
+- Tạo private verification log 6 dòng, crosscheck matrix (3 MATCH, 3 NOT_AVAILABLE), conflict log và review coverage kèm PDF SHA-256. Không xác lập tính độc lập giữa report và drawing nên không nâng L3. Không phát hiện conflict giá trị trong phạm vi đã xem; không kết luận toàn archive không có conflict.
+- Xem bổ sung 12 trang bản vẽ tường tâm (có trang lặp), hoàn tất 5 trang bản vẽ quan trắc và xem 3 trang bản vẽ 1983; bản 1983 mờ chưa dùng xác minh số liệu. Tên file tường tâm ghi 2002 khác titleblock 2000/05-2000, được ghi nhận, không biến thành event date. Các hồ sơ XL1/XL5/seepage/monthly còn lại chưa review toàn bộ.
+- MAIM technical giữ required=false cho cả 4 category, có rationale riêng; hash MAIM, source inventory và base-scope không đổi. Không mở rộng denominator/allowlist hoặc nâng source authority/maturity.
+- Compiler hiện hữu tạo **B02A gồm 3 technical, READY_TO_IMPORT** tại private `batches/B02-R/B02A/`. Bốn nhóm O&M trả NO_VERIFIED_CANDIDATES, không sinh batch rỗng. **Chưa dry-run/apply database**: bàn giao bước B02-I, không tuyên bố DB/API đã có các giá trị mới.
+- Kiểm tra offline đạt: review gates cho 6 candidate, 5 PDF hashes, input hashes, recompile batch/UUID giống hệt và protected-file hashes. **35 unit tests đạt, 5 DB tests không chạy**; một Starlette deprecation warning hiện hữu. Không đổi application code/schema/API/UI. Kiểm tra cấu trúc không thay thế xác minh kỹ thuật.
+- Hướng dẫn bàn giao và header-only templates tại `research/dataset/field_review_handoff.md`; chi tiết thực tế tại private `reviewed/B02-review.md`. Stage 5B vẫn NOT_READY, không freeze hoặc browser acceptance mới.
+- Không khởi chạy service cho lượt review; PostGIS và Docker Desktop do task trước khởi chạy đã được dừng khi hủy task đó, giữ nguyên volume. Không có API/web do task này khởi chạy.
