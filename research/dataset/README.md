@@ -37,3 +37,5 @@ For the initial unverified categories/source load, see [B01A workflow](initial_l
 For reviewed asset identities and optional geometry, see [B01B workflow](reviewed_asset_loading.md).
 
 For field-level technical/O&M candidates and import, see [B02 workflow](reviewed_om_loading.md).
+
+- [Reviewed documents and 3D loading](reviewed_media_loading.md)

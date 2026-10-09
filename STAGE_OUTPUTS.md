@@ -151,3 +151,18 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - **197 tests đạt: 109 unit + 88 DB/integration; 0 skipped/failed.** Bao gồm importer, overwrite rejection, idempotency, source linkage, technical/detail API, timeline/current-condition. Fixtures DB rollback; audit sau tests xác nhận dữ liệu thật không thay đổi. Ruff đạt, format 78 files đạt; một Starlette TestClient deprecation warning hiện hữu. Không đổi schema/API/UI, không cần migration/seed.
 - Báo cáo, snapshots baseline/rollback/apply/retry/post-tests, logs, scope change và kiểm tra hash lưu private tại `research/dataset/batches/B02-I/`; không đưa nguồn/batch riêng tư vào Git. B02 hoàn tất cho ba technical đã review; bước tiếp theo B03 documents + reviewed 3D, Stage 5B tổng thể vẫn NOT_READY.
 - Đã dừng PostGIS, gỡ container/network do task khởi chạy và tắt Docker Desktop; giữ nguyên volume chứa dữ liệu đã import. Không khởi chạy API/web server.
+
+
+## Stage 5B-B03 output
+
+**Trạng thái: đã import tài liệu và mô hình tham khảo LOCAL; mapping 3D chờ người dùng xác nhận ở prompt sau. B03 chưa hoàn tất toàn bộ.**
+
+- Import 5 PDF đã review bằng source/evidence linkage, SHA-256, original filename và page count thực tế. Dry-run rollback, apply 5 IMPORTED, retry 5 UNCHANGED; tổng documents 2→7. Các representation chưa đối chiếu giữ REFERENCE_ONLY, không tự khẳng định duplicate/revision.
+- Thêm importer reviewed documents với stable UUID, kiểm tra bytes/MIME/page count, chống duplicate/overwrite và audit manifest. Dependency pypdf được khóa; không đổi schema hoặc migration. Hướng dẫn và header-only templates tại `research/dataset/reviewed_media_loading.md`.
+- Chuyển SKP thật sang GLB bằng Blender 4.4.0 và SketchUp importer 0.24 theo authorization của người dùng; giữ nguyên file nguồn, hashes, tool provenance và render kiểm tra từ GLB re-import. Web converter đã render nhưng export timeout; không dùng output chưa hoàn chỉnh.
+- GLB khoảng 137 MiB, 11.758 mesh nodes, lưu object inventory. Import 1 model REFERENCE/PARTIALLY_VERIFIED, LOCAL với geographic placement NULL; dry-run/apply/retry đạt, tổng models 1→2. Hierarchy đã flatten, không coi tên object là bằng chứng identity, chưa tối ưu cho thiết bị yếu.
+- Viewer Cesium hỗ trợ LOCAL với camera và ánh sáng riêng. Browser đã render mô hình và picking object chưa liên kết trả thông báo phù hợp; không gán tọa độ địa lý hoặc mở asset giả. Cả 4 mapping vẫn AMBIGUOUS/UNVERIFIED theo yêu cầu hoãn trả lời của người dùng; RS model links vẫn 0, 3 DEV links giữ nguyên. Chưa nghiệm thu đầy đủ functional acceptance.
+- Kiểm chứng 41 document/asset API checks và 5 model API checks, gồm metadata/source, content hash, preview/download và HTTP Range. Snapshot cuối giữ nguyên toàn bộ baseline rows, source/asset/technical/O&M; RS current-condition null. Source verification và reservoir maturity không nâng.
+- Scope chỉ thêm 5 document UUID, 1 model UUID và danh sách 11 expected document sources từ inventory; không bỏ nguồn thiếu file khỏi denominator, không thêm model links hoặc đổi MAIM/target. Fingerprint mới `06fc48a9a3ce995e6a4ac8da3dc55ecd9cd1081f288bfbb087e161309d3aed63`. Readiness chạy lại tại private `reviewed/check-B03-updated/`: NOT_READY, không freeze DT-R1.
+- **208 backend tests đạt (119 unit + 89 DB/integration), 8 web picking tests đạt; Ruff/format, ESLint, TypeScript và production build đạt.** Còn warning Starlette TestClient và Node module type hiện hữu. Private logs/snapshots/review manifests tại `research/dataset/batches/B03/`; evidence và dữ liệu nghiên cứu không đưa vào Git.
+- Đã xác minh API/web không còn lắng nghe ở 8000/3000; PostGIS container/network do task khởi chạy đã được dừng/gỡ, giữ nguyên volume. Docker Desktop đã chạy trước task nên giữ nguyên; không còn container chạy tại thời điểm kiểm tra.
