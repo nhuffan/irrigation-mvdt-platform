@@ -25,3 +25,7 @@ uv run python -m scripts.import_research_data --batch ../../research/dataset/bat
 Review the dry-run log and rollback result. Only then apply that same batch with a separate applied log and `--apply`. Verify DB/API values, asset/source links, absence of unintended O&M events, latest-VERIFIED condition behaviour and idempotent retry. Do not overwrite an existing differing record. Update explicit record allowlists only after successful apply. No batch should be created for an empty category.
 
 B02-R does not approve source authority, complete archive review, browser acceptance, freeze or empirical effectiveness. Keep Stage 5B NOT_READY until those gates are actually satisfied.
+
+## B02-I execution status
+
+The existing three-row B02A batch has now been applied. Private `batches/B02-I/verification_report.json` records the reviewed dry-run/rollback, first apply, unchanged retry, DB/API snapshots, protected input hashes and scope fingerprint change. The technical allowlist contains exactly those persisted batch UUIDs; other allowlists and MAIM are unchanged. The earlier B02-R handoff remains historical evidence, including its pre-import base-scope hash; the intentional later scope change is recorded separately. Do not overwrite old audit logs or regenerate the reviewed batch to repeat this stage. Further corrections require a new reviewed cycle. Readiness remains NOT_READY, and no freeze or browser acceptance has been performed.
