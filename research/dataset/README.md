@@ -39,3 +39,5 @@ For reviewed asset identities and optional geometry, see [B01B workflow](reviewe
 For field-level technical/O&M candidates and import, see [B02 workflow](reviewed_om_loading.md).
 
 - [Reviewed documents and 3D loading](reviewed_media_loading.md)
+
+- [Reviewed model mapping and 3D eligibility](reviewed_model_mapping.md)

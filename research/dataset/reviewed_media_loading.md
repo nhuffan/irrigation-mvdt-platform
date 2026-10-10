@@ -24,6 +24,6 @@ Retain the original SKP, converter version/archive hash, invocation, output hash
 
 Use the existing research-data importer for a reviewed models batch, following its dry-run/apply/retry workflow. Keep LOCAL coordinates and null geographic placement when survey alignment is unavailable. The web viewer supports LOCAL preview without inventing an Earth position. Verify metadata, content hash, Range responses, reservoir listing and asset-link responses after import.
 
-Do not add model_asset_links until object-to-asset mappings have been reviewed. For B03 the four candidate mappings remain AMBIGUOUS/UNVERIFIED, deferred by the user. No new asset is created from a model object. The reference GLB is about 137 MiB and has not been optimized for constrained devices.
+Do not add model_asset_links until object-to-asset mappings have been reviewed. The B03 initial mapping review was deferred. Follow the later reviewed mapping workflow in [reviewed_model_mapping.md](reviewed_model_mapping.md) for exact object and eligibility decisions. No new asset is created from a model object. The reference GLB is about 137 MiB and has not been optimized for constrained devices.
 
 Update only imported document/model/link IDs in the private scope allowlist; preserve missing expected documents in the denominator. Re-run empirical readiness. A rendered model and successful API responses do not constitute full functional acceptance or authorize a dataset freeze.

@@ -42,7 +42,8 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
       <p className="muted break-all">{link.object_key}</p>
       <VerificationBadge status={link.verification_status} />
       <p className="muted text-sm mt-3">
-        Mapping verification is separate from the asset condition.
+        This link identifies the asset through the selected object; other parts may
+        remain unlinked. Mapping verification is separate from the asset condition.
       </p>
       {error ? (
         <p role="alert">Unable to load asset summary.</p>
@@ -55,6 +56,10 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
             <dd>
               {data[0].name} · {data[0].asset_code}
             </dd>
+          </div>
+          <div>
+            <dt>Asset ID</dt>
+            <dd className="break-all">{link.asset_id}</dd>
           </div>
           <div>
             <dt>Category</dt>

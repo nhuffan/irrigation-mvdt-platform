@@ -1,1 +1,1 @@
-model_code,asset_code,object_key,mapping_status,verification_status,reviewer,reviewed_at,notes
+model_code,asset_code,object_key,object_name,mapping_status,mapping_basis,source_evidence,visual_evidence,reviewer,reviewed_at,rationale
