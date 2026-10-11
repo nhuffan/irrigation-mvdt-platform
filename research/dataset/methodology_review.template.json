@@ -1,0 +1,44 @@
+{
+  "protocol": "STAGE-5B-MC-v1",
+  "dataset_version": "",
+  "files": {
+    "claim_sources": {
+      "path": "claim_sources.csv",
+      "sha256": ""
+    },
+    "evidence_index": {
+      "path": "evidence_index.csv",
+      "sha256": ""
+    },
+    "maim_review": {
+      "path": "maim_review.csv",
+      "sha256": ""
+    },
+    "readiness_gates": {
+      "path": "readiness_gates.csv",
+      "sha256": ""
+    },
+    "reviewer_independence_review": {
+      "path": "reviewer_independence_review.csv",
+      "sha256": ""
+    },
+    "source_boundary_review": {
+      "path": "source_boundary_review.csv",
+      "sha256": ""
+    },
+    "source_review": {
+      "path": "source_review.csv",
+      "sha256": ""
+    }
+  },
+  "approval": {
+    "status": "PENDING",
+    "reviewer": "",
+    "reviewed_at": "",
+    "reviewer_kind": "",
+    "package_sha256": "",
+    "evidence_reference": "",
+    "unknown_ownership_acknowledged": false,
+    "reviewer_limitations_acknowledged": false
+  }
+}

@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from scripts.methodology_review import PROTOCOL, load_methodology, validate_methodology
 from scripts.research_common import digest, research_code, validate_scope
 
 SPEC = "STAGE-5B-v1"
@@ -49,21 +50,22 @@ def boolean(value):
 
 
 def base_scope_fingerprint(base):
-    return digest(
-        {
-            key: base.get(key)
-            for key in (
-                "dataset_version",
-                "data_origin",
-                "as_of_date",
-                "reservoir_ids",
-                "record_ids",
-                "maim_required",
-                "not_applicable",
-                "conflict_reviews",
-            )
-        }
-    )
+    fields = {
+        key: base.get(key)
+        for key in (
+            "dataset_version",
+            "data_origin",
+            "as_of_date",
+            "reservoir_ids",
+            "record_ids",
+            "maim_required",
+            "not_applicable",
+            "conflict_reviews",
+        )
+    }
+    if "methodology_protocol" in base:
+        fields["methodology_protocol"] = base["methodology_protocol"]
+    return digest(fields)
 
 
 def compile_scope(
@@ -75,8 +77,16 @@ def compile_scope(
     acceptance,
     validate_output=True,
     applicability=None,
+    methodology=None,
 ):
     errors = []
+    mc_required = base.get("methodology_protocol") == PROTOCOL
+    if base.get("methodology_protocol") not in (None, PROTOCOL):
+        errors.append("Unsupported methodology protocol")
+    if mc_required and methodology is None:
+        errors.append("MC: formal methodology input required by base scope")
+    if methodology is not None and not mc_required:
+        errors.append("MC: declare methodology_protocol in the reviewed base scope")
     applicability = applicability or []
     fingerprint = base_scope_fingerprint(base)
     applicability_input_sha256 = digest(
@@ -212,7 +222,11 @@ def compile_scope(
             errors.append(f"Unapproved source type: {code}")
         if not all(
             source.get(k)
-            for k in ("title", "source_owner", "authority_level", "evidence_reference")
+            for k in (
+                ("title",)
+                if mc_required
+                else ("title", "source_owner", "authority_level", "evidence_reference")
+            )
         ):
             errors.append(f"Source ownership/evidence missing: {code}")
         if source.get("verification_status") not in (
@@ -293,8 +307,30 @@ def compile_scope(
             errors.append(f"N/A acceptance needs rationale: {check_id}")
     if seen_checks != expected_checks:
         errors.append("Incomplete functional acceptance checklist")
+    mc_fingerprint = None
+    if methodology is not None:
+        mc_errors, mc_fingerprint = validate_methodology(
+            {
+                "dataset_version": base.get("dataset_version"),
+                "base_scope_sha256": fingerprint,
+                "record_ids": base.get("record_ids", {}),
+                "targets": targets,
+                "sources": sources,
+                "requirements": requirements,
+                "review": review,
+                "acceptance": acceptance,
+                "applicability": applicability,
+            },
+            methodology,
+        )
+        errors.extend(mc_errors)
     if errors:
         return {
+            **(
+                {"methodology_package_sha256": mc_fingerprint}
+                if methodology is not None
+                else {}
+            ),
             "status": "NOT_READY",
             "base_scope_sha256": fingerprint,
             "blockers": sorted(set(errors)),
@@ -356,6 +392,16 @@ def compile_scope(
                 "applicability": applicability,
             }
         )
+    if methodology is not None:
+        scope["empirical_review"]["methodology"] = methodology
+        scope["empirical_review"]["methodology_package_sha256"] = mc_fingerprint
+        scope["empirical_review"]["input_sha256"] = digest(
+            {
+                "legacy_input_sha256": scope["empirical_review"]["input_sha256"],
+                "methodology": methodology,
+                "methodology_package_sha256": mc_fingerprint,
+            }
+        )
     if validate_output:
         validate_scope(scope)
     return {
@@ -380,6 +426,7 @@ def validate_compiled_scope(scope):
             evidence["acceptance"],
             validate_output=False,
             applicability=evidence.get("applicability"),
+            methodology=evidence.get("methodology"),
         )
     except (KeyError, TypeError) as error:
         raise ValueError("Incomplete empirical review bundle") from error
@@ -416,6 +463,7 @@ def main():
     ):
         parser.add_argument("--" + key, type=Path, required=True)
     parser.add_argument("--applicability", type=Path)
+    parser.add_argument("--methodology", type=Path)
     args = parser.parse_args()
     report, scope = compile_scope(
         json.loads(args.base_scope.read_text()),
@@ -425,6 +473,7 @@ def main():
         json.loads(args.review.read_text()),
         read_rows(args.acceptance),
         applicability=read_rows(args.applicability) if args.applicability else None,
+        methodology=load_methodology(args.methodology) if args.methodology else None,
     )
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "readiness.json").write_text(json.dumps(report, indent=2) + "\n")

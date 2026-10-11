@@ -68,8 +68,8 @@ cannot establish ownership, authenticity or research eligibility.
 
 ## Readiness and handoff
 
-SA is an **auxiliary review artifact**, not a new formal input to the empirical
-scope compiler. Compiler code, source inventory and case-study approvals remain
+At completion of SA, this was an **auxiliary review artifact**, not a new formal input to the empirical
+scope compiler. **MC supersedes that integration state:** see [methodology checkpoint review](../evaluation/methodology_checkpoint_review.md) for the formal inputs and current CLI. The remaining paragraph describes the SA-stage boundary. At that stage, compiler code, source inventory and case-study approvals remained
 unchanged. In particular, do not fill inventory owner/authority fields with
 `UNKNOWN` just to satisfy nonempty compiler checks. The SA package fingerprint
 binds the new review independently; the unchanged legacy compiler fingerprint

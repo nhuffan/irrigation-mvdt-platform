@@ -8,7 +8,7 @@ Use `dataset/target_assets.csv`, `source_inventory.csv` and `maim_requirements.c
 
 Declare required fields by category. A required technical row needs its attribute key and expected unit (blank means no unit); all required attributes must have verified, nonmissing values. Zero is a value. Per-asset N/A exceptions need a written rationale in the base scope and review; they cannot remove assets from the identification/GIS/condition denominator. 3D eligibility comes from each target's `requires_3d`, independently of category-wide requirements.
 
-Complete the study boundary, inventory, MAIM, source authority, identity, geometry, DEV separation and checkpoints A–D in `case_study_review.template.json`. Every approval requires an evidence reference and the review requires a reviewer and timezone-aware timestamp. Sources require ownership, an eligible source type, authority/verification metadata and explicit digital-file expectation. A missing expected file remains in the denominator.
+Complete the study boundary, inventory, MAIM, source authority, identity, geometry, DEV separation and checkpoints A–D in `case_study_review.template.json`. Every approval requires an evidence reference and the review requires a reviewer and timezone-aware timestamp. Legacy sources require ownership, an eligible source type, authority/verification metadata and explicit digital-file expectation. For a scope opted into `STAGE-5B-MC-v1`, the formal source review and role-specific claim policy replace the blanket ownership/authority nonempty check; unknowns require explicit human acknowledgment and do not become verified. A missing expected file remains in the denominator.
 
 Fill the existing `functional_validation.csv` from actual browser/manual checks on the intended dataset. Core checks F01–F06 and F19 must PASS. When 3D targets are selected, F12–F14, F16–F17 and F20–F21 must also PASS. Other checks can be N/A only with rationale; all blocking rows need reviewer, date and evidence. F15 per-object highlight is a disclosed limitation, not a freeze blocker. Correct selection panel and Asset ID resolution still require acceptance. Automated backend tests do not replace browser evidence.
 
@@ -30,6 +30,10 @@ uv run python -m scripts.prepare_empirical_scope \
 The first run reports `base_scope_sha256`. Review that exact scope, record its fingerprint in the review, resolve blockers and rerun to a **new** output directory. Exit 2 means NOT_READY and produces only readiness.json. READY_TO_FREEZE also produces scope.json. This checks declared evidence consistency; it does not authenticate reviewers or verify the truth of their evidence. Changes to record allowlists, date, N/A or conflict decisions require renewed review. Embedded input hashes preserve the reviewed inventories; freeze/evaluation revalidate the compiled bundle.
 
 Use the existing transactional import dry-run/apply workflow and archive import logs. Freeze with `scripts.freeze_research_dataset --scope <compiled scope.json> --output <new frozen directory>`, then evaluate with `scripts.evaluate_research_dataset --snapshot <snapshot.json> --output <new results directory>`. Do not use the legacy scope template directly for Stage 5B. Mark version.json frozen only after real acceptance, freeze and archival. A proposed DT-R1 label in a template is not a published dataset.
+
+## MC methodology closure
+
+The current MC workflow uses formal checksummed source, boundary, MAIM, reviewer, claim and readiness-gate inputs. See [methodology checkpoint review](methodology_checkpoint_review.md) for the complete CLI including `--methodology`, approval fingerprinting and compatibility policy. Once the reviewed base declares `methodology_protocol: STAGE-5B-MC-v1`, the legacy command above intentionally returns NOT_READY without that input. Do not remove the opt-in or reuse older approval to bypass MC.
 
 ## Metric specification STAGE-5B-v1
 
