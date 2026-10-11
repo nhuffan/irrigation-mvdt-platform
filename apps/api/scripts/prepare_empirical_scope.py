@@ -67,10 +67,74 @@ def base_scope_fingerprint(base):
 
 
 def compile_scope(
-    base, targets, sources, requirements, review, acceptance, validate_output=True
+    base,
+    targets,
+    sources,
+    requirements,
+    review,
+    acceptance,
+    validate_output=True,
+    applicability=None,
 ):
     errors = []
+    applicability = applicability or []
     fingerprint = base_scope_fingerprint(base)
+    applicability_input_sha256 = digest(
+        {
+            "base_scope_sha256": fingerprint,
+            "targets": targets,
+            "sources": sources,
+            "requirements": requirements,
+        }
+    )
+    exemptions = set()
+    seen_applicability = set()
+    controlled = {
+        "F02": "Asset GIS and geometry accuracy",
+        "F05": "Descending O&M timeline",
+    }
+    for decision in applicability:
+        check_id = decision.get("check_id")
+        if check_id not in controlled or check_id in seen_applicability:
+            errors.append("Unknown/duplicate applicability item")
+            continue
+        seen_applicability.add(check_id)
+        if decision.get("decision") != "APPROVED_NA":
+            continue  # Pending/keep-fail reviews never relax acceptance.
+        valid = (
+            decision.get("dataset_version") == base.get("dataset_version")
+            and decision.get("base_scope_sha256") == fingerprint
+            and decision.get("scope_input_sha256") == applicability_input_sha256
+            and decision.get("original_requirement") == controlled[check_id]
+            and decision.get("original_status") == "FAIL"
+            and decision.get("evidence_found") == "false"
+            and decision.get("proposed_applicability") == "N/A"
+            and decision.get("requires_retest") == "true"
+            and decision.get("retest_status") == "PASS"
+            and all(
+                isinstance(decision.get(k), str) and decision[k].strip()
+                for k in (
+                    "evidence_review_scope",
+                    "reviewer",
+                    "reviewed_at",
+                    "rationale",
+                    "protocol_effect",
+                    "decision_reference",
+                    "retest_evidence_reference",
+                )
+            )
+        )
+        try:
+            valid = (
+                valid
+                and datetime.fromisoformat(decision["reviewed_at"]).tzinfo is not None
+            )
+        except (KeyError, ValueError, TypeError):
+            valid = False
+        if not valid:
+            errors.append(f"Invalid controlled applicability review: {check_id}")
+        else:
+            exemptions.add(check_id)
     if review.get("base_scope_sha256") != fingerprint:
         errors.append(
             "Base scope/record allowlists changed or not reviewed; record their SHA-256"
@@ -215,7 +279,15 @@ def compile_scope(
             )
         ):
             errors.append(f"Browser acceptance pending: {check_id}")
-        if check_id in mandatory_checks and row.get("status") != "PASS":
+        if (
+            check_id in mandatory_checks
+            and row.get("status") != "PASS"
+            and not (
+                check_id in exemptions
+                and row.get("status") == "N/A"
+                and row.get("function") == controlled[check_id]
+            )
+        ):
             errors.append(f"Core functional acceptance must pass: {check_id}")
         if row.get("status") == "N/A" and not row.get("notes"):
             errors.append(f"N/A acceptance needs rationale: {check_id}")
@@ -271,6 +343,19 @@ def compile_scope(
             }
         ),
     }
+    if applicability:
+        scope["empirical_review"]["applicability"] = applicability
+        scope["empirical_review"]["input_sha256"] = digest(
+            {
+                "base_scope_sha256": fingerprint,
+                "targets": targets,
+                "sources": sources,
+                "requirements": requirements,
+                "review": review,
+                "acceptance": acceptance,
+                "applicability": applicability,
+            }
+        )
     if validate_output:
         validate_scope(scope)
     return {
@@ -294,6 +379,7 @@ def validate_compiled_scope(scope):
             evidence["review"],
             evidence["acceptance"],
             validate_output=False,
+            applicability=evidence.get("applicability"),
         )
     except (KeyError, TypeError) as error:
         raise ValueError("Incomplete empirical review bundle") from error
@@ -329,6 +415,7 @@ def main():
         "output",
     ):
         parser.add_argument("--" + key, type=Path, required=True)
+    parser.add_argument("--applicability", type=Path)
     args = parser.parse_args()
     report, scope = compile_scope(
         json.loads(args.base_scope.read_text()),
@@ -337,6 +424,7 @@ def main():
         read_rows(args.maim),
         json.loads(args.review.read_text()),
         read_rows(args.acceptance),
+        applicability=read_rows(args.applicability) if args.applicability else None,
     )
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "readiness.json").write_text(json.dumps(report, indent=2) + "\n")

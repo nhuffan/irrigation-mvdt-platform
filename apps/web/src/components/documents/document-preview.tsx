@@ -67,7 +67,7 @@ export function DocumentPreview({
       )}
       <a
         className="text-link"
-        href={state.url}
+        href={`/api/media/documents/${doc.id}?download=true`}
         download={doc.original_file_name}
       >
         Download {doc.original_file_name}

@@ -191,3 +191,15 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Before/after toàn bộ DB rows và stored media hashes giống nhau; targets/source inventory/MAIM/base-scope/GLB/review/eligibility giữ nguyên. Chỉ cập nhật private functional result metadata. Base fingerprint vẫn `b6a50803864d4e3d425edcc649aafb6b0a35cb1c6576a8076c95cabafbc57751`. Full-input fingerprint mới lưu trong private FV/fingerprints.json. Không đổi denominator, approval, source authority hoặc maturity; không freeze DT-R1.
 - Readiness tại private `reviewed/check-FV/` còn NOT_READY (F02/F05/F09 và review nguồn/phương pháp). Report, ma trận và evidence private tại `research/evaluation/evidence/FV/`. Thêm hướng dẫn `research/evaluation/functional_acceptance.md`; không thay schema/API/UI hoặc README.
 - Đã dừng đúng API/web của task và xác minh không còn listener 8000/3000. PostGIS healthy và Docker Desktop được giữ vì đã chạy trước task; không xóa volume.
+
+## Stage 5B-FV-R output
+
+**Trạng thái: F09 đã xử lý; FV-R chưa đóng vì F02/F05 vẫn KEEP_FAIL. Stage 5B NOT_READY, chưa chuyển SA.**
+
+- Đổi Download từ Blob URL sang attachment endpoint cùng origin đã có sẵn. Chrome thực tế phát download-complete và trả file; 769.124 bytes, SHA-256 khớp RS-DOC-017. Filename có hậu tố `(2)` do Chrome tránh trùng. Preview PDF vẫn hoạt động; Range qua frontend trả 206. F09 FAIL→PASS, ma trận **15 PASS / 3 FAIL / 3 N/A**.
+- Đã đọc exact F05, rà index XL1/XL5 và đọc có giới hạn các trang scan ưu tiên. XL1 là điều chỉnh thiết kế; XL5 quantity minutes thiếu ngày/tháng thực tế. Không lấy ngày hợp đồng làm sự kiện O&M; không import. Review chưa bao phủ toàn archive, không kết luận không có bằng chứng.
+- Phát hiện bản đồ hệ thống ghi WGS 1984 UTM Zone 48N, tỷ lệ 1:100.000; giữ nguồn reference để review vì chưa có geometry chi tiết/tolerance được chấp nhận. Không tuyên bố archive thiếu mọi nguồn CRS. Geometry bốn RS assets vẫn NULL.
+- Tạo private `fv_applicability_review.csv`: F02/F05 KEEP_FAIL, chưa duyệt N/A. Compiler thêm `--applicability` có gate reviewer/time/decision/retest, bind dataset/base-scope/targets/sources/MAIM và fingerprint; chỉ F02/F05 có thể exempt khi đủ review. Pending/stale/duplicate/unrelated không bỏ qua gate; compiled scope revalidate cùng evidence. Thêm template và hướng dẫn remediation; giữ F15 nonblocking FAIL.
+- **234 backend tests, 8 web tests đạt**; Ruff/format, ESLint, TypeScript, production build đạt. DB và media so với baseline FV giữ nguyên, protected input hashes không đổi; không nâng authority/maturity hay sửa denominator. Chỉ matrix F09 và private review mới thay đổi.
+- Lưu bằng chứng download, source page coverage, report và old/new hashes private tại `research/evaluation/evidence/FV-R/`. Full-input fingerprint mới `a46faaba02325e771f29f8fd12b0a53b3080cfebd4f079bda2b92f1c92caa8e0`. `reviewed/check-FV-R/` vẫn NOT_READY vì F02/F05 và các gate nguồn/phương pháp; không freeze.
+- Đã dừng API/web do task khởi chạy và xác minh không còn listener 8000/3000. PostGIS healthy và Docker Desktop có trước task được giữ nguyên; volume không thay đổi.
