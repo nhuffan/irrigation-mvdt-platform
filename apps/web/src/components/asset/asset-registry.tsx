@@ -7,7 +7,7 @@ export function AssetRegistry({ assets }: { assets: Asset[] }) {
       <div className="panel">
         <h3 className="font-semibold">No assets registered</h3>
         <p className="muted mt-2">
-          No verified assets are currently available for this reservoir.
+          No assets are registered in this dataset scope.
         </p>
       </div>
     );
@@ -41,7 +41,7 @@ export function AssetRegistry({ assets }: { assets: Asset[] }) {
                 <td>
                   <AssetStatus status={asset.data_status} />
                 </td>
-                <td>{asset.geometry?.type ?? "Not recorded"}</td>
+                <td>{asset.geometry?.type ?? "Not available in this dataset"}</td>
                 <td>
                   {asset.parent_asset_id ? (
                     <Link

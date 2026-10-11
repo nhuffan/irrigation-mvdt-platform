@@ -203,3 +203,18 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - **234 backend tests, 8 web tests đạt**; Ruff/format, ESLint, TypeScript, production build đạt. DB và media so với baseline FV giữ nguyên, protected input hashes không đổi; không nâng authority/maturity hay sửa denominator. Chỉ matrix F09 và private review mới thay đổi.
 - Lưu bằng chứng download, source page coverage, report và old/new hashes private tại `research/evaluation/evidence/FV-R/`. Full-input fingerprint mới `a46faaba02325e771f29f8fd12b0a53b3080cfebd4f079bda2b92f1c92caa8e0`. `reviewed/check-FV-R/` vẫn NOT_READY vì F02/F05 và các gate nguồn/phương pháp; không freeze.
 - Đã dừng API/web do task khởi chạy và xác minh không còn listener 8000/3000. PostGIS healthy và Docker Desktop có trước task được giữ nguyên; volume không thay đổi.
+
+
+## Stage 5B-GV output
+
+**GV đã thực hiện; Stage 5B vẫn NOT_READY. F02/F05 giữ FAIL / PENDING_EVIDENCE, không đổi N/A hoặc freeze DT-R1.**
+
+- Tách registry/map thành Research (RS), Development (DEV), Other; mặc định RS khi có, không hard-code hồ/asset. Browser xác nhận RS 4 identities / 0 geometry và DEV 4 / 3 geometry riêng. Geometry NULL có thông báo rõ, không tạo marker hoặc hiển thị CRS asset khi chưa có geometry. Basemap/reservoir center chỉ là bối cảnh điều hướng.
+- Chrome trên production kiểm tra đủ 5 PDF: metadata, source, preview và download-complete; mọi file tải về khớp size/SHA-256 lưu trong DB. F09 đã PASS từ FV-R và vẫn PASS. DOC001 lần đầu timeout, thử lại sau preview ổn định thành công; không lấy HTTP-only làm bằng chứng browser.
+- GLB LOCAL render, zoom/reset/rotate đạt; canvas mái `G-No_Name_008` mở đúng RS-DT-MGMT, clear/unlinked/reselect không giữ sai asset. Water `23`, cây `Deciduous Tree 005: Ash.012`, Background không resolve asset. 3D → MGMT detail → deep link model và truy cập asset trực tiếp đạt. Mapping chỉ là điểm chọn đại diện, không toàn bộ semantic geometry; F15 highlight vẫn nonblocking FAIL.
+- Bốn RS thiếu condition và rỗng O&M hiển thị đúng. Ba DAM technical giữ nguyên nhãn, 0.6 m / 28 m (datum chưa xác định) / 361.5 m và nguồn RS-SRC-007. Provenance phân biệt record, source, document, model và link; source authority/owner chưa được nâng.
+- Baseline kỹ thuật: GLB 144.006.072 bytes, 11.758 nodes đều có mesh, 3.669 mesh definitions; Chrome/macOS Apple M5/16 GiB. Reload navigation 0,353 s; quan sát thấy model trong 9,120 s và xác nhận canvas selectable trong 40,106 s. Đây là **upper bounds gồm automation/decision/scroll overhead**, cache không xóa, không phải đo cold-load hay empirical metric. Không tối ưu/re-export GLB.
+- **234 backend tests, 8 web picking tests đạt**; Ruff/format 83 files, ESLint, TypeScript, production build đạt. Warnings Starlette/Node đã có. API/web kiểm thử riêng 8001/3001 có CORS đúng origin; không mở rộng cấu hình API của người dùng.
+- Snapshot toàn DB và stored media trước/sau giống hệt; RS assets 4, technical 3, condition/inspection/repair/maintenance 0, model links 1; current condition đều NULL. Protected inputs và GLB hash không đổi so với FV-R. Private evidence/checklist/logs tại `research/evaluation/evidence/GV/`; matrix FV giữ nguyên 15 PASS / 3 FAIL / 3 N/A.
+- Readiness mới `reviewed/check-GV/` vẫn NOT_READY, giữ full-input fingerprint FV-R. **Awaiting user-supplied geometry/O&M evidence review.** Theo roadmap GV mới, có thể tiếp tục SA source authority/ownership trong lúc chờ F02/F05; xem `research/evaluation/gis_3d_continuation.md`. Không thực hiện SA hoặc tự duyệt methodology trong GV.
+- Đã dừng API/web kiểm thử ở 8001/3001 và xác minh không còn listener; production build đã khôi phục về cấu hình API mặc định và build đạt. API 8000, web 3000, PostGIS healthy và Docker Desktop có trước task được giữ nguyên; không xóa volume.

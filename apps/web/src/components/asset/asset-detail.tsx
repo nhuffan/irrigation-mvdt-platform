@@ -98,9 +98,9 @@ export async function AssetDetail({ asset }: { asset: Asset }) {
         <div className="section-heading">
           <div>
             <p className="eyebrow">Spatial information</p>
-            <h2>{asset.geometry?.type ?? "Geometry not recorded"}</h2>
+            <h2>{asset.geometry?.type ?? "Spatial geometry: Not available in this dataset"}</h2>
           </div>
-          <span className="muted text-sm">WGS 84 · EPSG:4326</span>
+          {asset.geometry && <span className="muted text-sm">WGS 84 · EPSG:4326</span>}
         </div>
         <AssetMap reservoir={reservoir} assets={[asset]} />
       </section>

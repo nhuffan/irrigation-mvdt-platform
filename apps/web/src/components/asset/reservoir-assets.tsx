@@ -1,7 +1,6 @@
 import { getReservoirAssets } from "@/lib/api";
 import type { Reservoir } from "@/types/reservoir";
-import { AssetMap } from "@/components/map/asset-map";
-import { AssetRegistry } from "./asset-registry";
+import { AssetExplorer } from "./asset-explorer";
 export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
   const assets = await getReservoirAssets(reservoir.id);
   return (
@@ -13,12 +12,7 @@ export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
         </div>
         <span className="muted">{assets.length} records</span>
       </div>
-      <div id="asset-gis">
-        <AssetMap reservoir={reservoir} assets={assets} />
-      </div>
-      <div className="mt-6">
-        <AssetRegistry assets={assets} />
-      </div>
+      <AssetExplorer reservoir={reservoir} assets={assets} />
     </section>
   );
 }

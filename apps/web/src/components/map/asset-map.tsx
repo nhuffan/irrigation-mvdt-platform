@@ -244,8 +244,9 @@ export function AssetMap({
         </p>
       ) : mapped.length === 0 ? (
         <p className="muted mt-3" role="status">
-          Asset records are available, but spatial geometry has not yet been
-          recorded or verified. Centered on the reservoir.
+          Spatial geometry: Not available in this dataset. Asset identities remain
+          accessible in the registry. The reservoir center and basemap are
+          navigation context, not asset location evidence.
         </p>
       ) : (
         <>
