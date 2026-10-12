@@ -10,6 +10,17 @@ from pathlib import Path
 from scripts.research_common import digest
 
 PROTOCOL = "STAGE-5B-MC-v1"
+APPROVAL_POLICY = "ROLE_SCOPED-v1"
+APPROVAL_ROLES = {
+    "RESEARCHER_APPROVAL": "RESEARCHER",
+    "DOMAIN_REVIEW": "DOMAIN_EXPERT",
+    "CUSTODIAN_CONFIRMATION": "CUSTODIAN",
+    "INDEPENDENT_REVIEW": "INDEPENDENT_REVIEWER",
+}
+REQUIRED_APPROVALS = {
+    ("RESEARCHER_APPROVAL", "METHODOLOGY_PACKAGE"),
+    ("DOMAIN_REVIEW", "MAIM"),
+}
 TABLES = {
     "source_review",
     "source_boundary_review",
@@ -87,6 +98,16 @@ def load_methodology(path):
         }
         # Preserve BOM bytes in the embedded content as well as the disk checksum.
         declaration["inputs"][name]["content"] = raw.decode("utf-8")
+    if "closure_files" in declaration:
+        declaration["closure_inputs"] = {}
+        for name, entry in declaration.pop("closure_files").items():
+            raw = (path.parent / entry["path"]).read_bytes()
+            if hashlib.sha256(raw).hexdigest() != entry["sha256"]:
+                raise ValueError(f"MC-R closure checksum mismatch: {name}")
+            declaration["closure_inputs"][name] = {
+                "sha256": entry["sha256"],
+                "content": raw.decode("utf-8"),
+            }
     return declaration
 
 
@@ -109,6 +130,47 @@ def timestamp(value):
 
 def reviewed(row):
     return bool(row.get("reviewer", "").strip()) and timestamp(row.get("reviewed_at"))
+
+
+def validate_role_approvals(approval, fingerprint):
+    """Validate scoped declarations, not the real-world identity of a signer."""
+    errors = []
+    accepted, seen = set(), set()
+    entries = approval.get("entries", []) if isinstance(approval, dict) else None
+    if not isinstance(entries, list):
+        return ["MC-R: approval entries must be a list"]
+    for entry in entries:
+        if not isinstance(entry, dict):
+            errors.append("MC-R: malformed approval entry")
+            continue
+        kind, scope = entry.get("approval_type"), entry.get("scope")
+        if not isinstance(kind, str) or not isinstance(scope, str) or not scope.strip():
+            errors.append("MC-R: missing approval type/scope")
+            continue
+        key = (kind, scope)
+        valid = (
+            key not in seen
+            and kind in APPROVAL_ROLES
+            and entry.get("reviewer_role") == APPROVAL_ROLES.get(kind)
+            and entry.get("package_fingerprint") == fingerprint
+            and isinstance(entry.get("reviewer_name"), str)
+            and bool(entry["reviewer_name"].strip())
+            and timestamp(entry.get("reviewed_at"))
+            and isinstance(entry.get("evidence"), str)
+            and bool(entry["evidence"].strip())
+            and entry.get("limitations_acknowledged") is True
+            and entry.get("decision") == "APPROVED"
+        )
+        seen.add(key)
+        if valid:
+            accepted.add(key)
+        else:
+            errors.append(
+                f"MC-R: invalid/stale/duplicate scoped approval: {kind}/{scope}"
+            )
+    for kind, scope in sorted(REQUIRED_APPROVALS - accepted):
+        errors.append(f"MC-R: required scoped approval pending: {kind}/{scope}")
+    return errors
 
 
 def validate_methodology(context, methodology):
@@ -348,7 +410,28 @@ def validate_methodology(context, methodology):
             fail(f"MC: required gate unresolved: {gid}")
 
     approval = methodology.get("approval", {})
-    if (
+    policy = methodology.get("approval_policy")
+    if policy is not None:
+        if policy != APPROVAL_POLICY:
+            fail("MC-R: unsupported approval policy")
+        else:
+            errors.extend(validate_role_approvals(approval, fingerprint))
+        closure = methodology.get("closure_inputs", {})
+        expected = {
+            "mc_r_gate_resolution",
+            "researcher_methodology_confirmation",
+            "maim_closure_review",
+            "ai_consistency_review",
+        }
+        if set(closure) != expected:
+            fail("MC-R: incomplete closure review bundle")
+        for name, entry in closure.items():
+            content = entry.get("content")
+            if not isinstance(content, str) or hashlib.sha256(
+                content.encode()
+            ).hexdigest() != entry.get("sha256"):
+                fail(f"MC-R: closure checksum mismatch: {name}")
+    elif (
         approval.get("status") != "APPROVED"
         or approval.get("package_sha256") != fingerprint
         or approval.get("reviewer_kind") not in {"HUMAN", "DOMAIN_EXPERT", "CUSTODIAN"}

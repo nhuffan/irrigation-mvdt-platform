@@ -1,0 +1,11 @@
+{
+  "approval_type": "RESEARCHER_APPROVAL",
+  "package_fingerprint": "",
+  "scope": "METHODOLOGY_PACKAGE",
+  "reviewer_role": "RESEARCHER",
+  "reviewer_name": "",
+  "reviewed_at": "",
+  "decision": "PENDING",
+  "evidence": "",
+  "limitations_acknowledged": false
+}

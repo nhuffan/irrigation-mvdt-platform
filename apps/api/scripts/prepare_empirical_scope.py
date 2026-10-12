@@ -65,6 +65,8 @@ def base_scope_fingerprint(base):
     }
     if "methodology_protocol" in base:
         fields["methodology_protocol"] = base["methodology_protocol"]
+    if "methodology_approval_policy" in base:
+        fields["methodology_approval_policy"] = base["methodology_approval_policy"]
     return digest(fields)
 
 
@@ -87,6 +89,11 @@ def compile_scope(
         errors.append("MC: formal methodology input required by base scope")
     if methodology is not None and not mc_required:
         errors.append("MC: declare methodology_protocol in the reviewed base scope")
+    policy = base.get("methodology_approval_policy")
+    if policy is not None and (policy != "ROLE_SCOPED-v1" or not mc_required):
+        errors.append("MC-R: unsupported base approval policy")
+    if methodology is not None and methodology.get("approval_policy") != policy:
+        errors.append("MC-R: approval policy differs from reviewed base scope")
     applicability = applicability or []
     fingerprint = base_scope_fingerprint(base)
     applicability_input_sha256 = digest(

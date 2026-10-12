@@ -148,3 +148,7 @@ may remain evidence for their unchanged narrow roles; they do not sign this new
 MC package. A promising source candidate is a FV-R review lead only. When new
 F02/F05 evidence arrives, review/import/retest through FV-R and rerun MC; only
 then consider the FR freeze/reproducibility stage.
+
+## MC-R role-scoped extension
+
+For current closure work use [methodology closure review](methodology_closure_review.md). Its declared ROLE_SCOPED-v1 policy supersedes the legacy single-reviewer approval for that package; legacy replay remains supported.

@@ -60,3 +60,5 @@ Predeclare the answer key, task wording/version, targets, success criteria, time
 Use DOMAIN_STAFF and RESEARCH_TEAM participant groups. Research-team timings are benchmarks, not domain-staff validation. Keep consent and identities outside Git; the profile template uses pseudonymous IDs. Questionnaire Q1–Q8 is custom, not SUS. Preserve missing/N/A answers and report each item's actual n, including n=0. Do not combine cohorts to imply a larger domain sample.
 
 Complete geometry review, qualitative coding and the results outline from evidence. Capture screenshots only from the frozen case study and link each table/figure to its dataset, metric specification and evidence archive. Report mapping/highlight limitations, missing sources, convenience sampling and small sample size explicitly. No claim of retrieval improvement, usability or research validation is warranted before those observations exist.
+
+MC-R adds opt-in role-scoped approval and closure evidence; see [methodology closure review](methodology_closure_review.md). The current case study requires separate researcher package and domain MAIM approvals; AI consistency review does not satisfy either.
