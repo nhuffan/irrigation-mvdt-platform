@@ -21,4 +21,16 @@ The current private export audit joins the imported technical batch provenance, 
 
 The GIS diagram is explicitly a conditional workflow, with QGIS preparation still pending for research geometry. LOCAL model selection is representative only; side-panel mapping does not imply object highlighting or full semantic decomposition. The source database may retain UNVERIFIED status even when a bounded field/source-role review is SUPPORTING; display these distinctions rather than silently rewriting source authority.
 
-The remaining methodological/domain approvals are documented in the package closure report. An actual as-of boundary cannot be inferred from the screenshot date. The optional summary card was not added because existing sections already expose the relevant states and counts.
+The remaining methodological/domain approvals are documented in the package closure report. An actual as-of boundary cannot be inferred from the screenshot date. The initial paper-preparation stage did not add a summary card; the subsequent PAPER-UI-GIS stage adds API-derived scope totals as described below.
+
+## Interactive asset explorer (PAPER-UI-GIS)
+
+The reservoir Assets section now shares selection across registry, map and evidence panel. `/map?asset=<UUID>` loads the asset's reservoir and opens its panel; `&paper=1` simplifies presentation without changing values, scope labels or missingness. The selected asset ID is synchronized through browser history. Geometry filters and 3D filters affect visible rows and map features; summary totals describe the full selected dataset scope. A selected asset excluded by a filter remains explicitly identified in the panel.
+
+Counts use existing API endpoints. Failed sections report Unavailable, not zero. Technical preview contains at most three records with explicit reviewed provenance; VERIFIED alone does not imply L2. O&M counts include only VERIFIED timeline events, and current condition uses the existing verified-current-condition endpoint. Document counts are API-linked documents, not the separate source-claim coverage metric in paper table T1. 3D actions use actual model/object links. No schema migration or research import is involved.
+
+Point, line and polygon selection uses GeoJSON property IDs via `promoteId` so UUID feature-state highlighting works. NULL geometry generates no feature. Controlled child assets use the same rendering and parent link; no special component names or coordinates are embedded in UI logic.
+
+`pnpm --dir apps/web test:explorer` runs the state/filter/provenance/count tests. Browser smoke additionally checks registry/map selection, deep links, Back, layer filters, real action targets and identical panel/summary content with paper mode on/off. Existing DEV geometry is used only to test interaction mechanics, never as RS evidence.
+
+The updated private `figure_state.json` uses schema version 2: `capture_sets` stores each snapshot and `figures` assigns every PNG to its actual capture set. Only S1/S2 were recaptured for this UI stage; S3–S6 and diagrams retain their original state. The previous package is archived under `evidence/PAPER-UI-GIS/previous-paper/`. Rehash `package_manifest.json` after changing outputs; do not stamp older figures with a new software commit or capture date.
