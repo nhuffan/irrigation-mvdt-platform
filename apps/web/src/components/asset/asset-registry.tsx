@@ -1,64 +1,14 @@
 import Link from "next/link";
 import type { Asset } from "@/types/asset";
-import { AssetStatus } from "./asset-status";
-export function AssetRegistry({ assets }: { assets: Asset[] }) {
-  if (assets.length === 0)
-    return (
-      <div className="panel">
-        <h3 className="font-semibold">No assets registered</h3>
-        <p className="muted mt-2">
-          No assets are registered in this dataset scope.
-        </p>
-      </div>
-    );
-  return (
-    <div className="asset-table-wrap">
-      <table className="asset-table">
-        <caption className="sr-only">Reservoir asset registry</caption>
-        <thead>
-          <tr>
-            <th scope="col">Asset</th>
-            <th scope="col">Category</th>
-            <th scope="col">Data status</th>
-            <th scope="col">Geometry</th>
-            <th scope="col">Parent</th>
-          </tr>
-        </thead>
-        <tbody>
-          {assets.map((asset) => {
-            const parent = assets.find(
-              (item) => item.id === asset.parent_asset_id,
-            );
-            return (
-              <tr key={asset.id}>
-                <th scope="row">
-                  <Link className="text-link" href={`/assets/${asset.id}`}>
-                    {asset.name}
-                  </Link>
-                  <span className="asset-code">{asset.asset_code}</span>
-                </th>
-                <td>{asset.category.name}</td>
-                <td>
-                  <AssetStatus status={asset.data_status} />
-                </td>
-                <td>{asset.geometry?.type ?? "Not available in this dataset"}</td>
-                <td>
-                  {asset.parent_asset_id ? (
-                    <Link
-                      className="text-link"
-                      href={`/assets/${asset.parent_asset_id}`}
-                    >
-                      {parent?.asset_code ?? "View parent"}
-                    </Link>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+import type { ExplorerRecords } from "@/lib/explorer-data";
+import { modelHref } from "@/lib/explorer-state";
+export function AssetRegistry({ assets, records, selectedId, onSelect }: { assets: Asset[]; records: ExplorerRecords; selectedId?: string; onSelect: (asset: Asset) => void }) {
+  return <div className="asset-table-wrap"><table className="asset-table"><caption className="sr-only">Reservoir asset registry</caption>
+    <thead><tr><th scope="col">Asset / type</th><th scope="col">Status / geometry</th><th scope="col">Records</th><th scope="col">Actions</th></tr></thead><tbody>
+    {assets.map(a => <tr key={a.id} className={a.id === selectedId ? "selected-asset" : ""} aria-selected={a.id === selectedId}>
+      <th scope="row"><button className="text-link" onClick={() => onSelect(a)}>{a.name}</button><span className="asset-code">{a.asset_code} · {a.category.name}</span></th>
+      <td>{a.data_status}<span className="asset-code">{a.geometry?.type ?? "Geometry unavailable"}</span></td>
+      <td>{records[a.id].technical?.length ?? "Unavailable"} technical<br />{records[a.id].events?.length ?? "Unavailable"} verified O&M<br />{records[a.id].links?.length ?? "Unavailable"} 3D links</td>
+      <td><div className="explorer-actions"><button className="text-link" onClick={() => onSelect(a)}>Select</button><button className="text-link" onClick={() => { onSelect(a); document.getElementById("asset-gis")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>View on Map</button><Link className="text-link" href={`/assets/${a.id}`}>View Detail</Link>{records[a.id].links?.map(l => <Link className="text-link" key={l.id} href={modelHref(a,l)}>View 3D</Link>)}</div></td>
+    </tr>)}</tbody></table>{!assets.length && <p className="panel">No assets match these filters.</p>}</div>;
 }

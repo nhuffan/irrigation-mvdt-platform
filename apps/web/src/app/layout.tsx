@@ -14,8 +14,7 @@ export default function RootLayout({
         <AppHeader />
         {children}
         <footer className="site-footer">
-          Development dataset · Coordinates and readiness levels are
-          illustrative, not verified research data.
+          Research and development records are labeled separately. Development coordinates and readiness levels are illustrative, not verified research evidence.
         </footer>
       </body>
     </html>

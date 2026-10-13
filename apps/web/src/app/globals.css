@@ -668,3 +668,79 @@ dd {
     min-height: 420px;
   }
 }
+
+.explorer-summary {
+  display:flex;
+  flex-wrap:wrap;
+  gap:1rem;
+  padding:1rem;
+  background:#edf5f4;
+  border:1px solid #b9d3d0;
+  border-radius:12px;
+  margin-bottom:1rem}
+.explorer-summary span {
+  flex:1;
+  min-width:110px;
+  font-size:.8rem}
+.explorer-summary strong {
+  display:block;
+  font-size:1.5rem;
+  color:#145e58}
+.explorer-filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.2rem;
+  margin:1rem 0}
+.explorer-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 360px;
+  gap:1.25rem;
+  align-items:start}
+.explorer-main {
+  min-width:0}
+.explorer-panel {
+  position:sticky;
+  top:1rem;
+  font-size:.85rem;
+  overflow-wrap:anywhere}
+.explorer-panel h2 {
+  font-size:1.3rem}
+.explorer-panel h3 {
+  font-weight:700;
+  margin:1.1rem 0 .4rem}
+.explorer-record {
+  padding:.65rem 0;
+  border-bottom:1px solid #dbe5e4}
+.explorer-record dt {
+  font-size:.7rem;
+  color:#526664;
+  margin-top:.3rem}
+.explorer-record dd {
+  margin:0;
+  font-size:.75rem}
+.explorer-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  font-size:.8rem}
+.selected-asset {
+  background:#e1f3ef;
+  box-shadow:inset 4px 0 #16786d}
+.asset-explorer .asset-table td,.asset-explorer .asset-table th {
+  padding:.65rem}
+.paper-mode .explorer-filters {
+  font-size:.8rem}
+body:has(.paper-mode) nextjs-portal {
+  display:none}
+.asset-explorer .asset-map-canvas {
+  height:480px}
+@media(max-width:1000px) {
+  .explorer-layout {
+  grid-template-columns:1fr}
+.explorer-panel {
+  position:static}
+}
+
+.asset-popup { max-height: 240px; overflow-y: auto; }
+.asset-popup p { margin: 3px 0; line-height: 1.35; }
+.asset-popup a { margin-top: 4px; }

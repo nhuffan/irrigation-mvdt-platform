@@ -5,11 +5,13 @@ import type {
   Popup as LibrePopup,
   LngLatLike,
 } from "maplibre-gl";
-import { getAssetModelLinks } from "@/lib/api";
+import type { ExplorerRecords } from "@/lib/explorer-data";
 import { geometryPositions } from "@/lib/asset-geometry";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
 
+const emptyRecords: ExplorerRecords = {};
+const ignoreSelection = () => {};
 const LAYERS = [
   "asset-points",
   "asset-lines",
@@ -18,18 +20,26 @@ const LAYERS = [
 ];
 export function AssetMap({
   reservoir,
-  assets,
+  assets, selectedId, onSelect = ignoreSelection, records = emptyRecords,
 }: {
   reservoir: Reservoir;
   assets: Asset[];
+  selectedId?: string;
+  onSelect?: (asset: Asset) => void;
+  records?: ExplorerRecords;
 }) {
+  const selection = useRef({ selectedId, onSelect });
+  useEffect(() => { selection.current = { selectedId, onSelect }; }, [selectedId, onSelect]);
+  const highlight = useRef<((id?: string) => void) | null>(null);
   const container = useRef<HTMLDivElement>(null);
   const selectAsset = useRef<((asset: Asset) => void) | null>(null);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">(
     "loading",
   );
   const mapped = assets.filter((asset) => asset.geometry !== null);
+  const assetsJson = JSON.stringify(assets);
   useEffect(() => {
+    const assets: Asset[] = JSON.parse(assetsJson);
     let disposed = false;
     let map: LibreMap | undefined;
     let popup: LibrePopup | undefined;
@@ -80,14 +90,14 @@ export function AssetMap({
         const showPopup = (asset: Asset, coordinate: LngLatLike) => {
           popup?.remove();
           const content = document.createElement("div");
-          content.className = "reservoir-popup";
+          content.className = "reservoir-popup asset-popup";
           const title = document.createElement("h3");
           title.textContent = asset.name;
           content.append(title);
           for (const value of [
             asset.asset_code,
             `Category: ${asset.category.name}`,
-            `Status: ${asset.data_status}`,
+            `${asset.data_status} · Geometry: ${asset.geometry?.type ?? "Unavailable"}`,
           ]) {
             const line = document.createElement("p");
             line.textContent = value;
@@ -97,23 +107,12 @@ export function AssetMap({
           link.textContent = "View Asset →";
           link.href = `/assets/${encodeURIComponent(asset.id)}`;
           content.append(link);
-          void getAssetModelLinks(asset.id)
-            .then((links) => {
-              if (disposed || !links.length) return;
-              const target = links[0];
-              const threeD = document.createElement("a");
-              threeD.textContent = "View in 3D →";
-              threeD.href = `/reservoirs/${asset.reservoir_id}/3d?model=${target.model_id}&object=${encodeURIComponent(target.object_key)}`;
-              threeD.style.display = "block";
-              content.append(threeD);
-            })
-            .catch(() => {
-              if (disposed) return;
-              const unavailable = document.createElement("p");
-              unavailable.textContent = "3D links could not be loaded.";
-              content.append(unavailable);
-            });
-          popup = new Popup({ maxWidth: "300px", offset: 12 })
+          for (const record of (records[asset.id]?.technical ?? []).slice(0, 2)) {
+            const line = document.createElement("p");
+            line.textContent = `${record.attribute_label}: ${record.value_number ?? record.value_text ?? "Unavailable"} ${record.unit ?? ""} · ${record.reviewed_provenance?.verification_level ?? record.verification_status}`;
+            content.append(line);
+          }
+          popup = new Popup({ maxWidth: "300px", offset: 12, anchor: "bottom" })
             .setLngLat(coordinate)
             .setDOMContent(content)
             .addTo(instance);
@@ -122,6 +121,7 @@ export function AssetMap({
           if (disposed) return;
           instance.addSource("assets", {
             type: "geojson",
+            promoteId: "id",
             data: { type: "FeatureCollection", features },
           });
           instance.addLayer({
@@ -129,21 +129,21 @@ export function AssetMap({
             type: "fill",
             source: "assets",
             filter: ["==", ["geometry-type"], "Polygon"],
-            paint: { "fill-color": "#7c3aed", "fill-opacity": 0.3 },
+            paint: { "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#7c3aed"], "fill-opacity": 0.3 },
           });
           instance.addLayer({
             id: "asset-polygon-outlines",
             type: "line",
             source: "assets",
             filter: ["==", ["geometry-type"], "Polygon"],
-            paint: { "line-color": "#6d28d9", "line-width": 2 },
+            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#6d28d9"], "line-width": 2 },
           });
           instance.addLayer({
             id: "asset-lines",
             type: "line",
             source: "assets",
             filter: ["==", ["geometry-type"], "LineString"],
-            paint: { "line-color": "#0369a1", "line-width": 5 },
+            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#0369a1"], "line-width": 5 },
           });
           instance.addLayer({
             id: "asset-points",
@@ -151,7 +151,7 @@ export function AssetMap({
             source: "assets",
             filter: ["==", ["geometry-type"], "Point"],
             paint: {
-              "circle-color": "#b45309",
+              "circle-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#b45309"],
               "circle-radius": 9,
               "circle-stroke-width": 3,
               "circle-stroke-color": "#ffffff",
@@ -162,7 +162,7 @@ export function AssetMap({
               layers: LAYERS,
             })[0];
             const asset = assets.find((item) => item.id === hit?.properties.id);
-            if (asset) showPopup(asset, event.lngLat);
+            if (asset) { selection.current.onSelect(asset); showPopup(asset, event.lngLat); }
           });
           instance.on("mousemove", (event) => {
             instance.getCanvas().style.cursor = instance.queryRenderedFeatures(
@@ -179,12 +179,19 @@ export function AssetMap({
               assetBounds.extend(position);
             const center = assetBounds.getCenter();
             instance.fitBounds(assetBounds, {
-              padding: 90,
+              padding: { top: Math.min(260, instance.getContainer().clientHeight * 0.55), bottom: 50, left: 70, right: 70 },
               maxZoom: 15,
               duration: 0,
             });
             showPopup(asset, center);
           };
+          highlight.current = (id) => {
+            for (const asset of assets) instance.setFeatureState({ source: "assets", id: asset.id }, { selected: asset.id === id });
+            const asset = assets.find(a => a.id === id);
+            popup?.remove();
+            if (asset?.geometry) selectAsset.current?.(asset);
+          };
+          highlight.current(selection.current.selectedId);
           if (timer) clearTimeout(timer);
           setMapState("ready");
         });
@@ -195,11 +202,13 @@ export function AssetMap({
     return () => {
       disposed = true;
       selectAsset.current = null;
+      highlight.current = null;
       if (timer) clearTimeout(timer);
       popup?.remove();
       map?.remove();
     };
-  }, [reservoir, assets]);
+  }, [reservoir, assetsJson, records]);
+  useEffect(() => { highlight.current?.(selectedId); }, [selectedId]);
   return (
     <div>
       <div className="map-frame asset-map-frame">
@@ -224,6 +233,7 @@ export function AssetMap({
           aria-label="Asset geometry legend"
         >
           <p className="eyebrow">Geometry</p>
+          <div><span className="status-dot" style={{ background: "#059669" }} />Selected</div>
           <div>
             <span className="status-dot" style={{ background: "#b45309" }} />
             Point
@@ -265,7 +275,7 @@ export function AssetMap({
                 key={asset.id}
                 className="locate-button"
                 disabled={mapState !== "ready"}
-                onClick={() => selectAsset.current?.(asset)}
+                onClick={() => { onSelect(asset); selectAsset.current?.(asset); }}
               >
                 Locate {asset.asset_code}
               </button>
