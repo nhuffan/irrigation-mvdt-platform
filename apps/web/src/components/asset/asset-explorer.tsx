@@ -7,6 +7,7 @@ import type { ExplorerRecords } from "@/lib/explorer-data";
 import { AssetMap } from "@/components/map/asset-map";
 import { AssetRegistry } from "./asset-registry";
 import { dataset, selectedAsset, filterAssets, recordTotal } from "@/lib/explorer-state";
+import { assetLocation, matchesSearch } from "@/lib/asset-location";
 import { ExplorerPanel } from "./explorer-panel";
 export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reservoir; assets: Asset[]; records: ExplorerRecords }) {
   const params = useSearchParams();
@@ -14,10 +15,15 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
   const paper = params.get("paper") === "1";
   const [scopeChoice, setScope] = useState<string | null>(null);
   const scope = selected ? dataset(selected) : scopeChoice ?? (assets.some(a => dataset(a) === "research") ? "research" : assets.some(a => dataset(a) === "development") ? "development" : "other");
-  const [geometryOnly, setGeometryOnly] = useState(false);
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [query, setQuery] = useState("");
+  const [type, setType] = useState("");
+  const [contextVisible, setContextVisible] = useState(true);
   const [modelOnly, setModelOnly] = useState(false);
   const scoped = assets.filter(a => dataset(a) === scope);
-  const visible = filterAssets(assets, scope, geometryOnly, modelOnly, records);
+  const visible = filterAssets(assets, scope, false, modelOnly, records).filter(a =>
+    (locationFilter === "all" || assetLocation(a).location_status === locationFilter) && matchesSearch(a, query, type));
+  const types = [...new Map(scoped.map(a => [a.category.code, a.category.name])).entries()];
   function select(asset?: Asset) {
     const url = new URL(window.location.href);
     if (asset) url.searchParams.set("asset", asset.id); else url.searchParams.delete("asset");
@@ -29,18 +35,21 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
   return <div className={paper ? "asset-explorer paper-mode" : "asset-explorer"}>
     <div className="explorer-summary" aria-label="Dataset summary">
       <span><strong>{scoped.length}</strong> {scope === "research" ? "Research assets" : scope === "development" ? "DEV assets" : "Unclassified assets"}</span>
-      <span><strong>{scoped.filter(a => a.geometry).length} / {scoped.filter(a => !a.geometry).length}</strong> Geometry available / missing</span>
+      <span><strong>{scoped.filter(a => assetLocation(a).location_status === "VERIFIED_GEOMETRY").length} / {scoped.filter(a => assetLocation(a).location_status === "REFERENCE_LOCATION").length} / {scoped.filter(a => assetLocation(a).location_status === "NO_LOCATION").length}</strong> Verified / reference / missing locations</span>
       <span><strong>{total("technical")}</strong> Technical records</span><span><strong>{total("events")}</strong> Verified O&M</span><span><strong>{total("links")}</strong> 3D links</span>
     </div>
-    <div className="explorer-filters"><label>Dataset scope <select value={scope} onChange={e => { setScope(e.target.value); select(); }}><option value="research">Research registry (RS)</option><option value="development">Development examples (DEV)</option><option value="other">Other / unclassified</option></select></label>
-    <label><input type="checkbox" checked={geometryOnly} onChange={e => setGeometryOnly(e.target.checked)} /> With geometry</label>
+    <div className="explorer-filters"><label>Dataset scope <select value={scope} onChange={e => { setScope(e.target.value); setType(""); select(); }}><option value="research">Research registry (RS)</option><option value="development">Development examples (DEV)</option><option value="other">Other / unclassified</option></select></label>
+    <label>Search assets <input type="search" placeholder="Name, ID or component" value={query} onChange={e => setQuery(e.target.value)} /></label>
+    <label>Location <select value={locationFilter} onChange={e => setLocationFilter(e.target.value)}><option value="all">All location states</option><option value="VERIFIED_GEOMETRY">Verified geometry</option><option value="REFERENCE_LOCATION">Reference location</option><option value="NO_LOCATION">Missing location</option></select></label>
+    <label>Asset type <select value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{types.map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label>
+    <label><input type="checkbox" checked={contextVisible} onChange={e => setContextVisible(e.target.checked)} /> Reservoir context</label>
     <label><input type="checkbox" checked={modelOnly} onChange={e => setModelOnly(e.target.checked)} /> With 3D</label></div>
-    <p className="muted mb-3">{scope === "development" ? "DEV · Synthetic development data; not research evidence." : "Registry identity does not imply reviewed geometry or source authority."} Basemap and reservoir center are navigation context only.</p>
+    <p className="muted mb-3">{scope === "development" ? "DEV · Synthetic development data; not research evidence." : "Reference locations are for navigation / presentation only, not verified GIS evidence."} Basemap and reservoir center are navigation context only.</p>
     {params.get("asset") && !selected && <p role="alert">Selected asset is unavailable in this reservoir.</p>}
     {selected && !visible.includes(selected) && <p role="status">Selected asset is excluded by the layer filters. Its information remains open.</p>}
     <div className="explorer-layout"><div className="explorer-main">
       <AssetRegistry assets={visible} records={records} selectedId={selected?.id} onSelect={select} />
-      <div id="asset-gis" className="mt-4"><AssetMap reservoir={reservoir} assets={visible} selectedId={selected?.id} onSelect={select} records={records} /></div>
-    </div>{selected ? <ExplorerPanel asset={selected} data={records[selected.id]} /> : <aside className="panel explorer-panel"><h2>Explore an asset</h2><p className="muted">Select a registry row or real map geometry to inspect its evidence and digital links.</p></aside>}</div>
+      <div id="asset-gis" className="mt-4"><AssetMap reservoir={reservoir} assets={visible} selectedId={selected?.id} onSelect={select} records={records} contextVisible={contextVisible} /></div>
+    </div>{selected ? <ExplorerPanel key={selected.id} asset={selected} assets={assets} data={records[selected.id]} onSelect={select} paper={paper} /> : <aside className="panel explorer-panel"><h2>Explore an asset</h2><p className="muted">Select a registry row or real map geometry to inspect its evidence and digital links.</p></aside>}</div>
   </div>;
 }

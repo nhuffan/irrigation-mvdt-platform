@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.models.asset import Asset
 from app.models.asset_category import AssetCategory
 from app.schemas.asset import AssetCategoryResponse, AssetResponse
+from app.services.asset_location import asset_location
 
 
 def asset_query():
@@ -36,7 +37,9 @@ def serialize_asset(row) -> AssetResponse:
         name=values.pop("category_name"),
     )
     values["geometry"] = json.loads(values["geometry"]) if values["geometry"] else None
-    return AssetResponse(**values, category=category)
+    asset = AssetResponse(**values, category=category)
+    asset.location = asset_location(asset)
+    return asset
 
 
 def list_assets(db: Session, reservoir_id: UUID) -> list[AssetResponse]:

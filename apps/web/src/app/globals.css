@@ -744,3 +744,19 @@ body:has(.paper-mode) nextjs-portal {
 .asset-popup { max-height: 240px; overflow-y: auto; }
 .asset-popup p { margin: 3px 0; line-height: 1.35; }
 .asset-popup a { margin-top: 4px; }
+
+.location-badge { display: inline-block; padding: 3px 7px; border-radius: 5px; font-size: 10px; font-weight: 700; letter-spacing: .03em; }
+.location-reference_location { color: #84480a; background: #fff2d7; border: 1px dashed #c77713; }
+.location-verified_geometry { color: #1e40af; background: #eaf1ff; border: 1px solid #93b7f5; }
+.location-no_location { color: #596872; background: #f0f3f4; border: 1px solid #cbd5dc; }
+.explorer-filters input[type=search], .explorer-filters select { padding: 5px 8px; border: 1px solid #b7cbc6; border-radius: 5px; background: white; }
+.explorer-filters { align-items: center; font-size: .8rem; }
+.explorer-panel .location-details { font-size: .75rem; }
+.location-details dt { color: #627570; margin-top: .4rem; }
+.location-details dd { margin: 0; }
+.explorer-panel details summary { cursor: pointer; color: #236b5d; margin-top: .4rem; }
+.explorer-panel section { padding-bottom: .4rem; border-bottom: 1px solid #e8eeeb; }
+.reference-dot { background: #fff2d7; border: 2px dashed #c77713; }
+.context-dot { background: white; border: 2px solid #64748b; }
+.asset-legend { font-size: 11px; max-width: 210px; }
+.asset-popup button { display: block; margin-top: 5px; font-size: 12px; }

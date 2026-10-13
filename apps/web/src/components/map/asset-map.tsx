@@ -6,6 +6,7 @@ import type {
   LngLatLike,
 } from "maplibre-gl";
 import type { ExplorerRecords } from "@/lib/explorer-data";
+import { assetLocation, mapGeometry, locationLayer } from "@/lib/asset-location";
 import { geometryPositions } from "@/lib/asset-geometry";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
@@ -20,13 +21,14 @@ const LAYERS = [
 ];
 export function AssetMap({
   reservoir,
-  assets, selectedId, onSelect = ignoreSelection, records = emptyRecords,
+  assets, selectedId, onSelect = ignoreSelection, records = emptyRecords, contextVisible = true,
 }: {
   reservoir: Reservoir;
   assets: Asset[];
   selectedId?: string;
   onSelect?: (asset: Asset) => void;
   records?: ExplorerRecords;
+  contextVisible?: boolean;
 }) {
   const selection = useRef({ selectedId, onSelect });
   useEffect(() => { selection.current = { selectedId, onSelect }; }, [selectedId, onSelect]);
@@ -36,7 +38,7 @@ export function AssetMap({
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">(
     "loading",
   );
-  const mapped = assets.filter((asset) => asset.geometry !== null);
+  const mapped = assets.filter((asset) => mapGeometry(asset) !== null);
   const assetsJson = JSON.stringify(assets);
   useEffect(() => {
     const assets: Asset[] = JSON.parse(assetsJson);
@@ -64,18 +66,20 @@ export function AssetMap({
           if (!disposed && !instance.loaded()) setMapState("error");
         }, 15000);
         const features = assets.flatMap((asset) =>
-          asset.geometry
+          mapGeometry(asset)
             ? [
                 {
                   type: "Feature" as const,
                   id: asset.id,
-                  geometry: asset.geometry,
+                  geometry: mapGeometry(asset)!,
                   properties: {
                     id: asset.id,
                     asset_code: asset.asset_code,
                     name: asset.name,
                     category: asset.category.code,
                     data_status: asset.data_status,
+                    location_status: assetLocation(asset).location_status,
+                    layer_kind: locationLayer(asset),
                   },
                 },
               ]
@@ -97,7 +101,8 @@ export function AssetMap({
           for (const value of [
             asset.asset_code,
             `Category: ${asset.category.name}`,
-            `${asset.data_status} · Geometry: ${asset.geometry?.type ?? "Unavailable"}`,
+            `${asset.data_status} · ${assetLocation(asset).location_status.replaceAll("_", " ")}`,
+            locationLayer(asset) === "DEV" ? "DEV example — not research evidence" : assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Navigation / presentation only. Not verified GIS evidence." : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
           ]) {
             const line = document.createElement("p");
             line.textContent = value;
@@ -107,18 +112,33 @@ export function AssetMap({
           link.textContent = "View Asset →";
           link.href = `/assets/${encodeURIComponent(asset.id)}`;
           content.append(link);
+          if (selection.current.onSelect !== ignoreSelection) {
+            const openPanel = document.createElement("button");
+            openPanel.className = "text-link";
+            openPanel.textContent = "Open Panel →";
+            openPanel.addEventListener("click", () => {
+              selection.current.onSelect(asset);
+              requestAnimationFrame(() => document.getElementById("selected-asset-panel")?.focus());
+            });
+            content.append(openPanel);
+          }
           for (const record of (records[asset.id]?.technical ?? []).slice(0, 2)) {
             const line = document.createElement("p");
             line.textContent = `${record.attribute_label}: ${record.value_number ?? record.value_text ?? "Unavailable"} ${record.unit ?? ""} · ${record.reviewed_provenance?.verification_level ?? record.verification_status}`;
             content.append(line);
           }
-          popup = new Popup({ maxWidth: "300px", offset: 12, anchor: "bottom" })
+          popup = new Popup({ maxWidth: "300px", offset: 12, anchor: "bottom", focusAfterOpen: false })
             .setLngLat(coordinate)
             .setDOMContent(content)
             .addTo(instance);
         };
         instance.on("load", () => {
           if (disposed) return;
+          instance.addSource("reservoir-context", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: contextVisible ? [{ type: "Feature", geometry: { type: "Point", coordinates: [reservoir.longitude, reservoir.latitude] }, properties: {} }] : [] },
+          });
+          instance.addLayer({ id: "reservoir-context", type: "circle", source: "reservoir-context", paint: { "circle-radius": 11, "circle-color": "#ffffff", "circle-opacity": 0.5, "circle-stroke-width": 2, "circle-stroke-color": "#64748b" } });
           instance.addSource("assets", {
             type: "geojson",
             promoteId: "id",
@@ -129,21 +149,21 @@ export function AssetMap({
             type: "fill",
             source: "assets",
             filter: ["==", ["geometry-type"], "Polygon"],
-            paint: { "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#7c3aed"], "fill-opacity": 0.3 },
+            paint: { "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", ["match", ["get", "layer_kind"], "RS_VERIFIED", "#2563eb", "RS_REFERENCE", "#c77713", "DEV", "#8055ad", "#64748b"]], "fill-opacity": 0.3 },
           });
           instance.addLayer({
             id: "asset-polygon-outlines",
             type: "line",
             source: "assets",
             filter: ["==", ["geometry-type"], "Polygon"],
-            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#6d28d9"], "line-width": 2 },
+            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", ["match", ["get", "layer_kind"], "RS_VERIFIED", "#2563eb", "RS_REFERENCE", "#c77713", "DEV", "#8055ad", "#64748b"]], "line-width": 2 },
           });
           instance.addLayer({
             id: "asset-lines",
             type: "line",
             source: "assets",
             filter: ["==", ["geometry-type"], "LineString"],
-            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#0369a1"], "line-width": 5 },
+            paint: { "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", ["match", ["get", "layer_kind"], "RS_VERIFIED", "#2563eb", "RS_REFERENCE", "#c77713", "DEV", "#8055ad", "#64748b"]], "line-width": 5 },
           });
           instance.addLayer({
             id: "asset-points",
@@ -151,10 +171,11 @@ export function AssetMap({
             source: "assets",
             filter: ["==", ["geometry-type"], "Point"],
             paint: {
-              "circle-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", "#b45309"],
-              "circle-radius": 9,
+              "circle-color": ["case", ["boolean", ["feature-state", "selected"], false], "#059669", ["match", ["get", "layer_kind"], "RS_VERIFIED", "#2563eb", "RS_REFERENCE", "#c77713", "DEV", "#8055ad", "#64748b"]],
+              "circle-radius": ["case", ["boolean", ["feature-state", "selected"], false], 12, 9],
+              "circle-opacity": ["case", ["==", ["get", "layer_kind"], "RS_REFERENCE"], 0.4, 1],
               "circle-stroke-width": 3,
-              "circle-stroke-color": "#ffffff",
+              "circle-stroke-color": ["case", ["boolean", ["feature-state", "selected"], false], "#047857", ["match", ["get", "layer_kind"], "RS_VERIFIED", "#2563eb", "RS_REFERENCE", "#c77713", "DEV", "#8055ad", "#64748b"]],
             },
           });
           instance.on("click", (event) => {
@@ -173,9 +194,10 @@ export function AssetMap({
               : "";
           });
           selectAsset.current = (asset) => {
-            if (!asset.geometry) return;
+            const geometry = mapGeometry(asset);
+            if (!geometry) return;
             const assetBounds = new LngLatBounds();
-            for (const position of geometryPositions(asset.geometry))
+            for (const position of geometryPositions(geometry))
               assetBounds.extend(position);
             const center = assetBounds.getCenter();
             instance.fitBounds(assetBounds, {
@@ -189,7 +211,7 @@ export function AssetMap({
             for (const asset of assets) instance.setFeatureState({ source: "assets", id: asset.id }, { selected: asset.id === id });
             const asset = assets.find(a => a.id === id);
             popup?.remove();
-            if (asset?.geometry) selectAsset.current?.(asset);
+            if (asset && mapGeometry(asset)) selectAsset.current?.(asset);
           };
           highlight.current(selection.current.selectedId);
           if (timer) clearTimeout(timer);
@@ -207,7 +229,7 @@ export function AssetMap({
       popup?.remove();
       map?.remove();
     };
-  }, [reservoir, assetsJson, records]);
+  }, [reservoir, assetsJson, records, contextVisible]);
   useEffect(() => { highlight.current?.(selectedId); }, [selectedId]);
   return (
     <div>
@@ -232,39 +254,28 @@ export function AssetMap({
           className="map-legend asset-legend"
           aria-label="Asset geometry legend"
         >
-          <p className="eyebrow">Geometry</p>
-          <div><span className="status-dot" style={{ background: "#059669" }} />Selected</div>
-          <div>
-            <span className="status-dot" style={{ background: "#b45309" }} />
-            Point
-          </div>
-          <div>
-            <span className="legend-line" />
-            LineString
-          </div>
-          <div>
-            <span className="legend-polygon" />
-            Polygon
-          </div>
+          <p className="eyebrow">Location layers</p>
+          <div><span className="status-dot" style={{ background: "#2563eb" }} />RS verified geometry</div>
+          <div><span className="status-dot reference-dot" />RS reference location</div>
+          <div><span className="status-dot" style={{ background: "#8055ad" }} />DEV geometry</div>
+          <div><span className="status-dot context-dot" />Reservoir context{!contextVisible ? " (hidden)" : ""}</div>
+          <div><span className="status-dot" style={{ background: "#059669" }} />Selected asset</div>
         </aside>
       </div>
       {assets.length === 0 ? (
         <p className="muted mt-3">
-          No assets to map. Centered on the reservoir location.
+          No asset locations match the filters. Reservoir context is navigation only.
         </p>
       ) : mapped.length === 0 ? (
         <p className="muted mt-3" role="status">
-          Spatial geometry: Not available in this dataset. Asset identities remain
-          accessible in the registry. The reservoir center and basemap are
-          navigation context, not asset location evidence.
+          NO LOCATION · No asset-specific location available in this view. Asset identities remain accessible in the registry. Reservoir context is not asset location evidence.
         </p>
       ) : (
         <>
           <p className="muted mt-3 text-sm">
-            {mapped.length} of {assets.length} assets have geometry. Geometry
-            presence does not imply verification.
+            {mapped.length} of {assets.length} assets have display locations. Reference locations are navigation / presentation only, not verified GIS evidence.
             {mapped.length < assets.length &&
-              ` ${assets.length - mapped.length} asset(s) without geometry remain in the registry.`}
+              ` ${assets.length - mapped.length} asset(s) with NO LOCATION remain in the registry.`}
           </p>
           <div
             className="asset-locate-controls"

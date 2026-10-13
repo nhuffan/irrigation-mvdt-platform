@@ -26,6 +26,22 @@ GeoJsonGeometry = Annotated[
 ]
 
 
+class AssetLocation(BaseModel):
+    location_status: Literal["VERIFIED_GEOMETRY", "REFERENCE_LOCATION", "NO_LOCATION"]
+    geometry: GeoJsonGeometry | None = None
+    geometry_type: Literal["Point", "LineString", "Polygon"] | None = None
+    crs: str | None = None
+    source: str | None = None
+    source_url: str | None = None
+    locator: str | None = None
+    evidence_id: str | None = None
+    accuracy_limitation: str
+    verification_note: str
+    reviewer: str | None = None
+    reviewed_at: str | None = None
+    review_state: Literal["AVAILABLE", "PENDING", "UNAVAILABLE"] = "PENDING"
+
+
 class AssetCategoryResponse(BaseModel):
     id: UUID
     code: str
@@ -44,3 +60,4 @@ class AssetResponse(BaseModel):
     data_status: Literal["REGISTERED", "PARTIAL", "VERIFIED"]
     category: AssetCategoryResponse
     geometry: GeoJsonGeometry | None
+    location: AssetLocation | None = None
