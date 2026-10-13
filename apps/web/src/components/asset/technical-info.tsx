@@ -39,6 +39,13 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                     Multiple records for this attribute — review sources.
                   </p>
                 )}
+                <dl className="source-grid mt-3 text-sm" aria-label="Record provenance">
+                  <div><dt>Verification level</dt><dd>{record.reviewed_provenance?.verification_level ?? "Unavailable"}</dd></div>
+                  <div><dt>Source code</dt><dd>{record.source?.source_code ?? "Unavailable"}</dd></div>
+                  <div><dt>Evidence ID</dt><dd>{record.reviewed_provenance?.evidence_id ?? "Unavailable"}</dd></div>
+                  <div><dt>Source locator</dt><dd className="break-words">{record.reviewed_provenance?.source_locator ?? "Unavailable"}</dd></div>
+                  <div><dt>Reviewed authority</dt><dd>{record.reviewed_provenance?.authority ?? "Unavailable"}</dd></div>
+                </dl>
                 <SourceInfo source={record.source} />
               </article>
             ))}

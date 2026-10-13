@@ -9,7 +9,10 @@ export function OmTimeline({ events }: { events: TimelineEvent[] }) {
         Newest event first. Verification is shown for each record.
       </p>
       {events.length === 0 ? (
-        <p className="muted mt-4">No O&M timeline records available.</p>
+        <div className="muted mt-4" role="status">
+          <p>No verified O&M events available.</p>
+          <p className="mt-2 text-sm">Candidate historical records may exist, but none currently meet verification requirements.</p>
+        </div>
       ) : (
         <ol className="om-timeline">
           {events.map((event) => (

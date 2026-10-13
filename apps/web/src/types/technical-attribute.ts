@@ -5,4 +5,8 @@ export type TechnicalAttribute = SourcedRecord & {
   value_text: string | null;
   value_number: number | null;
   unit: string | null;
+  reviewed_provenance: {
+    verification_level: string; source_code: string; evidence_id: string;
+    source_locator: string; authority: string; reviewer: string; reviewed_at: string;
+  } | null;
 };

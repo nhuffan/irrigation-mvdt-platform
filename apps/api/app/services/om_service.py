@@ -46,7 +46,13 @@ def list_records(db: Session, asset_id: UUID, kind: str):
         .options(selectinload(model.source))
         .order_by(primary_order, model.created_at.desc(), model.id.desc())
     )
-    return [schema.model_validate(record) for record in db.scalars(query)]
+    results = [schema.model_validate(record) for record in db.scalars(query)]
+    if kind == "technical":
+        from app.services.reviewed_provenance import technical_provenance
+
+        for record in results:
+            record.reviewed_provenance = technical_provenance(record)
+    return results
 
 
 def current_condition(db: Session, asset_id: UUID) -> AssetConditionResponse | None:
