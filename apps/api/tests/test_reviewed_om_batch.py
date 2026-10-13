@@ -271,3 +271,50 @@ def test_compiled_batch_db_roundtrip_and_retry(domain, kind, typ, payload):
     )
     with pytest.raises(ValueError, match="Existing record differs"):
         import_batch(db, batch)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("temporal_precision", "YEAR_ONLY"),
+        ("temporal_precision", "DATE_RANGE"),
+        ("temporal_precision", "UNKNOWN"),
+        ("completion_status", "UNVERIFIED"),
+        ("completion_status", "PLANNED"),
+        ("source_eligibility", "REFERENCE_ONLY"),
+        ("mapping_verified", "false"),
+    ],
+)
+def test_declared_annual_candidate_limits_block_even_with_formatted_date(field, value):
+    values = inputs("maintenance")
+    row = values[0][0]
+    row.update(
+        record_type="MAINTENANCE",
+        candidate_date="2025-01-01",
+        record_payload='{"description":"SYNTHETIC TEST ONLY"}',
+        event_basis="TEST",
+        temporal_precision="FULL_DATE",
+        completion_status="VERIFIED",
+        source_eligibility="VERIFIED_EVENT",
+        mapping_verified="true",
+    )
+    row[field] = value
+    batch, _, report = compile_batch(*values)
+    assert batch is None
+    assert report["missing_required_fields"]
+
+
+def test_verified_explicit_event_review_remains_supported():
+    values = inputs("maintenance")
+    values[0][0].update(
+        record_type="MAINTENANCE",
+        candidate_date="2025-03-17",
+        record_payload='{"description":"SYNTHETIC TEST ONLY"}',
+        event_basis="TEST",
+        temporal_precision="FULL_DATE",
+        completion_status="VERIFIED",
+        source_eligibility="VERIFIED_EVENT",
+        mapping_verified="true",
+    )
+    batch, _, report = compile_batch(*values)
+    assert batch is not None, report

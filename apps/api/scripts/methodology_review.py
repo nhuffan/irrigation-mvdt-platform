@@ -409,6 +409,21 @@ def validate_methodology(context, methodology):
         ):
             fail(f"MC: required gate unresolved: {gid}")
 
+    candidate_review = methodology.get("candidate_evidence_review")
+    if candidate_review is not None:
+        review_files = candidate_review.get("reviews", {})
+        if set(review_files) != {
+            "maintenance_2021_2025_review.csv",
+            "maintenance_asset_mapping_review.csv",
+        }:
+            fail("AR-FV-R1: incomplete maintenance candidate review")
+        for name, entry in review_files.items():
+            content = entry.get("content")
+            if not isinstance(content, str) or hashlib.sha256(
+                content.encode()
+            ).hexdigest() != entry.get("sha256"):
+                fail(f"AR-FV-R1: candidate review checksum mismatch: {name}")
+
     approval = methodology.get("approval", {})
     policy = methodology.get("approval_policy")
     if policy is not None:

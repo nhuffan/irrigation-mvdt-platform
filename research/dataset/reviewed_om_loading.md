@@ -49,3 +49,7 @@ Verify Technical/O&M/current-condition/timeline API for each RS asset. Technical
 Only after reviewed imports are stable, add their exact UUIDs intentionally to the private base-scope record allowlists. Do not select all RS rows. Keep MAIM/geometry/browser review separate. Stage 5B stays NOT_READY until the later review gates pass; no DT-R1 freeze during B02.
 
 Current extraction is an initial bounded pass, not a complete review of the archive. Missing O&M in the database is not proof no O&M exists in unexamined files.
+
+## Annual statistical workbook candidates
+
+Follow [maintenance evidence review](../evaluation/maintenance_evidence_review.md) before preparing annual-workbook O&M. Preserve explicit time/completion/source/mapping review columns; candidate acceptance alone does not establish a verified event.

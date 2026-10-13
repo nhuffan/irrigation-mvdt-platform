@@ -127,3 +127,33 @@ def test_new_policy_changes_base_fingerprint():
     old = base_scope_fingerprint(data[0])
     data[0]["methodology_approval_policy"] = "ROLE_SCOPED-v1"
     assert base_scope_fingerprint(data[0]) != old
+
+
+def test_eight_policy_confirmation_does_not_approve_entire_package():
+    a = approvals("test")
+    for entry in a["entries"]:
+        if entry["approval_type"] == "RESEARCHER_APPROVAL":
+            entry["scope"] = "EIGHT_RESEARCHER_POLICIES"
+    errors = validate_role_approvals(a, "test")
+    assert errors == [
+        "MC-R: required scoped approval pending: RESEARCHER_APPROVAL/METHODOLOGY_PACKAGE"
+    ]
+
+
+def test_candidate_evidence_checksum_is_validated_even_after_new_approval():
+    from test_methodology_review import approve
+
+    data, bundle = fixture()
+    bundle["candidate_evidence_review"] = {
+        "reviews": {
+            name: {"content": "changed", "sha256": "stale"}
+            for name in (
+                "maintenance_2021_2025_review.csv",
+                "maintenance_asset_mapping_review.csv",
+            )
+        }
+    }
+    approve(data, bundle)
+    report, scope = compile_scope(*data, methodology=bundle)
+    assert scope is None
+    assert any("candidate review checksum mismatch" in e for e in report["blockers"])

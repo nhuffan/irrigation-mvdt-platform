@@ -224,6 +224,31 @@ def compile_batch(
                     unit=rule["expected_unit"] or None,
                 )
             else:
+                # Optional explicit review columns preserve partial-date semantics.
+                # Legacy reviewed batches retain their existing full-date contract.
+                if (
+                    "temporal_precision" in row
+                    and row["temporal_precision"] != "FULL_DATE"
+                ):
+                    raise ValueError(
+                        "Partial/unknown temporal precision cannot become a full event date"
+                    )
+                if (
+                    "completion_status" in row
+                    and row["completion_status"] != "VERIFIED"
+                ):
+                    raise ValueError(
+                        "Listed/planned work is not verified completed O&M"
+                    )
+                if (
+                    "source_eligibility" in row
+                    and row["source_eligibility"] != "VERIFIED_EVENT"
+                ):
+                    raise ValueError(
+                        "Reference-only source cannot establish an operational event"
+                    )
+                if "mapping_verified" in row and row["mapping_verified"] != "true":
+                    raise ValueError("Candidate asset mapping is not verified")
                 raw_date = row.get("candidate_date", "")
                 if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw_date):
                     raise ValueError(
