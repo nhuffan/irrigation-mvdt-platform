@@ -103,6 +103,7 @@ export function AssetMap({
           const content = document.createElement("div");
           content.className = "reservoir-popup asset-popup";
           const title = document.createElement("h3");
+          title.className = "asset-display-name";
           title.textContent = assetDisplayName(asset);
           content.append(title);
           for (const value of [

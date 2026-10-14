@@ -808,3 +808,17 @@ body:has(.clean-paper) nextjs-portal { display:none; }
 .explorer-panel .coverage-summary dl>div { font-size:11px; padding:4px 0; }
 .explorer-panel .evidence-summary .technical-metadata { font-size:11px; }
 @media(max-width:900px) { .asset-properties-layout,.asset-summary-grid { grid-template-columns:1fr; } .component-tree { position:static; } }
+
+/* Human-readable asset titles retain a shared left edge when they wrap. */
+.asset-display-name { display: inline-block; width: 100%; text-align: left; }
+.asset-table .text-link, .component-tree .text-link,
+.explorer-panel .text-link, .asset-popup h3 { text-align: left; justify-content: flex-start; }
+
+/* Paper registry foregrounds retained technical evidence and document retrieval. */
+.evidence-first-panel { display: flex; flex-direction: column; }
+.evidence-first-panel > * { order: 4; }
+.evidence-first-panel > .eyebrow, .evidence-first-panel > nav,
+.evidence-first-panel > h2, .evidence-first-panel > .muted,
+.evidence-first-panel > .technical-metadata { order: 0; }
+.evidence-first-panel > .explorer-technical { order: 1; }
+.evidence-first-panel > .explorer-documents { order: 2; }
