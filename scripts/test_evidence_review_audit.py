@@ -56,5 +56,21 @@ class ReviewBoundaryTests(unittest.TestCase):
         self.row['mapping_verified']='false'
         self.assertIn('ASSET_IDENTITY_UNRESOLVED',self.audit()['blockers'])
 
+    def test_researcher_approval_is_limited_to_optional_reported_l2(self):
+        self.row['kind'] = 'TECHNICAL'
+        self.approval.update(reviewer_role='RESEARCHER', approval_scope='OPTIONAL_REPORTED_TECHNICAL_L2', verification_level='L2')
+        rule = {'category_code':'RS-CAT-SPILLWAY','attribute_key':'','attribute_label':'Test observation','expected_unit':'','required_by_maim':'false'}
+        def result():
+            return module.audit([self.row], self.register, self.root, [rule], [{'source_code':'RS-SRC-TEST'}], {'TEST-1':self.approval})['candidates'][0]
+        self.assertTrue(result()['eligible_for_compiler'])
+        rule['required_by_maim'] = 'true'
+        self.assertIn('HUMAN_DOMAIN_APPROVAL_REQUIRED', result()['blockers'])
+        rule['required_by_maim'] = 'false'
+        self.approval['verification_level'] = 'L3'
+        self.assertIn('HUMAN_DOMAIN_APPROVAL_REQUIRED', result()['blockers'])
+        self.approval['verification_level'] = 'L2'
+        self.row['kind'] = 'INSPECTION'
+        self.assertIn('HUMAN_DOMAIN_APPROVAL_REQUIRED', result()['blockers'])
+
 if __name__ == '__main__':
     unittest.main()

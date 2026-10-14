@@ -21,13 +21,18 @@ def rows(path):
         return list(csv.DictReader(stream))
 
 
-def review_blockers(candidate, approval):
+def review_blockers(candidate, approval, optional_reported_field=False):
     """Human declarations are inspected for binding, never authenticated by this audit."""
     if not approval:
         return ['MISSING_HUMAN_FIELD_REVIEW']
     reasons = []
+    researcher_l2 = (optional_reported_field
+        and candidate.get('kind') == 'TECHNICAL'
+        and approval.get('reviewer_role') == 'RESEARCHER'
+        and approval.get('approval_scope') == 'OPTIONAL_REPORTED_TECHNICAL_L2'
+        and approval.get('verification_level') == 'L2')
     if (approval.get('decision') != 'APPROVED'
-            or approval.get('reviewer_role') not in DOMAIN_ROLES
+            or (approval.get('reviewer_role') not in DOMAIN_ROLES and not researcher_l2)
             or not approval.get('reviewer_name', '').strip()
             or approval.get('reviewer_is_ai') is not False):
         reasons.append('HUMAN_DOMAIN_APPROVAL_REQUIRED')
@@ -76,7 +81,10 @@ def audit(queue, register, originals, dictionary, sources, approvals=None):
             reasons.append('REFERENCE_CLASS_NOT_IMPORTABLE')
         if candidate['decision'] != 'VERIFIED':
             reasons.append('CANDIDATE_NOT_VERIFIED')
-        reasons.extend(review_blockers(candidate, approvals.get(cid)))
+        category = 'RS-CAT-' + candidate['asset_code'].removeprefix('RS-DT-')
+        rule = rules.get((category, candidate['attribute_key']))
+        optional_reported = bool(rule and rule.get('required_by_maim') == 'false')
+        reasons.extend(review_blockers(candidate, approvals.get(cid), optional_reported))
         if candidate['mapping_verified'] != 'true':
             reasons.append('ASSET_IDENTITY_UNRESOLVED')
         if candidate['source_eligibility'] != 'ELIGIBLE':
@@ -84,8 +92,6 @@ def audit(queue, register, originals, dictionary, sources, approvals=None):
         if candidate['source_code'] not in source_map:
             reasons.append('CONTROLLED_SOURCE_ADMISSION_PENDING')
         if candidate['kind'] == 'TECHNICAL':
-            category = 'RS-CAT-' + candidate['asset_code'].removeprefix('RS-DT-')
-            rule = rules.get((category, candidate['attribute_key']))
             if (not rule or rule['attribute_label'] != candidate['label']
                     or rule['expected_unit'] != candidate['unit']):
                 reasons.append('APPROVED_DICTIONARY_KEY_LABEL_UNIT_REQUIRED')
@@ -107,7 +113,7 @@ def audit(queue, register, originals, dictionary, sources, approvals=None):
             'candidate_count': len(queue),
             'eligible_count': sum(r['eligible_for_compiler'] for r in results),
             'decisions': dict(Counter(r['decision'] for r in queue)), 'candidates': results,
-            'limitations': 'Declaration validation does not authenticate the human reviewer or establish source truth. Existing compiler/dry-run/apply/retry and scope/denominator approval remain required.'}
+            'limitations': 'Declaration validation does not authenticate the human reviewer or establish source truth. Explicit researcher approval is accepted only for optional reported L2 technical fields; it does not satisfy domain/methodology gates. Existing compiler/dry-run/apply/retry and scope/denominator approval remain required.'}
 
 
 def main():
