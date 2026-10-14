@@ -123,3 +123,18 @@ Table 2 exporter now accepts `--snapshot`; run `python3 scripts/export_paper_ui_
 | Asset-document API links | 1 | 1 | DAM 1; SPILLWAY/INTAKE/MGMT 0; source-derived, no direct link contract |
 
 Targeted verification: 10 presentation/location tests, lint of modified TSX paths and production build/typecheck pass. Browser smoke covers selected DAM, SPILLWAY reference GIS, technical, actual PDF, MGMT 3D and alignment, O&M and coverage; no errors in inspected current tab logs. No full regression. Captions, figure-state, docs manifest and private 43-file package manifest updated.
+
+
+## PAPER-EVIDENCE-ENRICH-2 — review checkpoint awaiting decisions
+
+The private review packet is prepared: 14 downloaded PDF files with exact byte hashes; bounded visual review of the new manual, two top-level scans, office site plan/condition record and nine spillway scans; 41 candidates and a coherent seven-key optional SPILLWAY technical proposal. Maintenance prescriptions and generic failure examples remain reference content. Dated site observations are kept for genuine event/source review; office records require exact identity and effective-date review before any controlled MGMT/current-condition claim. No completed repair is inferred from design minutes or signatures.
+
+Four logical source additions are proposals. Manual-first admission would change controlled-source/expected-file counts 17/12→18/13 if approved; neither denominator changes now. Source authority, mandatory MAIM, geometry, INTAKE identity and representative 3D scope remain unchanged. The user stated that professional review exists; the actual reviewer/role/date/key/source decisions are awaited. Private review_request.md now includes the seven proposed values/units/locators and response template.
+
+`scripts/audit_evidence_enrichment.py` checks private bytes, locators, field-review binding, actual human role declaration, source admission/eligibility, exact dictionary label/unit, asset identity and event date/performed-activity boundaries before the existing compiler. It never approves data or writes DB/import batches. Four boundary tests and 48 existing compiler tests pass. Existing compiler produces NO_VERIFIED_CANDIDATES for the seven pending rows; dry-run/apply/retry awaits qualified approval.
+
+After snapshot and API confirm the prior Table 2: 4 RS/4 researcher identities, geometry 0, reference 1, technical 3 L2, verified current condition/O&M 0, controlled sources 17/expected-file 12, distinct reviewed documents 5, selected 3D target/representative link 1/1. Source-derived document API associations remain DAM 1, other assets 0. All 46 active controlled hashes and provenance/location sidecars remain unchanged; no research original/approval signature is published.
+
+No displayed data or UI changed, so S1–S7 and all composites/diagrams retain their exact bytes, existing capture set and UI commit 6c14892. Hình 6 stays S1+S3+S5; no old image is relabeled as a fresh capture. Figure state adds a separate data-review checkpoint, and the private package manifest now hashes 44 files. F02/F05 pending, NOT_READY and not frozen remain. No service was started.
+
+Private packet: `research/evaluation/evidence/PAPER-EVIDENCE-ENRICH-2/review_request.md`, `evidence_candidate_review.csv`, proposed dictionary, field/source approval templates, source/evidence register, conflict notes and import gate report. Continue with the actual human field/source decisions, then compile→dry-run→apply→retry and recapture only affected figures.
