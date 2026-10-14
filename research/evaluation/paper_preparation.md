@@ -34,3 +34,11 @@ Point, line and polygon selection uses GeoJSON property IDs via `promoteId` so U
 `pnpm --dir apps/web test:explorer` runs the state/filter/provenance/count tests. Browser smoke additionally checks registry/map selection, deep links, Back, layer filters, real action targets and identical panel/summary content with paper mode on/off. Existing DEV geometry is used only to test interaction mechanics, never as RS evidence.
 
 The updated private `figure_state.json` uses schema version 2: `capture_sets` stores each snapshot and `figures` assigns every PNG to its actual capture set. Only S1/S2 were recaptured for this UI stage; S3–S6 and diagrams retain their original state. The previous package is archived under `evidence/PAPER-UI-GIS/previous-paper/`. Rehash `package_manifest.json` after changing outputs; do not stamp older figures with a new software commit or capture date.
+
+### PAPER-GIS-VISUAL capture
+
+The asset map uses OpenStreetMap standard raster tiles with visible attribution, ordinary browser caching and viewport-only requests. See [OSMF tile policy](https://operations.osmfoundation.org/policies/tiles/); no tile archive/offline download is provided. The raster source is independent of the local style and asset/context layers. Raster errors or a pending-source timeout show `Basemap unavailable`; network-outage browser testing remains for consolidated validation.
+
+Context is the existing registry center/label plus basemap geography, not a new controlled reservoir outline. Camera overview at zoom 10 is a navigation view, not an asserted reservoir boundary. Reference focus caps at zoom 11, verified geometry at 14. Reference rings/labels remain distinct; a top selection halo does not promote verification. Missing locations return to context with a warning. Paper mode puts the map before the registry and retains attribution, legend, panel and limitations.
+
+S2 was recaptured with the reference marker selected, popup closed and one zoom-out step to show the reservoir surroundings. S1 and other figures retain their previous capture states; read per-figure `capture_set` in `figure_state.json`. Basemap labels and context never contribute to F02 or completeness metrics.
