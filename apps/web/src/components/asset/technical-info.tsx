@@ -28,7 +28,7 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                 className="om-record"
                 id={`record-${record.id}`}
               >
-                
+
                 <h3 className="font-semibold">{record.attribute_label}</h3>
                 <p className="technical-value">
                   {record.value_number ?? record.value_text ?? "Not available"}

@@ -42,3 +42,45 @@ The asset map uses OpenStreetMap standard raster tiles with visible attribution,
 Context is the existing registry center/label plus basemap geography, not a new controlled reservoir outline. Camera overview at zoom 10 is a navigation view, not an asserted reservoir boundary. Reference focus caps at zoom 11, verified geometry at 14. Reference rings/labels remain distinct; a top selection halo does not promote verification. Missing locations return to context with a warning. Paper mode puts the map before the registry and retains attribution, legend, panel and limitations.
 
 S2 was recaptured with the reference marker selected, popup closed and one zoom-out step to show the reservoir surroundings. S1 and other figures retain their previous capture states; read per-figure `capture_set` in `figure_state.json`. Basemap labels and context never contribute to F02 or completeness metrics.
+
+
+## PAPER-UI-CLEAN-COMPLETE presentation and current paper figures
+
+Software snapshot: `c6477f4`. Presentation aliases are keyed by controlled asset code: Đập chính — Main Dam; Tràn xả lũ — Spillway; Công trình lấy nước — Intake Structure; Nhà quản lý/vận hành — Management / Operations Building. Canonical DB names/IDs and joins are unchanged. Asset, record, document, source and model identifiers remain copyable in keyboard-accessible native details, closed by default. The browser's native PDF toolbar can show a transient blob identifier; application document headings use the real filename.
+
+Asset Detail uses real Components beside Properties and stacks below 900px; no components are invented. Reusable coverage lists Identity, Location, Technical, Condition, Inspection, Repair, Maintenance, Documents and 3D. Successful empty responses and unavailable requests remain distinct; Reference never becomes Verified; no synthetic score. Identity is Available for REGISTERED API records; the API does not expose the separate researcher identity-review decision, so the UI does not infer it. Table 2 separately reports that controlled review.
+
+Sources & Evidence deduplicates technical sources by source ID and distinguishes reference location, linked files, verified O&M and representative model links. Linked file counts are UI counts, not paper source-coverage denominators. Bound reviewed provenance supplies L2; record VERIFIED status alone never supplies a level. O&M empty state means no verified record, not no maintenance activity. 3D retains LOCAL and representative-only disclosure.
+
+### Capture and manuscript mapping
+
+All S1–S7 were recaptured because their visible UI changed. Exact URLs, viewport sizes, capture date and software commit are in the private `figure_state.json` capture set `paper_ui_clean`. New screenshots alone receive that capture set; old diagram capture sets remain intact. Previous paper package is retained under `evidence/PAPER-UI-CLEAN/previous-paper`. S1 uses normal RS-filtered registry; S2/S3/S5/S6/S7 use paper mode; S4 uses the actual PDF preview. S5 uses the preexisting configured localhost:3000 origin; other views use the task's production preview at 3100. The API rejected 3100 model requests by CORS, so it was not reconfigured merely for capture.
+
+| Screenshot / artifact | State and paper use |
+|---|---|
+| S1 | `/map?asset=<DAM>#assets`, four RS names, selected DAM; §4.2 Hình 6 current panel A |
+| S2 | `/map?paper=1&asset=<SPILLWAY>#selected-asset-panel`, popup closed, reference halo, OSM attribution/scale/legend; §3.4 Hình 3 left |
+| S3 | `/assets/<DAM>?paper=1#technical`, three historical L2 records; optional §4.2, supporting evidence |
+| S4 | `/documents/<retained-PDF>`, meaningful filename and real PDF; supporting evidence |
+| S5 | `/reservoirs/<reservoir>/3d?paper=1&model=<legacy-model>&object=<reviewed-object>`, LOCAL MGMT representative selection; Hình 3 right and Hình 6 current C |
+| S6 | `/assets/<DAM>?paper=1#timeline`, honest verified-empty state; private supporting evidence |
+| S7 | `/assets/<DAM>?paper=1#coverage`, coverage plus source/evidence summary; §4.3 and Hình 6 current B |
+| Hinh_1 | Authored phased research architecture for §3.1, not browser capture |
+| Hinh_2 | Authored review/import workflow for §3.3, not browser capture |
+| Hinh_3 | S2 + S5 composite; different selected assets illustrate navigation through common asset identity, not shared geographic placement |
+| Hinh_5_current | Controlled GeoPDF context, CRS and scale, only approved SPILLWAY reference symbol annotated; §4.1 |
+| Hinh_6_current | S1 + S7 + S5 clean composite for §4.2 |
+
+Copies named `S1.png`–`S7.png` and named Hinh composites are in `docs/paper_img`, with a mapping and checksum manifest. Current Hình 5 becomes final Hình 4 and current Hình 6 becomes final Hình 5 only when all manuscript cross-references are updated together. §5 refers back to Hình 2/3/current 5/current 6 and Tables 2/3; no extra Discussion screenshots.
+
+### Controlled Table 2 and functional Table 3
+
+Run `python3 scripts/export_paper_ui_counts.py` from repo root with the retained private snapshot and reviewed package. It reads files only and writes `results/paper/table_paper_2_counts.csv` and `.md`; it never connects to or writes the DB. Rehash the package after exports. Current counts: 4 targets, 4 researcher-reviewed identities, 0 verified canonical geometries, 1 reference location (separate), 3 technical records at L2, 0 assets with verified condition, 0 verified O&M events, 17 controlled sources, 12 expected-file sources, 5 distinct SHA-256 documents with IMPORT file-retention review, 1 selected 3D target, 1 representative verified link. Document retention review does not establish validated technical content. CSV definitions preserve each denominator.
+
+For main-paper Table 3, select Registry/Detail, GIS selection, document preview, 3D load/select/deep link, O&M timeline and per-object highlight limitation from existing `table_t4_functional_validation.csv`; retain all F01–F21 in the package. This stage's targeted smoke is not a rerun or promotion of that historical matrix.
+
+### Verification and unchanged research boundary
+
+Ten targeted tests pass; modified frontend lint and production build/typecheck pass. Browser inspection covered Registry, GIS popup/panel, two-column detail, technical, document, O&M and representative 3D. Current document/3D tab error logs were empty after navigating through the configured API origin. Responsive stacking is implemented in CSS; no claim of a full device matrix. Native details were inspected for accessible/copyable canonical identifiers.
+
+DB rows and retained media hashes before/after match exactly (`c32988b9918e65471eecf6bdbd96360d76f06478898d865c59450bc6806b8dd8`). All 46 controlled hashes and both provenance/location sidecar hashes match the previous snapshot. Package manifest contains 43 file hashes. Four canonical geometries remain NULL; SPILLWAY is reference only, INTAKE unresolved, DAM/MGMT have no location. Technical L2, zero verified O&M, LOCAL representative mapping, source authority, F02/F05 and NOT_READY/not frozen are unchanged. Private evidence records detailed checks and reproduction scripts.

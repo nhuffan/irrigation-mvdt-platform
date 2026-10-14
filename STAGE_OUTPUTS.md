@@ -318,3 +318,15 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Recapture **chỉ S2** tại software commit `7e60e2a`: chọn reference, đóng popup, zoom out một bước, panel vẫn hiện source/limitation. Cập nhật caption, capture set `paper_gis_visual` và 35 artifact hashes; giữ S1/các hình khác ở state cũ. Bộ paper/evidence private không đưa lên git.
 - Snapshot DB/media khớp trước/sau: `c32988b9918e65471eecf6bdbd96360d76f06478898d865c59450bc6806b8dd8`; 46 controlled files, reviewed provenance và location sidecar không đổi. 4 RS canonical geometry vẫn NULL; chỉ SPILLWAY reference, INTAKE chưa mapping. F02/F05, technical L2, O&M, authority/completeness và NOT_READY/not frozen giữ nguyên. Không đổi API/schema/import.
 - Đã dừng preview task trên 3100 (PID 37815), cổng được giải phóng. Giữ API 8000, web 3000, Zalo 3001 và PostGIS healthy vì đã chạy sẵn; không dừng Docker hoặc sửa volume.
+
+
+## Stage PAPER-UI-CLEAN-COMPLETE output
+
+- Software commit `c6477f4`: controlled VN — EN presentation aliases, shared native technical details/status badges, cleaned Registry/GIS/Asset Detail/technical/documents/O&M/3D, real Components/Properties layout, reusable Information Coverage and Sources & Evidence. No API/schema changes or research import.
+- IDs remain inspectable/copyable; missing/reference/unavailable and L2 boundaries remain explicit. Registered identity displays Available; it does not infer a domain review. Native PDF toolbar may expose a transient blob ID outside application headings.
+- Targeted verification: 10 tests, modified-path lint, production build/typecheck passed; browser smoke and actual PDF/LOCAL GLB capture completed. No full regression or device-matrix claim. CORS for preview 3100 was handled by capturing 3D on existing allowed 3000, without API changes.
+- Recaptured S1–S7 in capture set `paper_ui_clean`, software `c6477f4`; captions, exact deep links, figure state and 43-file package manifest updated. User copies: `docs/paper_img/S1.png`–`S7.png`; authored Hinh_1/2, source-map Hinh_5_current, Hinh_3 (S2+S5), Hinh_6_current (S1+S7+S5), naming map and manifest included. Historic capture sets preserved.
+- Read-only `scripts/export_paper_ui_counts.py` reproduces Table 2: 4 targets/4 researcher identities, canonical geometry 0, reference 1, technical 3 L2, verified condition/O&M 0, controlled sources 17, expected-file sources 12, distinct retained reviewed documents 5, selected 3D targets/representative verified links 1/1. Per-row denominator/meaning retained; linked UI documents are a different metric.
+- Before/after DB/media snapshots identical (`c32988b9918e65471eecf6bdbd96360d76f06478898d865c59450bc6806b8dd8`); 46 controlled input hashes and provenance/location sidecars unchanged. No new geometry/evidence/authority; F02/F05 pending, NOT_READY and not frozen unchanged.
+- Preparation and manuscript image mapping updated in `research/evaluation/paper_preparation.md`; outputs remain outside project README. Current figure numbers preserved until manuscript-wide renumbering.
+- Cleanup verified: task preview 3100 stopped and port released. Preexisting web 3000, API 8000 and PostGIS/Docker remain running; no volumes removed.
