@@ -822,3 +822,15 @@ body:has(.clean-paper) nextjs-portal { display:none; }
 .evidence-first-panel > .technical-metadata { order: 0; }
 .evidence-first-panel > .explorer-technical { order: 1; }
 .evidence-first-panel > .explorer-documents { order: 2; }
+
+/* Category symbols do not imply positional verification. */
+.asset-category-symbol { width: 22px; height: 22px; flex: none; display: inline-block; vertical-align: middle; margin-right: 6px; }
+.asset-map-symbol { width: 36px; height: 36px; border-radius: 8px; padding: 5px; background: white; color: #215bc2; border: 2px solid currentColor; cursor: pointer; }
+.asset-map-symbol svg { width: 100%; height: 100%; }
+.asset-map-symbol.is-reference { color: #945600; border-style: dashed; background: #fff9ec; }
+.asset-map-symbol.is-dev { color: #8055ad; }
+.asset-map-symbol.is-selected { outline: 3px solid #047857; outline-offset: 4px; }
+.asset-map-symbol span { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); padding: 1px 4px; background: #fff9ec; color: #714500; font-size: 10px; font-weight: 700; }
+.symbol-legend { display: grid !important; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-bottom: 10px; }
+.symbol-legend span { display: flex; align-items: center; font-size: 11px; }
+.selection-feedback { font-size: 13px; margin: 8px 0 16px; color: #71510b; }

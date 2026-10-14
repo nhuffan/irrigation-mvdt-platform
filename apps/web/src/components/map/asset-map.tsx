@@ -1,4 +1,6 @@
 "use client";
+import { AssetSymbol } from "@/components/asset/asset-symbol";
+import { assetSymbolSvg, assetSymbols } from "@/lib/asset-symbol";
 import { assetDisplayName, locationSourceTitle } from "@/lib/asset-display";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -48,6 +50,7 @@ export function AssetMap({
     let disposed = false;
     let map: LibreMap | undefined;
     let popup: LibrePopup | undefined;
+    const symbolButtons = new Map<string, HTMLButtonElement>();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let basemapTimer: ReturnType<typeof setTimeout> | undefined;
     void import("maplibre-gl")
@@ -221,11 +224,16 @@ export function AssetMap({
           }
           instance.addLayer({ id: "selected-halo", type: "circle", source: "assets", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 18, "circle-opacity": 0, "circle-stroke-width": 3, "circle-stroke-color": "#047857", "circle-stroke-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0] } });
           for (const geometryType of ["LineString", "Polygon"]) instance.addLayer({ id: `selected-${geometryType}`, type: "line", source: "assets", filter: ["==", ["geometry-type"], geometryType], paint: { "line-width": 6, "line-color": "#047857", "line-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0] } });
-          for (const asset of assets.filter(a => mapGeometry(a)?.type === "Point" && assetLocation(a).location_status === "REFERENCE_LOCATION" && locationLayer(a) !== "DEV")) {
-            const label = document.createElement("button"); label.className = "reference-map-label"; label.textContent = "REFERENCE";
-            label.setAttribute("aria-label", `Select reference location ${assetDisplayName(asset)}`);
-            label.addEventListener("click", (event) => { event.stopPropagation(); selection.current.onSelect(asset); selectAsset.current?.(asset); });
-            new Marker({ element: label, anchor: "top", offset: [0, 21] }).setLngLat(geometryPositions(mapGeometry(asset)!)[0]).addTo(instance);
+          for (const asset of assets.filter(a => mapGeometry(a)?.type === "Point")) {
+            const reference = assetLocation(asset).location_status === "REFERENCE_LOCATION";
+            const button = document.createElement("button");
+            button.className = `asset-map-symbol ${reference ? "is-reference" : "is-geometry"} ${locationLayer(asset) === "DEV" ? "is-dev" : ""}`;
+            button.innerHTML = assetSymbolSvg(asset.category.code);
+            button.setAttribute("aria-label", `Select ${reference ? "reference location" : "geometry"} ${assetDisplayName(asset)}`);
+            if (reference) { const label=document.createElement("span"); label.textContent="Reference"; button.append(label); }
+            button.addEventListener("click", event => { event.stopPropagation(); selection.current.onSelect(asset); selectAsset.current?.(asset); });
+            symbolButtons.set(asset.id, button);
+            new Marker({ element: button }).setLngLat(geometryPositions(mapGeometry(asset)!)[0]).addTo(instance);
           }
           instance.on("click", (event) => {
             const hit = instance.queryRenderedFeatures(event.point, {
@@ -258,6 +266,7 @@ export function AssetMap({
             showPopup(asset, center);
           };
           highlight.current = (id) => {
+            for (const [key,button] of symbolButtons) { button.classList.toggle("is-selected", key === id); button.setAttribute("aria-pressed", String(key === id)); }
             for (const asset of assets) instance.setFeatureState({ source: "assets", id: asset.id }, { selected: asset.id === id });
             const asset = assets.find(a => a.id === id);
             popup?.remove();
@@ -308,6 +317,7 @@ export function AssetMap({
           className="map-legend asset-legend"
           aria-label="Asset geometry legend"
         >
+          <p className="eyebrow">Asset symbols</p><div className="symbol-legend">{Object.entries(assetSymbols).map(([code,symbol]) => <span key={code}><AssetSymbol category={code}/>{symbol.label}</span>)}</div>
           <p className="eyebrow">Location layers</p>
           <div><span className="status-dot" style={{ background: "#2563eb" }} />RS verified geometry</div>
           <div><span className="status-dot reference-dot" />RS reference location</div>

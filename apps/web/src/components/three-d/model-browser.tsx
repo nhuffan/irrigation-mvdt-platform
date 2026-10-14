@@ -56,7 +56,7 @@ function ModelView({
           <button onClick={() => setAttempt((n) => n + 1)}>Try again</button>
         </div>
       ) : links ? (
-        <Viewer model={model} links={links} initialObject={initialObject} />
+        <Viewer key={`${model.id}:${initialObject ?? ""}`} model={model} links={links} initialObject={initialObject} />
       ) : (
         <p role="status">Loading model asset links…</p>
       )}

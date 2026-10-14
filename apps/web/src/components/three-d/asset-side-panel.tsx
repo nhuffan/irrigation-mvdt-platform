@@ -54,7 +54,7 @@ export function AssetSidePanel({ link, placement }: { link: ModelAssetLink; plac
           <div>
             <dt>Asset</dt>
             <dd>
-              <AssetDisplayName asset={data[0]}/>
+              <AssetDisplayName asset={data[0]}/><span className="asset-code">{data[0].asset_code}</span>
             </dd>
           </div>
           <div>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
 import type { ModelRecord, ModelAssetLink } from "@/types/media";
 import { loadCesium } from "./cesium-loader";
+import { selectedPrimitives } from "@/lib/model-selection";
 import { pickedObjectKey } from "@/lib/model-picking";
 import { AssetSidePanel } from "./asset-side-panel";
 export default function CesiumViewer({
@@ -16,6 +17,9 @@ export default function CesiumViewer({
   initialObject?: string;
 }) {
   const container = useRef<HTMLDivElement>(null);
+  const selectionEffect = useRef<((key: string | null, focus?: boolean) => void) | null>(null);
+  const selectedRef = useRef<string | null>(initialObject ?? null);
+  const [highlighted, setHighlighted] = useState(false);
   const reset = useRef<(() => void) | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
@@ -25,6 +29,10 @@ export default function CesiumViewer({
     initialObject ?? null,
   );
   const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    selectedRef.current = selected;
+    selectionEffect.current?.(selected);
+  }, [selected]);
   useEffect(() => {
     let disposed = false;
     let viewer: Viewer | undefined;
@@ -147,12 +155,44 @@ export default function CesiumViewer({
           }
           v.scene.requestRender();
         };
+        const tint = v.scene.postProcessStages.add(new C.PostProcessStage({
+          name: `object-selection-${model.id}`,
+          fragmentShader: `uniform sampler2D colorTexture;
+            in vec2 v_textureCoordinates;
+            void main() {
+              vec4 color = texture(colorTexture, v_textureCoordinates);
+              out_FragColor = czm_selected() ? vec4(mix(color.rgb, vec3(1.0, 0.68, 0.08), 0.6), color.a) : color;
+            }`,
+        }));
+        tint.selected = [];
+        // Render again after selected-ID texture/shader preparation in request-render mode.
+        let selectionFrames = 0;
+        v.scene.postRender.addEventListener(() => {
+          if (selectionFrames > 0) { selectionFrames--; v.scene.requestRender(); }
+        });
+        const applySelection = (key: string | null, focus = false) => {
+          if (!loaded.ready || disposed) return;
+          const ids = selectedPrimitives(loaded, model.id, key);
+          tint.selected = ids.length ? [{ pickIds: ids }] : [];
+          selectionFrames = 3;
+          setHighlighted(ids.length > 0);
+          if (focus && ids.length) {
+            const spheres = ids.map(p => p.object.detail?.primitive?.drawCommand?.boundingVolume).filter((b): b is import("cesium").BoundingSphere => !!b && Number.isFinite(b.radius) && b.radius > 0);
+            if (spheres.length === ids.length) {
+              const bounds = C.BoundingSphere.fromBoundingSpheres(spheres);
+              v.camera.lookAtTransform(C.Matrix4.fromTranslation(bounds.center), new C.HeadingPitchRange(C.Math.toRadians(25), C.Math.toRadians(-50), Math.max(bounds.radius * 2.6, 1)));
+            }
+          }
+          v.scene.requestRender();
+        };
+        selectionEffect.current = applySelection;
         reset.current = frame;
         const ready = () => {
           if (!disposed) {
             clearTimeout(timer);
             setStatus("ready");
             frame();
+            applySelection(selectedRef.current, true);
           }
         };
         if (loaded.ready) ready();
@@ -189,6 +229,7 @@ export default function CesiumViewer({
       disposed = true;
       clearTimeout(timer);
       reset.current = null;
+      selectionEffect.current = null;
       if (handler && !handler.isDestroyed()) handler.destroy();
       if (viewer && !viewer.isDestroyed()) viewer.destroy();
       else if (primitive && !primitive.isDestroyed()) primitive.destroy();
@@ -204,11 +245,13 @@ export default function CesiumViewer({
         <button onClick={() => reset.current?.()} disabled={status !== "ready"}>
           Reset camera
         </button>
+        <button onClick={() => selectionEffect.current?.(selected, true)} disabled={!highlighted}>Focus selected object</button>
         <button onClick={() => setSelected(null)}>Clear selection</button>
         <span className="muted">
           Drag to rotate/pan · Wheel to zoom · Click an object
         </span>
       </div>
+      <p className="selection-feedback" role="status">{selected ? highlighted ? "Selected mesh highlighted · amber tint · original materials preserved" : "Selection has no reliable mesh identifier; visual highlight unavailable." : "No object selected"}</p>
       <div className="three-d-grid">
         <div className="viewer-frame">
           <div ref={container} className="cesium-container" />
