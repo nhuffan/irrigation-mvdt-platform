@@ -760,3 +760,21 @@ body:has(.paper-mode) nextjs-portal {
 .context-dot { background: white; border: 2px solid #64748b; }
 .asset-legend { font-size: 11px; max-width: 210px; }
 .asset-popup button { display: block; margin-top: 5px; font-size: 12px; }
+
+/* Cartographic presentation; no evidence or location changes. */
+.map-context-heading { position:absolute; top:14px; left:14px; background:rgba(255,255,255,.94); padding:9px 13px; border-radius:7px; font-weight:700; max-width:70%; pointer-events:none; }
+.map-context-heading span { display:block; font-size:10px; font-weight:400; color:#526664; }
+.basemap-notice { position:absolute; top:78px; left:14px; background:#fff3d8; padding:8px; font-size:12px; z-index:3; }
+.reservoir-context-label { font-size:10px; background:#ffffffdf; color:#526664; border:1px solid #829991; border-radius:4px; padding:3px 6px; pointer-events:none; }
+.reference-map-label { color:#864600; background:#fff8e9; border:1px dashed #ba700e; padding:2px 5px; border-radius:3px; font-size:9px; font-weight:800; cursor:pointer; }
+.asset-map-frame .asset-legend { bottom:45px; left:14px; padding:10px; background:rgba(255,255,255,.95); }
+.asset-map-frame .maplibregl-ctrl-attrib { font-size:10px; }
+.asset-map-frame .maplibregl-popup-content { padding:12px; }
+.asset-popup { max-height:260px; font-size:11px; }
+.location-unavailable { padding:8px 12px; background:#f0f3f4; color:#526664; font-size:12px; }
+.paper-mode .explorer-main { display:flex; flex-direction:column; }
+.paper-mode #asset-gis { order:-1; margin-top:0; margin-bottom:16px; }
+.paper-mode .asset-map-canvas { height:620px; }
+.paper-mode .asset-locate-controls { display:none; }
+.paper-mode .explorer-layout { grid-template-columns:minmax(0,1fr) 340px; }
+@media(max-width:1000px) { .paper-mode .explorer-layout { grid-template-columns:1fr; } .paper-mode .asset-map-canvas { height:520px; } }
