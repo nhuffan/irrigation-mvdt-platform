@@ -9,7 +9,7 @@ import { AssetInformationCoverage } from "./asset-information-coverage";
 import { AssetEvidenceSummary } from "./asset-evidence-summary";
 export function ExplorerPanel({asset,assets,data,onSelect,paper}:{asset:Asset;assets:Asset[];data:ExplorerData;onSelect:(asset:Asset)=>void;paper?:boolean}) {
  const technical=reviewedPreview(data);const {ancestors,children}=hierarchy(assets,asset);
- return <aside id="selected-asset-panel" className={`panel explorer-panel${paper ? " evidence-first-panel" : ""}`} aria-label="Selected asset information" tabIndex={-1}>
+ return <aside id="selected-asset-panel" className={`panel explorer-panel${paper && technical?.length ? " evidence-first-panel" : ""}`} aria-label="Selected asset information" tabIndex={-1}>
  <p className="eyebrow">Thông tin tài sản — Asset information · {dataset(asset)==="research"?"RS":dataset(asset)==="development"?"DEV":"Unclassified"}</p>
  <nav aria-label="Asset hierarchy">{ancestors.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}><AssetDisplayName asset={a}/> / </button>)}</nav>
  <h2><AssetDisplayName asset={asset}/></h2><p className="muted">{asset.category.name}</p><AssetMetadata asset={asset}/>
