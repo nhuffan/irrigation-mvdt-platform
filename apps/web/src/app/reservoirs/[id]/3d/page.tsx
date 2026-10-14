@@ -7,7 +7,7 @@ export default async function ThreeDPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ model?: string; object?: string }>;
+  searchParams: Promise<{ model?: string; object?: string; paper?: string }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -20,7 +20,7 @@ export default async function ThreeDPage({
     throw error;
   });
   return (
-    <main className="page-shell">
+    <main className={query.paper==="1"?"page-shell clean-paper":"page-shell"}>
       <Link className="text-link" href={`/reservoirs/${id}`}>
         ← Reservoir & GIS
       </Link>

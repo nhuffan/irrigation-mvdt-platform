@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "./presentation";
 import type { Condition } from "@/types/condition";
 import { SourceInfo, VerificationBadge } from "./source-info";
 export function ConditionCard({ condition }: { condition: Condition | null }) {
@@ -28,7 +29,7 @@ export function ConditionCard({ condition }: { condition: Condition | null }) {
               <dd>{condition.recommended_action ?? "Not available"}</dd>
             </div>
           </dl>
-          <SourceInfo source={condition.source} />
+          <TechnicalMetadataPopover fields={{"Record UUID":condition.id,"Asset UUID":condition.asset_id,"Source UUID":condition.source_id}}/><SourceInfo source={condition.source} />
         </>
       ) : (
         <p className="muted mt-4">No verified condition record is available.</p>

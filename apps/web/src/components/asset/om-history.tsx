@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "./presentation";
 import type { SourcedRecord } from "@/types/data-source";
 import { SourceInfo, VerificationBadge } from "./source-info";
 export type HistoryItem = SourcedRecord & {
@@ -45,7 +46,7 @@ export function OmHistory({
                   </div>
                 ))}
               </dl>
-              <SourceInfo source={record.source} />
+              <TechnicalMetadataPopover fields={{"Record UUID":record.id,"Asset UUID":record.asset_id,"Source UUID":record.source_id}}/><SourceInfo source={record.source} />
             </article>
           ))}
         </div>

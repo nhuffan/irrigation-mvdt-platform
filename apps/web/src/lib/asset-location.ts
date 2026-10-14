@@ -1,3 +1,4 @@
+import { assetDisplayName } from "./asset-display.ts";
 import type { Asset, AssetLocation } from "../types/asset";
 
 // Older API responses may expose geometry without a spatial review. Never infer verified.
@@ -36,5 +37,5 @@ export function hierarchy(assets: Asset[], asset: Asset) {
 }
 export function matchesSearch(asset: Asset, query: string, type: string) {
   const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
-  return (!type || asset.category.code === type) && normalize(`${asset.id} ${asset.asset_code} ${asset.name} ${asset.category.name}`).includes(normalize(query.trim()));
+  return (!type || asset.category.code === type) && normalize(`${asset.id} ${asset.asset_code} ${asset.name} ${assetDisplayName(asset)} ${asset.category.name}`).includes(normalize(query.trim()));
 }

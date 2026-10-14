@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "./presentation";
 import type { TimelineEvent } from "@/types/timeline";
 import { SourceInfo, VerificationBadge } from "./source-info";
 export function OmTimeline({ events }: { events: TimelineEvent[] }) {
@@ -10,7 +11,7 @@ export function OmTimeline({ events }: { events: TimelineEvent[] }) {
       </p>
       {events.length === 0 ? (
         <div className="muted mt-4" role="status">
-          <p>No verified O&M events available.</p>
+          <p>Chưa có bản ghi O&M đã xác minh — No verified O&M record available.</p>
           <p className="mt-2 text-sm">Candidate historical records may exist, but none currently meet verification requirements.</p>
         </div>
       ) : (
@@ -32,7 +33,7 @@ export function OmTimeline({ events }: { events: TimelineEvent[] }) {
               >
                 View record →
               </a>
-              <SourceInfo source={event.source} />
+              <TechnicalMetadataPopover fields={{"Event UUID":event.record_id,"Asset UUID":event.asset_id,"Source UUID":event.source_id}}/><SourceInfo source={event.source} />
             </li>
           ))}
         </ol>

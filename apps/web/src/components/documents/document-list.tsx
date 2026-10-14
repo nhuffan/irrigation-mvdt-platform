@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import Link from "next/link";
 import type { DocumentRecord } from "@/types/media";
 import { VerificationBadge } from "@/components/asset/source-info";
@@ -19,7 +20,7 @@ export function DocumentList({ documents }: { documents: DocumentRecord[] }) {
             {doc.source.source_date ?? "Date not available"} ·{" "}
             {doc.mime_type ?? "Unknown file type"}
           </p>
-          <VerificationBadge status={doc.source.verification_status} />
+          <VerificationBadge status={doc.source.verification_status} /><TechnicalMetadataPopover fields={{"Document UUID":doc.id,"Source UUID":doc.source_id,"Document code":doc.document_code,"SHA-256":doc.checksum_sha256,"Page count":doc.page_count}}/>
           <Link className="text-link" href={`/documents/${doc.id}`}>
             Open document →
           </Link>

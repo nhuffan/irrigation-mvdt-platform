@@ -1,4 +1,5 @@
 "use client";
+import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import { useEffect, useRef, useState } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
 import type { ModelRecord, ModelAssetLink } from "@/types/media";
@@ -226,15 +227,15 @@ export default function CesiumViewer({
           )}
         </div>
         {link ? (
-          <AssetSidePanel key={link.id} link={link} />
+          <AssetSidePanel key={link.id} link={link} placement={model.coordinate_mode} />
         ) : (
           <aside className="panel">
             <h2>Asset selection</h2>
             <p className="muted mt-3">
               {selected
-                ? `No asset is linked to object ${selected}.`
+                ? "No asset is linked to this object."
                 : "Select a model object to view its asset information."}
-            </p>
+            </p><TechnicalMetadataPopover fields={{"Object key":selected}}/>
           </aside>
         )}
       </div>
@@ -244,7 +245,7 @@ export default function CesiumViewer({
           {links.map((item) => (
             <li key={item.id}>
               <button onClick={() => setSelected(item.object_key)}>
-                {item.object_name ?? item.object_key}
+                Representative object
               </button>
             </li>
           ))}

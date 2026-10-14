@@ -1,4 +1,5 @@
 "use client";
+import { assetDisplayName, locationSourceTitle } from "@/lib/asset-display";
 import { useEffect, useRef, useState } from "react";
 import type {
   Map as LibreMap,
@@ -102,10 +103,10 @@ export function AssetMap({
           const content = document.createElement("div");
           content.className = "reservoir-popup asset-popup";
           const title = document.createElement("h3");
-          title.textContent = asset.name;
+          title.textContent = assetDisplayName(asset);
           content.append(title);
           for (const value of [
-            `${asset.asset_code} · ${asset.id}`,
+
             `Category: ${asset.category.name}`,
             `${asset.data_status} · ${assetLocation(asset).location_status.replaceAll("_", " ")}`,
             locationLayer(asset) === "DEV" ? "DEV example — not research evidence" : assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Map-symbol reference location only. Not surveyed geometry." : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
@@ -114,12 +115,17 @@ export function AssetMap({
             line.textContent = value;
             content.append(line);
           }
-          if (assetLocation(asset).location_status === "REFERENCE_LOCATION") {
-            const location = assetLocation(asset);
-            for (const value of [`Source: ${location.source ?? "Unavailable"}`, `Scale / limitation: ${location.accuracy_limitation}`, `Locator: ${location.locator ?? "Unavailable"}`]) {
-              const line = document.createElement("p"); line.textContent = value; content.append(line);
-            }
+          const location = assetLocation(asset);
+          if (location.location_status === "REFERENCE_LOCATION") {
+            const source = document.createElement("p"); source.textContent = locationSourceTitle(location.source); content.append(source);
+            const scale = location.accuracy_limitation.match(/1:[\d,]+/)?.[0];
+            if (scale) { const line = document.createElement("p"); line.textContent = `Map scale · ${scale}`; content.append(line); }
           }
+          const metadata = document.createElement("details"); const summary = document.createElement("summary"); summary.textContent = "Technical details"; metadata.append(summary);
+          for (const [key,value] of Object.entries({"Asset code":asset.asset_code,UUID:asset.id,Source:location.source,Locator:location.locator,CRS:location.crs,"Evidence ID":location.evidence_id,Limitation:location.accuracy_limitation})) {
+            if (!value) continue; const line=document.createElement("p");line.textContent=`${key}: ${value}`;metadata.append(line);
+          }
+          content.append(metadata);
           const link = document.createElement("a");
           link.textContent = "View Asset →";
           link.href = `/assets/${encodeURIComponent(asset.id)}`;
@@ -216,7 +222,7 @@ export function AssetMap({
           for (const geometryType of ["LineString", "Polygon"]) instance.addLayer({ id: `selected-${geometryType}`, type: "line", source: "assets", filter: ["==", ["geometry-type"], geometryType], paint: { "line-width": 6, "line-color": "#047857", "line-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0] } });
           for (const asset of assets.filter(a => mapGeometry(a)?.type === "Point" && assetLocation(a).location_status === "REFERENCE_LOCATION" && locationLayer(a) !== "DEV")) {
             const label = document.createElement("button"); label.className = "reference-map-label"; label.textContent = "REFERENCE";
-            label.setAttribute("aria-label", `Select reference location ${asset.asset_code}`);
+            label.setAttribute("aria-label", `Select reference location ${assetDisplayName(asset)}`);
             label.addEventListener("click", (event) => { event.stopPropagation(); selection.current.onSelect(asset); selectAsset.current?.(asset); });
             new Marker({ element: label, anchor: "top", offset: [0, 21] }).setLngLat(geometryPositions(mapGeometry(asset)!)[0]).addTo(instance);
           }
@@ -337,7 +343,7 @@ export function AssetMap({
                 disabled={mapState !== "ready"}
                 onClick={() => { onSelect(asset); selectAsset.current?.(asset); }}
               >
-                Locate {asset.asset_code}
+                Locate {assetDisplayName(asset)}
               </button>
             ))}
           </div>

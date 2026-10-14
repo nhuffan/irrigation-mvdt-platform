@@ -1,4 +1,5 @@
 "use client";
+import { AssetDisplayName, TechnicalMetadataPopover, StatusBadge } from "@/components/asset/presentation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -9,7 +10,7 @@ import {
 } from "@/lib/api";
 import { VerificationBadge } from "@/components/asset/source-info";
 import type { ModelAssetLink } from "@/types/media";
-export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
+export function AssetSidePanel({ link, placement }: { link: ModelAssetLink; placement: string }) {
   const [data, setData] = useState<Awaited<ReturnType<typeof load>> | null>(
     null,
   );
@@ -38,8 +39,7 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
   return (
     <aside className="panel">
       <p className="eyebrow">Selected object</p>
-      <h2>{link.object_name ?? link.object_key}</h2>
-      <p className="muted break-all">{link.object_key}</p>
+      <h2>Representative object</h2><StatusBadge>{placement}</StatusBadge><p>Representative mapping only</p><TechnicalMetadataPopover fields={{"Object key":link.object_key,"Object name":link.object_name,"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Mapping status":link.verification_status}}/>
       <VerificationBadge status={link.verification_status} />
       <p className="muted text-sm mt-3">
         This link identifies the asset through the selected object; other parts may
@@ -54,12 +54,8 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
           <div>
             <dt>Asset</dt>
             <dd>
-              {data[0].name} · {data[0].asset_code}
+              <AssetDisplayName asset={data[0]}/>
             </dd>
-          </div>
-          <div>
-            <dt>Asset ID</dt>
-            <dd className="break-all">{link.asset_id}</dd>
           </div>
           <div>
             <dt>Category</dt>
@@ -80,7 +76,7 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
                   <VerificationBadge status={data[2][0].verification_status} />
                 </>
               ) : (
-                "No inspection records"
+                "No inspection records available"
               )}
             </dd>
           </div>
@@ -93,7 +89,7 @@ export function AssetSidePanel({ link }: { link: ModelAssetLink }) {
                   <VerificationBadge status={data[3][0].verification_status} />
                 </>
               ) : (
-                "No maintenance records"
+                "No maintenance records available"
               )}
             </dd>
           </div>

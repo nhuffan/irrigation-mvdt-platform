@@ -1,109 +1,22 @@
 import { Suspense } from "react";
-import { AssetMedia } from "./asset-media";
-import { AssetOm } from "./asset-om";
 import Link from "next/link";
-import { getAsset, getReservoir } from "@/lib/api";
+import { getReservoir, getReservoirAssets } from "@/lib/api";
+import { getExplorerData } from "@/lib/explorer-data";
 import type { Asset } from "@/types/asset";
-import { AssetMap } from "@/components/map/asset-map";
-import { AssetStatus } from "./asset-status";
-export async function AssetDetail({ asset }: { asset: Asset }) {
-  const [reservoir, parent] = await Promise.all([
-    getReservoir(asset.reservoir_id),
-    asset.parent_asset_id
-      ? getAsset(asset.parent_asset_id)
-      : Promise.resolve(null),
-  ]);
-  return (
-    <>
-      <div className="registry-grid">
-        <section className="panel">
-          <p className="eyebrow">Asset identity</p>
-          <h2>Classification & hierarchy</h2>
-          <dl className="detail-list">
-            <div>
-              <dt>Reservoir</dt>
-              <dd>
-                <Link
-                  className="text-link"
-                  href={`/reservoirs/${reservoir.id}`}
-                >
-                  {reservoir.name} · {reservoir.code}
-                </Link>
-              </dd>
-            </div>
-            <div>
-              <dt>Category</dt>
-              <dd>
-                {asset.category.name} · {asset.category.code}
-              </dd>
-            </div>
-            <div>
-              <dt>Parent asset</dt>
-              <dd>
-                {parent ? (
-                  <Link className="text-link" href={`/assets/${parent.id}`}>
-                    {parent.name} · {parent.asset_code}
-                  </Link>
-                ) : (
-                  "No parent asset"
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>Asset UUID</dt>
-              <dd className="break-all text-sm">{asset.id}</dd>
-            </div>
-          </dl>
-        </section>
-        <section className="panel">
-          <p className="eyebrow">Information readiness</p>
-          <h2>Data readiness</h2>
-          <dl className="detail-list">
-            <div>
-              <dt>Data status</dt>
-              <dd>
-                <AssetStatus status={asset.data_status} />
-              </dd>
-            </div>
-            <div>
-              <dt>Description</dt>
-              <dd className="muted">
-                {asset.description ?? "No description recorded."}
-              </dd>
-            </div>
-          </dl>
-        </section>
-      </div>
-      <section className="panel mt-6">
-        <p className="eyebrow">Technical information</p>
-        <h2>Technical description</h2>
-        <p className="muted mt-3 whitespace-pre-wrap">
-          {asset.technical_description ??
-            "Technical information has not been recorded."}
-        </p>
-      </section>
-      <Suspense
-        fallback={
-          <section className="panel mt-6" role="status">
-            Loading technical information and O&M histories…
-          </section>
-        }
-      >
-        <AssetOm assetId={asset.id} />
-      </Suspense>
-      <Suspense fallback={<p role="status">Loading documents and 3D links…</p>}>
-        <AssetMedia assetId={asset.id} reservoirId={asset.reservoir_id} />
-      </Suspense>
-      <section className="mt-10">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">Spatial information</p>
-            <h2>{asset.geometry?.type ?? "Spatial geometry: Not available in this dataset"}</h2>
-          </div>
-          {asset.geometry && <span className="muted text-sm">WGS 84 · EPSG:4326</span>}
-        </div>
-        <AssetMap reservoir={reservoir} assets={[asset]} />
-      </section>
-    </>
-  );
+import { AssetOm } from "./asset-om";
+import { AssetMedia } from "./asset-media";
+import { AssetDisplayName, AssetMetadata, StatusBadge } from "./presentation";
+import { AssetLocationSummary } from "./asset-location-summary";
+import { AssetInformationCoverage } from "./asset-information-coverage";
+import { AssetEvidenceSummary } from "./asset-evidence-summary";
+export async function AssetDetail({asset}:{asset:Asset}) {
+ const [reservoir,assets,data]=await Promise.all([getReservoir(asset.reservoir_id),getReservoirAssets(asset.reservoir_id).catch(()=>null),getExplorerData(asset.id)]);
+ const parent=assets?.find(a=>a.id===asset.parent_asset_id);const children=assets?.filter(a=>a.parent_asset_id===asset.id);
+ return <div className="asset-properties-layout">
+ <aside className="panel component-tree"><h2>Bộ phận — Components</h2>{parent&&<Link className="text-link" href={`/assets/${parent.id}`}><AssetDisplayName asset={parent}/></Link>}<p className="selected-component"><AssetDisplayName asset={asset}/></p>{children?.map(a=><p key={a.id}><Link className="text-link" href={`/assets/${a.id}`}><AssetDisplayName asset={a}/></Link></p>)}{assets===null?<p>Hierarchy unavailable</p>:!children?.length&&<p className="muted">No controlled child components recorded.</p>}<AssetMetadata asset={asset}/><Link className="text-link" href={`/map?paper=1&asset=${asset.id}`}>Bản đồ — GIS →</Link></aside>
+ <div className="asset-properties"><section className="panel"><h2>Thông tin cơ bản — Overview</h2><StatusBadge>{asset.asset_code.startsWith("RS-")?"RS":asset.asset_code.startsWith("DEV-")?"DEV":"Unclassified"}</StatusBadge><p>{asset.category.name} · {reservoir.name}</p><p className="muted">{asset.description??"Description unavailable."}</p><AssetLocationSummary asset={asset}/></section>
+ <div className="asset-summary-grid" id="coverage"><AssetInformationCoverage asset={asset} data={data}/><div className="panel"><AssetEvidenceSummary asset={asset} data={data}/></div></div>
+ <Suspense fallback={<p>Loading technical and O&M information…</p>}><AssetOm assetId={asset.id}/></Suspense>
+ <Suspense fallback={<p>Loading documents and model links…</p>}><AssetMedia assetId={asset.id} reservoirId={asset.reservoir_id}/></Suspense>
+ </div></div>;
 }

@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover, StatusBadge } from "./presentation";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
 import { SourceInfo, VerificationBadge } from "./source-info";
 export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
@@ -27,7 +28,7 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                 className="om-record"
                 id={`record-${record.id}`}
               >
-                <p className="eyebrow">{record.attribute_key}</p>
+                
                 <h3 className="font-semibold">{record.attribute_label}</h3>
                 <p className="technical-value">
                   {record.value_number ?? record.value_text ?? "Not available"}
@@ -39,13 +40,8 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                     Multiple records for this attribute — review sources.
                   </p>
                 )}
-                <dl className="source-grid mt-3 text-sm" aria-label="Record provenance">
-                  <div><dt>Verification level</dt><dd>{record.reviewed_provenance?.verification_level ?? "Unavailable"}</dd></div>
-                  <div><dt>Source code</dt><dd>{record.source?.source_code ?? "Unavailable"}</dd></div>
-                  <div><dt>Evidence ID</dt><dd>{record.reviewed_provenance?.evidence_id ?? "Unavailable"}</dd></div>
-                  <div><dt>Source locator</dt><dd className="break-words">{record.reviewed_provenance?.source_locator ?? "Unavailable"}</dd></div>
-                  <div><dt>Reviewed authority</dt><dd>{record.reviewed_provenance?.authority ?? "Unavailable"}</dd></div>
-                </dl>
+                <StatusBadge>{record.reviewed_provenance?.verification_level ?? "Level unavailable"}</StatusBadge>
+                <TechnicalMetadataPopover fields={{"Record UUID":record.id,"Asset UUID":record.asset_id,"Attribute key":record.attribute_key,"Source UUID":record.source_id,"Source code":record.source?.source_code,"Evidence ID":record.reviewed_provenance?.evidence_id,Locator:record.reviewed_provenance?.source_locator,Authority:record.reviewed_provenance?.authority,Reviewer:record.reviewed_provenance?.reviewer,"Reviewed at":record.reviewed_provenance?.reviewed_at,Verification:record.verification_status}}/>
                 <SourceInfo source={record.source} />
               </article>
             ))}

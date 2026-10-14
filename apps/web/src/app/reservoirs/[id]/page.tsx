@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import { Suspense } from "react";
 import { ReservoirAssets } from "@/components/asset/reservoir-assets";
 import Link from "next/link";
@@ -60,7 +61,7 @@ export default async function ReservoirPage({
             </div>
             <div>
               <dt>Reservoir ID</dt>
-              <dd className="break-all text-sm">{reservoir.id}</dd>
+              <dd><TechnicalMetadataPopover fields={{"Reservoir UUID":reservoir.id}}/></dd>
             </div>
           </dl>
         </section>

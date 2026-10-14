@@ -1,3 +1,4 @@
+import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiError, getDocument } from "@/lib/api";
@@ -24,7 +25,7 @@ export default async function DocumentPage({
       </Link>
       <div className="page-heading mt-6">
         <div>
-          <p className="eyebrow">{doc.document_code}</p>
+          <p className="eyebrow">Tài liệu — Document</p>
           <h1>{doc.original_file_name}</h1>
         </div>
       </div>
@@ -32,9 +33,7 @@ export default async function DocumentPage({
         {doc.mime_type} · {doc.file_size ?? "Unknown"} bytes ·{" "}
         {doc.page_count ?? "Unknown"} pages
       </p>
-      <p className="muted break-all text-sm mt-3">
-        SHA-256: {doc.checksum_sha256 ?? "Not available"}
-      </p>
+      <TechnicalMetadataPopover fields={{"Document UUID":doc.id,"Document code":doc.document_code,"Source UUID":doc.source_id,"SHA-256":doc.checksum_sha256,MIME:doc.mime_type,"Page count":doc.page_count}}/>
       <SourceInfo source={doc.source} />
       <DocumentPreview document={doc} />
     </main>

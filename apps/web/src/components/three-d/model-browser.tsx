@@ -1,4 +1,5 @@
 "use client";
+import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
 import { getModelLinks } from "@/lib/api";
@@ -42,11 +43,7 @@ function ModelView({
         <p className="muted mt-3">
           {model.coordinate_mode} · {model.format} · {model.model_type}
         </p>
-        <p className="muted">
-          Longitude {model.longitude ?? "N/A"} · Latitude{" "}
-          {model.latitude ?? "N/A"} · Height {model.height ?? "N/A"} m · H/P/R{" "}
-          {model.heading}/{model.pitch}/{model.roll}° · Scale {model.scale}
-        </p>
+        <TechnicalMetadataPopover fields={{"Model UUID":model.id,"Model code":model.model_code,"Source UUID":model.source_id,Placement:model.coordinate_mode,Longitude:model.longitude,Latitude:model.latitude,Height:model.height,Heading:model.heading,Pitch:model.pitch,Roll:model.roll,Scale:model.scale}}/>
         <p className="muted text-sm">
           Placement and visibility do not establish surveyed accuracy or
           verified asset mapping.
@@ -93,7 +90,7 @@ export function ModelBrowser({
         <select value={id} onChange={(event) => setId(event.target.value)}>
           {models.map((m) => (
             <option key={m.id} value={m.id}>
-              {m.name} · {m.model_code}
+              {m.name}
             </option>
           ))}
         </select>

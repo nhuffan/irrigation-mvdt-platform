@@ -1,3 +1,4 @@
+import { AssetDisplayName } from "@/components/asset/presentation";
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -5,11 +6,13 @@ import { ApiError, getAsset } from "@/lib/api";
 import { AssetDetail } from "@/components/asset/asset-detail";
 export const dynamic = "force-dynamic";
 export default async function AssetPage({
-  params,
+  params, searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{paper?:string}>;
 }) {
   const { id } = await params;
+  const paper=(await searchParams).paper==="1";
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
   )
@@ -20,7 +23,7 @@ export default async function AssetPage({
     throw error;
   });
   return (
-    <main className="page-shell">
+    <main className={paper?"page-shell clean-paper":"page-shell"}>
       <Link
         className="text-link"
         href={`/reservoirs/${asset.reservoir_id}#assets`}
@@ -29,8 +32,8 @@ export default async function AssetPage({
       </Link>
       <div className="page-heading mt-8">
         <div>
-          <p className="eyebrow">Asset detail · {asset.asset_code}</p>
-          <h1>{asset.name}</h1>
+          <p className="eyebrow">Tài sản — Asset detail</p>
+          <h1><AssetDisplayName asset={asset}/></h1>
         </div>
       </div>
       <Suspense
