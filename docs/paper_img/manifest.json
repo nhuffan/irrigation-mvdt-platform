@@ -1,25 +1,48 @@
 {
-  "capture_set": "paper_data_enrich_recapture",
-  "software_commit": "6c14892d45297c0b20f3abd9f00ec69565b21d40",
-  "date": "2026-10-14T14:00:29.521339+07:00",
+  "capture_set": "paper_evidence_enrich_2_approved",
+  "software_commit": "d9a1c7c62a327bfed0cb8da7fa79b791e2564691",
+  "date": "2026-10-14T20:39:19.341878+07:00",
+  "files": {
+    "Hinh_2.png": "72cabc28dd21d88cc61e7ab1622f78424fc85c253b3d7512078097a5546a3b0a",
+    "Hinh_3.png": "10f485625ab02620274b8fd52886faeabd05721b2cd9c117d157cb58bb7d74b0",
+    "Hinh_1.png": "ca881c4de83d16460de0ad4de309493fe0d5bb94d783207ba873c59c1f12d63e",
+    "S6.png": "6fba28bc85e6aca8e565e649d3499cbeaed815c6be61d477468774d618f96ffb",
+    "S7.png": "d1266c83e7456c05e26b57b23de0753ecc497fe84b94aefb2f88e77ff5383185",
+    "S5.png": "f541ad1667e616de640585446ec61d11ac96c4b455b1a1cb65231eef2a23508f",
+    "S4.png": "e3d691280698dd92da866e0afd715fb4d488ec639b33619a0671a47606350221",
+    "S1.png": "5e85544dccb89d84048df4f9e795bdce22a1b52d54ac0a589bb4fc25fcfbee8a",
+    "S3.png": "4e22c0dae957e904b9866f8fb6196ed768f524d243bdc581d53bb94426a2906f",
+    "S2.png": "d3ba7ed76d8aa6fc55c5328d46257a3d227cbf680cf36e229c21866664338291",
+    "README.md": "2beb272a2a454fce2f8f201ebb48938f5a5ad85a1fe01fb513788a4681fce95a",
+    "Hinh_5_current.png": "7935dbf02b48f345ef6d5e1cb9f5a9eaa73f37e3c8de28f67e8c3518595164ea",
+    "Hinh_6_current.png": "c36e5670e75d50a83ee8a0a9cf19eeb00a7bda10c2b160533ed480bacc4bbd0b"
+  },
+  "image_capture_sets": {
+    "S1.png": "paper_evidence_enrich_2_approved",
+    "S2.png": "paper_evidence_enrich_2_approved",
+    "S3.png": "paper_evidence_enrich_2_approved",
+    "S4.png": "paper_evidence_enrich_2_approved",
+    "S5.png": "paper_data_enrich_recapture",
+    "S6.png": "paper_data_enrich_recapture",
+    "S7.png": "paper_evidence_enrich_2_approved"
+  },
+  "retained_capture_metadata": {
+    "paper_data_enrich_recapture": {
+      "software_commit": "6c14892d45297c0b20f3abd9f00ec69565b21d40",
+      "date": "2026-10-14T14:00:29.521339+07:00"
+    }
+  },
   "unchanged_figures": [
     "Hinh_1.png",
     "Hinh_2.png",
-    "Hinh_5_current.png"
+    "Hinh_5_current.png",
+    "S5.png",
+    "S6.png"
   ],
-  "files": {
-    "Hinh_1.png": "ca881c4de83d16460de0ad4de309493fe0d5bb94d783207ba873c59c1f12d63e",
-    "Hinh_2.png": "72cabc28dd21d88cc61e7ab1622f78424fc85c253b3d7512078097a5546a3b0a",
-    "Hinh_3.png": "baaede0b0f4bd4e52a002ea287540a04b46fbe15e07a3d3f6a665c185faf8afb",
-    "Hinh_5_current.png": "7935dbf02b48f345ef6d5e1cb9f5a9eaa73f37e3c8de28f67e8c3518595164ea",
-    "Hinh_6_current.png": "fdcb75bbab3bf62c67c7ddd5bcbc89af3a96c1711e2305e96009fba67c961bf9",
-    "README.md": "553d554db6f6c80137e157e16c779db49b5308630ffef8c9ef489cb524f1a586",
-    "S1.png": "e58a61ce931e71f74d95f86e33dfbaee6d42bb8146c881f9412bfb03dac21d25",
-    "S2.png": "5f7445fde2c2ff691ededde05d5a7259a9a3261d0afbd34e132ad2a277d58dff",
-    "S3.png": "c3814b22f0150855c31e1f04ce560ac10fc7ca42e05937d78e284044ef3c9f06",
-    "S4.png": "032a56594353a19f9d2b9eaad31d0eb9620865786c24cdcd220e213a5e7231c1",
-    "S5.png": "f541ad1667e616de640585446ec61d11ac96c4b455b1a1cb65231eef2a23508f",
-    "S6.png": "6fba28bc85e6aca8e565e649d3499cbeaed815c6be61d477468774d618f96ffb",
-    "S7.png": "1dc181ea0bf205e90c499dcb0ad51b18cf7179864c438c84cf8ea234504798b4"
-  }
+  "public_s4_crop": [
+    450,
+    125,
+    1680,
+    530
+  ]
 }

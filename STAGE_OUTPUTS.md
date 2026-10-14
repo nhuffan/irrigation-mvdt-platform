@@ -350,3 +350,28 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Current counts/DB/media unchanged; Table 2 recomputed from explicit stage after snapshot. 46 active controlled hashes and both sidecars match baseline. Source admission proposals do not change 17/12; four canonical geometries remain NULL, reference=1, technical=3 L2, verified condition/O&M=0, documents=5, 3D target/link=1/1. F02/F05 pending, NOT_READY/not frozen.
 - No affected screenshot: S1–S7 and diagrams/composites keep original bytes/capture lineage 6c14892, Hình 6=S1+S3+S5. Figure state records a separate review checkpoint; private package manifest updated to 44 hashes. No new capture set or false recapture date.
 - Browser/API baseline checked. No task service/container started; preexisting web 3000/API 8000/PostGIS preserved. Continue once the genuine review decisions arrive.
+
+
+## Stage PAPER-EVIDENCE-ENRICH-2 — approval applied
+
+The explicit user approval is recorded as nhuffan / RESEARCHER, not a fabricated domain-expert attestation. Seven optional SPILLWAY source-reported technical fields HYD-T01/T02/T08–T12 were admitted at L2, together with source RS-SRC-018 and retained document RS-DOC-041. Required MAIM and independent domain/methodology gates were not approved by this operation. Manual procedures remain reference material; no completed event or current condition was inferred. SP-I01–03 and MGMT identity/effective-date candidates remain pending their specific source/event contracts.
+
+| Measure | Before | After |
+|---|---:|---:|
+| Technical L2 records | 3 | 10 |
+| Controlled / expected-file sources | 17 / 12 | 18 / 13 |
+| Distinct retained documents | 5 | 6 |
+| API asset-document links | 1 | 2 |
+| Verified condition / O&M | 0 / 0 | 0 / 0 |
+| Canonical geometry / reference location | 0 / 1 | 0 / 1 |
+| Selected 3D target / representative link | 1 / 1 | 1 / 1 |
+
+Source remains UNKNOWN authority and UNVERIFIED independently of field-level L2 decisions. Dry-run → apply → retry completed: source/technical retry 8 UNCHANGED; document retry 1 UNCHANGED. Snapshot audit confirms only one source, seven technical records and one document were added; all prior rows and stored media hashes are unchanged. API and browser show seven SPILLWAY L2 records and one linked manual. Five review-boundary tests pass, including rejection of researcher-only approvals for required MAIM, L3 and events. No frontend/API schema changed; no new full build or full regression claimed.
+
+S1/S2/S3/S4/S7 freshly captured at software d9a1c7c. S3 shows one expanded field/source excerpt, not all seven values. Public S4 is a metadata/toolbar crop; full page-1 preview stays private. S5/S6 and Hình 1/2/5 preserve old bytes/date/software. Hình 3 = new S2 + retained S5; Hình 6 = new S1 + new S3 + retained S5. Capture sets, captions, tables and hashes distinguish mixed capture lineage.
+
+Methodology input checksums were refreshed without rebinding old approvals. Updated package remains NOT_READY / NOT_FROZEN; F02/F05 are pending. Previous package approval is stale and source-boundary/provenance methodology coverage needs reconciliation for added records. The private readiness-final report lists every gate. These imports do not establish research completeness or observed operational performance.
+
+No task service was started; preexisting API, web and PostGIS remain running. Raw originals, approvals and candidate files remain private/ignored.
+
+Methodology fingerprint: `fc806300b7fb12d5d3fccca193e2e203ed6c5caaf252b8a4b0dd7271a8525f90`. DB fingerprint: `49288aa558362c14f9c9238a92858ff05ed70e3d68a98a79bf9baf40ef7b4c72`.
