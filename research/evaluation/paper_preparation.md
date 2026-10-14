@@ -84,3 +84,42 @@ For main-paper Table 3, select Registry/Detail, GIS selection, document preview,
 Ten targeted tests pass; modified frontend lint and production build/typecheck pass. Browser inspection covered Registry, GIS popup/panel, two-column detail, technical, document, O&M and representative 3D. Current document/3D tab error logs were empty after navigating through the configured API origin. Responsive stacking is implemented in CSS; no claim of a full device matrix. Native details were inspected for accessible/copyable canonical identifiers.
 
 DB rows and retained media hashes before/after match exactly (`c32988b9918e65471eecf6bdbd96360d76f06478898d865c59450bc6806b8dd8`). All 46 controlled hashes and both provenance/location sidecar hashes match the previous snapshot. Package manifest contains 43 file hashes. Four canonical geometries remain NULL; SPILLWAY is reference only, INTAKE unresolved, DAM/MGMT have no location. Technical L2, zero verified O&M, LOCAL representative mapping, source authority, F02/F05 and NOT_READY/not frozen are unchanged. Private evidence records detailed checks and reproduction scripts.
+
+
+## PAPER-DATA-ENRICH-RECAPTURE
+
+Reused the supplied bounded pre-research; no broad Drive search or full archive OCR. Checks A–D and exact locators are retained in private `evidence/PAPER-DATA-ENRICH-RECAPTURE/decision_queue.md`.
+
+- A: approved dictionary only contains the three historical wall keys. Monitoring count/period/0.50 m offset stay reference/review-pending; no MAIM extension or technical import. Monitoring-equipment operation does not establish DAM condition.
+- B: workbook YEAR_ONLY entries lack exact completed-event dates; indexed XL1/XL5 findings concern design adjustment, contract/minutes dates or blank day/month. No qualified completed O&M event identified in the bounded review; no archive-wide absence claim.
+- C: B01B/model review identifies a representative MGMT roof but does not establish name equivalence with sail building, operating complex or branch-office entrance. Mapping remains unresolved for those activity candidates; INTAKE ambiguity unchanged; no components created.
+- D: exact DAM input-summary document RS-DOC-017 and hash match the existing DB document; no duplicate. Source map and workbook have no matching imported Document row and no direct supporting-document linkage contract in the existing API, which derives assets' documents via technical/O&M sources. Their relevance is retained, but no fake technical/event row or new schema was introduced to force links. Supporting-link candidates remain pending workflow support.
+
+No qualified batch, so compiler/dry-run/apply/retry was not applicable. DB/media snapshot before and after is identical; all 46 controlled hashes and both sidecars unchanged. Document API links remain DAM=1, others=0. F02/F05 pending, dataset NOT_READY and not frozen.
+
+UI: shared asset display wrapper and popup title use explicit left alignment; wrapped MGMT lines share the left edge across registry, detail, components and 3D. Browser computed style confirmed left. In paper panel only, actual reviewed technical records and meaningful document filenames come first; assets without technical evidence retain location-first layout. No empty states removed from full UI.
+
+All S1–S7 were freshly captured, replacing working filenames after old images/hashes were archived under `evidence/PAPER-DATA-ENRICH-RECAPTURE/previous-docs` and `previous-paper`. Capture set `paper_data_enrich_recapture` records software commit, date, URL, DB/media and sidecar hashes. S1 selects DAM with L2 and document; S2 selects reference SPILLWAY; S3 shows L2 technical; S4 actual PDF; S5 MGMT LOCAL representative/left alignment; S6 true verified-empty O&M; S7 supplementary coverage. 3D uses preexisting allowed API origin 3000; other screenshots use temporary production preview 3100.
+
+Hình 3 = S2 + S5. Hình 6 current = S1 + S3 + S5 because no qualified enrichment made coverage substantively richer. S7 remains supplementary/Table-2 support; S6 stays out of main figures. The S5 composite uses actual canvas, identity/LOCAL and asset-link excerpts, keeping empty O&M fields in full S5/S6. Hình 1/2 and source-map Hình 5 current are unchanged including hashes. Historic capture sets are preserved, not relabeled.
+
+Table 2 exporter now accepts `--snapshot`; run `python3 scripts/export_paper_ui_counts.py --snapshot research/evaluation/evidence/PAPER-DATA-ENRICH-RECAPTURE/db-after.json`. This prevents silently exporting an older stage snapshot. Recomputed values and definitions below are unchanged. API-derived linked files differ from distinct retained documents.
+
+| Metric | Before | After | Evidence / reason |
+|---|---:|---:|---|
+| Target assets | 4 | 4 | controlled RS asset count |
+| Reviewed identities | 4 | 4 | researcher identity inclusion review / 4; not independent domain approval |
+| Verified geometry | 0 | 0 | canonical RS geometry / 4; all null, no surveyed geometry |
+| Reference locations | 1 | 1 | separate / 4; excluded from verified numerator |
+| Technical records | 3 | 3 | RS records; level from bound reviewed provenance |
+| L2 technical records | 3 | 3 | historical L2; no promotion |
+| Verified current condition | 0 | 0 | assets with verified condition / 4 |
+| Verified O&M events | 0 | 0 | verified condition/inspection/repair/maintenance records; not real-world activity count |
+| Controlled sources | 17 | 17 | reviewed source inventory rows, including candidate/reference sources |
+| Expected-file sources | 12 | 12 | file_expected=true; distinct from linked documents |
+| Reviewed distinct documents | 5 | 5 | distinct SHA-256 among IMPORT file-retention reviews; not validated content |
+| Selected 3D targets | 1 | 1 | approved requires_3d=true scope |
+| Representative verified links | 1 | 1 | representative link records / 1 selected target; LOCAL, not full geometry |
+| Asset-document API links | 1 | 1 | DAM 1; SPILLWAY/INTAKE/MGMT 0; source-derived, no direct link contract |
+
+Targeted verification: 10 presentation/location tests, lint of modified TSX paths and production build/typecheck pass. Browser smoke covers selected DAM, SPILLWAY reference GIS, technical, actual PDF, MGMT 3D and alignment, O&M and coverage; no errors in inspected current tab logs. No full regression. Captions, figure-state, docs manifest and private 43-file package manifest updated.

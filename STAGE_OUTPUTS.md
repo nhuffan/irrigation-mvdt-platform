@@ -330,3 +330,13 @@ Kết quả triển khai và kiểm tra theo từng stage.
 - Before/after DB/media snapshots identical (`c32988b9918e65471eecf6bdbd96360d76f06478898d865c59450bc6806b8dd8`); 46 controlled input hashes and provenance/location sidecars unchanged. No new geometry/evidence/authority; F02/F05 pending, NOT_READY and not frozen unchanged.
 - Preparation and manuscript image mapping updated in `research/evaluation/paper_preparation.md`; outputs remain outside project README. Current figure numbers preserved until manuscript-wide renumbering.
 - Cleanup verified: task preview 3100 stopped and port released. Preexisting web 3000, API 8000 and PostGIS/Docker remain running; no volumes removed.
+
+
+## Stage PAPER-DATA-ENRICH-RECAPTURE output
+
+- Completed bounded checks A–D using the supplied pre-research and existing reviewed locators. No candidate satisfied existing technical/date/identity/document-link contracts, so no import or schema change. Monitoring candidates remain reference, YEAR_ONLY O&M blocked, MGMT name equivalence/INTAKE ambiguous; map/workbook supporting links pending a direct-link workflow. DAM document already exists; no duplicate.
+- Shared VN–EN asset names explicitly left aligned, including wrapped MGMT; paper DAM panel foregrounds actual L2 records and meaningful document filename. Missing-technical assets retain location-first presentation. Table exporter accepts an explicit current snapshot.
+- Recaptured all S1–S7, archived previous bytes/hashes, replaced docs/paper_img filenames. Hình 3 rebuilt S2+S5; Hình 6 current rebuilt S1+S3+S5. S7 supplementary, S6 not main figure. Hình 1/2/source map unchanged. Capture set paper_data_enrich_recapture binds software `6c14892`; captions/state and 43-file private manifest refreshed.
+- Checks: 10 targeted tests, modified-path lint, build/typecheck and seven-view browser smoke passed. MGMT computed text-align=left. No full regression. DB/media unchanged, 46 controlled hashes and provenance/location sidecars unchanged. F02/F05 pending, NOT_READY/not frozen preserved.
+- Counts before→after: RS 4→4; researcher identities 4→4; canonical geometry 0→0; reference 1→1; technical 3 L2→3 L2; verified condition/O&M 0→0; sources 17→17; expected files 12→12; distinct reviewed documents 5→5; asset-document API links 1→1; selected 3D target/representative link 1/1→1/1. Detailed definitions and before/after report in preparation/private evidence.
+- Task preview 3100 stopped; existing API 8000/web 3000/PostGIS preserved. Remote visibility was observed PUBLIC at final push check (previous stage was PRIVATE); new paper images/docs require explicit public-publication confirmation before pushing.
