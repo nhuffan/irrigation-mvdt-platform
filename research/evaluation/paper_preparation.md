@@ -163,3 +163,12 @@ Methodology input checksums were refreshed without rebinding old approvals. Upda
 No task service was started; preexisting API, web and PostGIS remain running. Raw originals, approvals and candidate files remain private/ignored.
 
 Methodology fingerprint: `fc806300b7fb12d5d3fccca193e2e203ed6c5caaf252b8a4b0dd7271a8525f90`. DB fingerprint: `49288aa558362c14f9c9238a92858ff05ed70e3d68a98a79bf9baf40ef7b4c72`.
+
+
+## F02–F05–F15 image update 2026-10-15
+
+Hình 3. Giao diện GIS hiển thị vị trí tham khảo của SPILLWAY (a) và mesh đại diện MGMT được chọn trong mô hình LOCAL (b). Hai panel thuộc hai asset khác nhau; hình không chứng minh đồng bộ tọa độ GIS–3D.
+
+Hình 6. Prototype gồm thông tin SPILLWAY (a), thuộc tính L2 kèm nguồn manual (b), và mesh đại diện MGMT với highlight lựa chọn (c). Xác minh thuộc tính, thẩm quyền nguồn, vị trí và tình trạng vận hành là các trạng thái riêng.
+
+S1/S2/S5 được chụp lại trên fdda470; S3/S4/S6/S7 giữ lineage cũ. F15 PASS theo kiểm thử Chrome thực; F02/F05 PENDING_EVIDENCE. Mẫu số: 4 asset, 0 canonical geometry, 2 reference locations, 10 L2, 18 sources/13 expected-file, 6 distinct documents/2 API links, 0 verified O&M, 1 selected 3D target/1 representative link. Ma trận 16 PASS, 2 FAIL, 3 N/A gồm các kết quả lịch sử được giữ lại; không phải chạy lại toàn bộ 21 tiêu chí. Word không chỉnh theo yêu cầu người dùng.

@@ -1,11 +1,12 @@
-# Paper images — PAPER-EVIDENCE-ENRICH-2
+# Paper images — F02–F05–F15 integrated
 
-- S1.png: SPILLWAY detail after researcher approval: seven optional source-reported L2 technical fields and one linked manual. Reference location remains navigation only.
-- S2.png: SPILLWAY reference GIS with L2 technical excerpt and linked manual; hollow reference marker, scale and OSM attribution. No surveyed geometry or F02 promotion.
-- S3.png: One of seven approved SPILLWAY L2 fields with source details expanded. Field verification is separate from source UNKNOWN authority / UNVERIFIED status; no independent domain attestation.
-- S4.png: Linked hydraulic manual: filename, MIME, bytes, 51 pages and PDF toolbar. Public image is a sanitized header crop; actual page-1 preview is retained privately.
-- S5.png: Retained previous capture; unchanged representative 3D.
-- S6.png: Retained previous empty O&M capture; supplementary only.
-- S7.png: SPILLWAY coverage: seven L2 fields, one linked file, reference location, missing condition and zero verified O&M. Category availability is not a completeness score.
+S1.png: refreshed SPILLWAY overview and information availability.
+S2.png: refreshed SPILLWAY GIS selection; category symbols, reference caveat, scale and OSM attribution. DAM and SPILLWAY have reference points; INTAKE and MGMT have no location.
+S5.png: refreshed close view of selected MGMT representative roof mesh with amber highlight, LOCAL and asset identity.
+S3/S4/S6/S7: retained prior captures; their original lineage is preserved in manifest.json. S4 remains a safe metadata crop.
 
-Hình 3 = S2 + retained S5. Hình 6 current = S1 + S3 + retained S5. Hình 1/2/5 unchanged. S4 excludes private page content; full preview is in the private package. Exact per-image capture lineage and hashes are in manifest.json.
+Hinh_3.png combines SPILLWAY reference GIS and MGMT LOCAL 3D as two distinct subjects. It does not demonstrate georeferenced synchronization.
+Hinh_6_current.png combines SPILLWAY overview/source and a larger MGMT 3D panel.
+Hinh_1.png, Hinh_2.png and Hinh_5_current.png retain their earlier source/diagram lineage.
+
+Use full page width for composites; use S1/S2/S3/S5 separately for narrower paper columns. No Word file was edited, per user request. F02/F05 remain pending; these figures are presentation evidence.

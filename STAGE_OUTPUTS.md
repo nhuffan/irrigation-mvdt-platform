@@ -375,3 +375,14 @@ Methodology input checksums were refreshed without rebinding old approvals. Upda
 No task service was started; preexisting API, web and PostGIS remain running. Raw originals, approvals and candidate files remain private/ignored.
 
 Methodology fingerprint: `fc806300b7fb12d5d3fccca193e2e203ed6c5caaf252b8a4b0dd7271a8525f90`. DB fingerprint: `49288aa558362c14f9c9238a92858ff05ed70e3d68a98a79bf9baf40ef7b4c72`.
+
+
+## Stage F02–F05–F15 integrated output
+
+- Implemented category SVG markers, reference-location styling and selected-object Cesium highlight with streaming pick-ID refresh; selected mesh camera focus and keyboard/deep-link support. Software commits e5bdd7c and fdda470.
+- Approved DAM reference added; SPILLWAY retained. Reference locations 1→2; canonical geometry 0/4, F02 pending. World Bank Table 2.1 reviewed privately; alternative spillway differs by approximately 32.95 m and duplicated culvert/auxiliary-dam coordinates remain documented.
+- Researcher Vũ Viết Hải confirmation of SP-I01–03 saved with exact role/time. Three local file hashes match candidate register; draft evidence IDs and event eligibility still require controlled review. No inspection import; F05 pending. MGMT identity unresolved.
+- Actual Chrome linked-roof/unlinked-tree selection, visible per-mesh highlight, clear, keyboard, focus/reset and back/deep-link restoration verified. F15 PASS. Controlled matrix: 16 PASS / 2 FAIL / 3 N/A, retaining historical results for other rows; no full-rerun claim.
+- Validation from implementation: 62 targeted API tests, 18 frontend tests, changed-path lint and production build passed. DB fingerprint remains 49288aa558362c14f9c9238a92858ff05ed70e3d68a98a79bf9baf40ef7b4c72; research data/media unchanged.
+- Refreshed docs/paper_img/S1.png, S2.png, S5.png; rebuilt Hinh_3.png and Hinh_6_current.png with larger 3D, asset-specific captions and original capture lineage. S3/S4/S6/S7 and Hình 1/2/5 retained. Private raw screenshots and earlier images archived. User requested no Word edit.
+- Exported current count/acceptance tables separately. Readiness NOT_READY / NOT_FROZEN; updated fingerprint 893ef9389bea0a1f8f23761b00453b2e17b8f57a630cf84f83376f249a8cb132. Prior approvals were not rebound. Remaining external work: canonical GIS evidence, eligible event review and methodology/domain/source gates.
