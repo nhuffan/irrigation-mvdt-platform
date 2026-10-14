@@ -185,6 +185,17 @@ export default function CesiumViewer({
           }
           v.scene.requestRender();
         };
+        // Streaming textures may rebuild draw commands and allocate fresh pick IDs.
+        // Keep the selected-ID texture bound to the current primitive IDs, not stale colors.
+        let lastIds: ReturnType<typeof selectedPrimitives> = [];
+        v.scene.postRender.addEventListener(() => {
+          if (disposed || !loaded.ready) return;
+          const current = selectedPrimitives(loaded, model.id, selectedRef.current);
+          if (current.length !== lastIds.length || current.some((id, i) => id !== lastIds[i])) {
+            lastIds = current;
+            applySelection(selectedRef.current);
+          }
+        });
         selectionEffect.current = applySelection;
         reset.current = frame;
         const ready = () => {
