@@ -10,3 +10,9 @@ Hinh_6_current.png combines SPILLWAY overview/source and a larger MGMT 3D panel.
 Hinh_1.png, Hinh_2.png and Hinh_5_current.png retain their earlier source/diagram lineage.
 
 Use full page width for composites; use S1/S2/S3/S5 separately for narrower paper columns. No Word file was edited, per user request. F02/F05 remain pending; these figures are presentation evidence.
+
+## SUBMIT_VIE numbering
+
+- Hinh_4.png: source study-area map and four-target scope; updated DAM reference note. Retained source map with annotation, not a fresh browser capture.
+- Hinh_5.png: fresh Chrome screenshot of SPILLWAY technical attribute and expanded manual provenance. Crop removes whitespace and next incomplete card.
+- Earlier Hinh_5_current/Hinh_6_current names belong to the older manuscript numbering and are retained. No Word edits.

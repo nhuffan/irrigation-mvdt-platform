@@ -13,9 +13,11 @@
     "S1.png": "c94d54cfe834de98d30130d42925ca505083ce6f055012136677bcac2eda21ca",
     "S3.png": "4e22c0dae957e904b9866f8fb6196ed768f524d243bdc581d53bb94426a2906f",
     "S2.png": "c58ec9b1f1c9644fd936a5a41487d37651309b3061cfba329bfd07959cad3f01",
-    "README.md": "5202a762d4ce549c4237e8e6b2cf07f5130d9a3587d9382f96dad4aa39fd57aa",
+    "README.md": "e728041f69965125c2726d455ed114673efa0dbc62717360da014b60194e08d1",
     "Hinh_5_current.png": "7935dbf02b48f345ef6d5e1cb9f5a9eaa73f37e3c8de28f67e8c3518595164ea",
-    "Hinh_6_current.png": "12a6d62a93f1f493d1091809f5d5c64ad0602bf90cde1b6e715c6b71cd195ab1"
+    "Hinh_6_current.png": "12a6d62a93f1f493d1091809f5d5c64ad0602bf90cde1b6e715c6b71cd195ab1",
+    "Hinh_4.png": "3fa9c1bd21d3cdb330262b46172bc4b08befd2d2e7709735bfd9359a692eb104",
+    "Hinh_5.png": "1cc4158ea50f97d9ec20ecec9f5015d7b22af25c990842388390999562335f12"
   },
   "image_capture_sets": {
     "S1.png": "f02_f05_f15_images",
@@ -81,5 +83,25 @@
       "S3.png",
       "S5.png"
     ]
+  },
+  "submit_vie_figures": {
+    "Hinh_4.png": {
+      "created_at": "2026-10-15T07:39:29.542032+07:00",
+      "kind": "retained source map with updated scope annotation",
+      "source": "Hinh_5_current.png; map area retained, outdated sidebar replaced",
+      "browser_capture": false
+    },
+    "Hinh_5.png": {
+      "created_at": "2026-10-15T07:39:29.542032+07:00",
+      "kind": "fresh Chrome screenshot crop",
+      "url": "http://localhost:3000/assets/9cc2f301-f40f-4f2b-aeef-dc45251d279c?paper=1#technical",
+      "crop": [
+        375,
+        0,
+        1560,
+        840
+      ],
+      "software_commit": "9a76d5c"
+    }
   }
 }

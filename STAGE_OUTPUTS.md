@@ -386,3 +386,7 @@ Methodology fingerprint: `fc806300b7fb12d5d3fccca193e2e203ed6c5caaf252b8a4b0dd72
 - Validation from implementation: 62 targeted API tests, 18 frontend tests, changed-path lint and production build passed. DB fingerprint remains 49288aa558362c14f9c9238a92858ff05ed70e3d68a98a79bf9baf40ef7b4c72; research data/media unchanged.
 - Refreshed docs/paper_img/S1.png, S2.png, S5.png; rebuilt Hinh_3.png and Hinh_6_current.png with larger 3D, asset-specific captions and original capture lineage. S3/S4/S6/S7 and Hình 1/2/5 retained. Private raw screenshots and earlier images archived. User requested no Word edit.
 - Exported current count/acceptance tables separately. Readiness NOT_READY / NOT_FROZEN; updated fingerprint 893ef9389bea0a1f8f23761b00453b2e17b8f57a630cf84f83376f249a8cb132. Prior approvals were not rebound. Remaining external work: canonical GIS evidence, eligible event review and methodology/domain/source gates.
+
+## Stage SUBMIT_VIE figures 4–5 output
+
+Read the supplied SUBMIT_VIE captions and checked asset provenance UI implementation. Added docs/paper_img/Hinh_4.png (retained source map with current four-target scope annotation) and Hinh_5.png (fresh Chrome technical/source panel capture). Figure 4 file-URL browser preview was blocked, so no new browser-capture claim is made for it. Existing figure names and Word file preserved. Image provenance recorded in manifest.json.
