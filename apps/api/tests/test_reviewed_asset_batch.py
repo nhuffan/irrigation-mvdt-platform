@@ -167,3 +167,17 @@ def test_hierarchy_cycle_and_missing_uuid():
     values[4].pop(0)
     with pytest.raises(ValueError, match="reserved UUID"):
         compile_batch(*values)
+
+
+def test_public_identity_evidence_requires_https_and_sha256():
+    args = inputs()
+    evidence = args[3][0]
+    evidence.update(
+        drive_file_id="",
+        source_url="https://example.org/original.pdf",
+        checksum_sha256="a" * 64,
+    )
+    assert compile_batch(*args)["records"]["assets"]
+    evidence["checksum_sha256"] = ""
+    with pytest.raises(ValueError, match="locator"):
+        compile_batch(*args)

@@ -4,8 +4,10 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlsplit
 from uuid import UUID
 
 from shapely.geometry import shape
@@ -110,7 +112,16 @@ def compile_batch(
         ):
             raise ValueError("Evidence source missing from reserved map")
         if (
-            not e.get("drive_file_id")
+            not (
+                e.get("drive_file_id")
+                or (
+                    urlsplit(e.get("source_url", "")).scheme == "https"
+                    and urlsplit(e.get("source_url", "")).hostname
+                    and not urlsplit(e.get("source_url", "")).username
+                    and not urlsplit(e.get("source_url", "")).password
+                    and re.fullmatch(r"[0-9a-f]{64}", e.get("checksum_sha256", ""))
+                )
+            )
             or not e.get("file_name")
             or not set(split(e["asset_codes"])) <= set(target_map)
         ):
