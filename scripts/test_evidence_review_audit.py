@@ -34,6 +34,16 @@ class ReviewBoundaryTests(unittest.TestCase):
         return module.audit([self.row],self.register,self.root,[],[{'source_code':'RS-SRC-TEST'}],
                             {'TEST-1':approval or self.approval})['candidates'][0]
 
+    def test_public_pdf_url_and_original_bytes_are_bound(self):
+        self.row.update(drive_file_id='', source_url='https://example.org/report.pdf')
+        self.register['files'][0].update(drive_file_id='', source_url=self.row['source_url'])
+        self.assertTrue(self.audit()['eligible_for_compiler'])
+        self.row['source_url'] = 'https://example.org/other.pdf'
+        self.assertIn('PUBLIC_SOURCE_BINDING_MISMATCH', self.audit()['blockers'])
+        self.row['source_url'] = self.register['files'][0]['source_url']
+        (self.root / 'test.pdf').write_bytes(b'changed bytes')
+        self.assertIn('SOURCE_BYTES_MISMATCH', self.audit()['blockers'])
+
     def test_ai_label_cannot_satisfy_human_review(self):
         self.approval.update(reviewer_role='AI_METHOD_REVIEWER',reviewer_is_ai=True)
         self.assertIn('HUMAN_DOMAIN_APPROVAL_REQUIRED',self.audit()['blockers'])

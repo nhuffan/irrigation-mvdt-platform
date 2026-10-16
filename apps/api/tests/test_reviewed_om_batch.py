@@ -318,3 +318,44 @@ def test_verified_explicit_event_review_remains_supported():
     )
     batch, _, report = compile_batch(*values)
     assert batch is not None, report
+
+
+def test_public_pdf_preserves_url_and_hash_without_fake_drive_id():
+    args = inputs()
+    e = args[2][0]
+    e.update(
+        drive_file_id="",
+        source_url="https://example.org/report.pdf",
+        checksum_sha256="a" * 64,
+        file_name="report.pdf",
+    )
+    batch, provenance, _ = compile_batch(*args)
+    assert batch is not None
+    assert provenance[0]["drive_file_id"] == ""
+    assert provenance[0]["checksum_sha256"] == "a" * 64
+    assert provenance[0]["source_url"] == e["source_url"]
+
+
+@pytest.mark.parametrize(
+    "change",
+    [
+        {"checksum_sha256": ""},
+        {"checksum_sha256": "not-a-hash"},
+        {"source_url": "http://example.org/report.pdf"},
+        {"source_url": "https:///report.pdf"},
+        {"file_name": ""},
+        {"source_url": "https://user:password@example.org/report.pdf"},
+    ],
+)
+def test_public_pdf_requires_exact_file_identity(change):
+    args = inputs()
+    args[2][0].update(
+        drive_file_id="",
+        source_url="https://example.org/report.pdf",
+        checksum_sha256="a" * 64,
+        file_name="report.pdf",
+    )
+    args[2][0].update(change)
+    batch, _, report = compile_batch(*args)
+    assert batch is None
+    assert report["status"] == "NOT_READY"

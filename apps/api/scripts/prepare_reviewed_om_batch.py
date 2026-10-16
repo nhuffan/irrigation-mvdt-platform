@@ -8,6 +8,7 @@ import re
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlsplit
 from uuid import UUID, uuid5
 
 from scripts.prepare_empirical_scope import boolean, read_rows
@@ -181,8 +182,17 @@ def compile_batch(
                 or asset not in split(e["asset_codes"])
             ):
                 raise ValueError("Evidence/source/asset linkage mismatch")
-            if e["mime_type"] == "application/vnd.google-apps.folder" or not e.get(
-                "drive_file_id"
+            public_url = urlsplit(e.get("source_url", ""))
+            public_file = (
+                public_url.scheme == "https"
+                and bool(public_url.hostname)
+                and not public_url.username
+                and not public_url.password
+                and bool(re.fullmatch(r"[0-9a-f]{64}", e.get("checksum_sha256", "")))
+                and bool(e.get("file_name", "").strip())
+            )
+            if e["mime_type"] == "application/vnd.google-apps.folder" or not (
+                e.get("drive_file_id") or public_file
             ):
                 raise ValueError("Exact physical evidence file required")
             if e["review_status"] not in {"REVIEWED", "VERIFIED"}:
@@ -289,7 +299,9 @@ def compile_batch(
                     "asset_code": asset,
                     "source_code": source,
                     "evidence_id": e["evidence_id"],
-                    "drive_file_id": e["drive_file_id"],
+                    "drive_file_id": e.get("drive_file_id", ""),
+                    "source_url": e.get("source_url", ""),
+                    "checksum_sha256": e.get("checksum_sha256", ""),
                     "source_locator": row["source_locator"],
                     "reviewer": row["reviewer"],
                     "reviewed_at": row["reviewed_at"],

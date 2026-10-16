@@ -69,6 +69,8 @@ def audit(queue, register, originals, dictionary, sources, approvals=None):
             if (not path.is_relative_to(originals.resolve()) or not path.is_file()
                     or hashlib.sha256(path.read_bytes()).hexdigest() != candidate['sha256']):
                 reasons.append('SOURCE_BYTES_MISMATCH')
+            if not candidate.get('drive_file_id') and (not candidate.get('source_url', '').startswith('https://') or candidate.get('source_url') != evidence.get('source_url')):
+                reasons.append('PUBLIC_SOURCE_BINDING_MISMATCH')
             if candidate['drive_file_id'] != evidence['drive_file_id']:
                 reasons.append('DRIVE_BINDING_MISMATCH')
             try:
