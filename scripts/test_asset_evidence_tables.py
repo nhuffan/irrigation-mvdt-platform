@@ -106,6 +106,81 @@ class ExportTests(unittest.TestCase):
         inputs[5] = [row]
         self.assertEqual(build_tables(*inputs)[2], [row])
 
+    def component_inputs(self):
+        values = self.inputs()
+        child = {
+            "id": "child",
+            "asset_code": "RS-CHILD",
+            "parent_asset_id": "a",
+            "geometry": None,
+        }
+        values[0]["rows"]["assets"].append(child)
+        values[1]["RS-CHILD"] = {
+            "asset": child,
+            "technical": [],
+            "documents": [],
+            "current-condition": None,
+        }
+        scope = {
+            "version": "COMPONENT-SCOPE-v1",
+            "primary_sample_count": 1,
+            "components": [
+                {
+                    "asset_code": "RS-CHILD",
+                    "asset_id": "child",
+                    "parent_asset_code": "RS-A",
+                    "parent_asset_id": "a",
+                    "technical_record_ids": [],
+                }
+            ],
+        }
+        return values, scope
+
+    def test_component_totals_keep_primary_denominator(self):
+        values, scope = self.component_inputs()
+        a, b, _ = build_tables(*values, component_scope=scope)
+        counts = {row["metric"]: row["count"] for row in a}
+        self.assertEqual(counts["RS assets"], 1)
+        self.assertEqual(counts["component.assets"], 1)
+        self.assertEqual(counts["all-tree.assets"], 2)
+        self.assertEqual(b[0]["technical_l2"], 0)
+
+    def test_wrong_parent_and_unapproved_record_rejected(self):
+        for kind in ("parent", "record"):
+            values, scope = self.component_inputs()
+            if kind == "parent":
+                scope["components"][0]["parent_asset_id"] = "wrong"
+            else:
+                scope["components"][0]["technical_record_ids"] = ["unapproved"]
+            with self.assertRaises(ValueError):
+                build_tables(*values, component_scope=scope)
+
+    def test_child_l2_is_not_rolled_up_to_parent(self):
+        values, scope = self.component_inputs()
+        record = {
+            "id": "t",
+            "asset_id": "child",
+            "source_id": "s",
+            "attribute_key": "width",
+            "attribute_label": "Width",
+            "value_number": 3,
+            "value_text": None,
+            "unit": "m",
+            "verification_status": "VERIFIED",
+        }
+        values[0]["rows"]["technical"] = [record]
+        values[1]["RS-CHILD"]["technical"] = [
+            {**record, "reviewed_provenance": {"verification_level": "L2"}}
+        ]
+        scope["components"][0]["technical_record_ids"] = ["t"]
+        a, b, _ = build_tables(*values, component_scope=scope)
+        counts = {r["metric"]: r["count"] for r in a}
+        self.assertEqual(counts["primary.technical_l2"], 0)
+        self.assertEqual(counts["component.technical_l2"], 1)
+        self.assertEqual(counts["all-tree.technical_l2"], 1)
+        self.assertEqual(b[0]["technical_l2"], 0)
+        self.assertEqual(b[-1]["technical_l2"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

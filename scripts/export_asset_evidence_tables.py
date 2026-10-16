@@ -18,14 +18,49 @@ def read_csv(path):
         return list(csv.DictReader(stream))
 
 
-def build_tables(snapshot, api, targets, sources, doc_reviews, acceptance):
+def build_tables(
+    snapshot, api, targets, sources, doc_reviews, acceptance, component_scope=None
+):
     rows = snapshot["rows"]
     codes = {r["target_asset_code"] for r in targets if r["in_scope"] == "true"}
+    primary_codes = set(codes)
+    components = (component_scope or {}).get("components", [])
+    component_map = {item["asset_code"]: item for item in components}
+    if component_scope:
+        if (
+            component_scope.get("version") != "COMPONENT-SCOPE-v1"
+            or component_scope.get("primary_sample_count") != len(primary_codes)
+            or len(component_map) != len(components)
+            or set(component_map) & primary_codes
+        ):
+            raise ValueError("Invalid component reporting scope")
+        codes |= set(component_map)
     assets = {r["asset_code"]: r for r in rows["assets"] if r["asset_code"] in codes}
     if set(assets) != codes or set(api) != codes:
         raise ValueError(
             "Snapshot/API must cover exactly the controlled in-scope targets"
         )
+    allowed_records = set()
+    for code, item in component_map.items():
+        asset = assets[code]
+        parent = assets.get(item["parent_asset_code"])
+        if (
+            parent is None
+            or item["parent_asset_code"] not in primary_codes
+            or parent["id"] != item["parent_asset_id"]
+            or asset["id"] != item["asset_id"]
+            or asset.get("parent_asset_id") != parent["id"]
+        ):
+            raise ValueError("Component snapshot identity/parent mismatch")
+        records = item["technical_record_ids"]
+        actual = {t["id"] for t in rows["technical"] if t["asset_id"] == asset["id"]}
+        if (
+            len(records) != len(set(records))
+            or set(records) != actual
+            or allowed_records & actual
+        ):
+            raise ValueError("Component technical allowlist mismatch")
+        allowed_records |= actual
     source_codes = {r["source_code"] for r in sources}
     source_ids = {
         r["id"] for r in rows["data_sources"] if r["source_code"] in source_codes
@@ -110,7 +145,7 @@ def build_tables(snapshot, api, targets, sources, doc_reviews, acceptance):
             }
         )
     metrics = [
-        ("RS assets", len(assets), "controlled in-scope target IDs"),
+        ("RS assets", len(primary_codes), "controlled in-scope target IDs"),
         (
             "Controlled sources",
             len(sources),
@@ -151,7 +186,13 @@ def build_tables(snapshot, api, targets, sources, doc_reviews, acceptance):
             "VERIFIED link records; representative LOCAL, not surveyed identity",
         ),
     ]:
-        metrics.append((key, sum(r[key] for r in per_asset), definition))
+        metrics.append(
+            (
+                key,
+                sum(r[key] for r in per_asset if r["asset_code"] in primary_codes),
+                definition,
+            )
+        )
     metrics.append(
         (
             "Selected 3D targets",
@@ -181,6 +222,50 @@ def build_tables(snapshot, api, targets, sources, doc_reviews, acceptance):
         }
         for r in acceptance
     ]
+    if component_scope:
+        for row in per_asset:
+            row["scope"] = (
+                "primary" if row["asset_code"] in primary_codes else "component"
+            )
+            row["parent_asset_code"] = component_map.get(row["asset_code"], {}).get(
+                "parent_asset_code", ""
+            )
+        for label, selected in (
+            ("primary", [r for r in per_asset if r["scope"] == "primary"]),
+            ("component", [r for r in per_asset if r["scope"] == "component"]),
+            ("all-tree", per_asset),
+        ):
+            for metric, count in (
+                ("assets", len(selected)),
+                ("technical_l2", sum(r["technical_l2"] for r in selected)),
+            ):
+                table1.append(
+                    {
+                        "metric": f"{label}.{metric}",
+                        "count": count,
+                        "definition": "Direct records only; all-tree is primary + components, not the primary study denominator",
+                    }
+                )
+        detail_rows = list(per_asset)
+        for label in ("primary", "component", "all-tree"):
+            selected = [
+                r for r in detail_rows if label == "all-tree" or r["scope"] == label
+            ]
+            total = {key: "" for key in detail_rows[0]}
+            total.update(
+                asset_code=f"TOTAL:{label}",
+                scope=label,
+                technical_l2=sum(r["technical_l2"] for r in selected),
+            )
+            # Other columns intentionally blank: overlapping sources/files are not additive.
+            per_asset.append(total)
+        for row in table6:
+            row["scope"] = (
+                "Historical controlled acceptance; component expansion not retested"
+            )
+            row["primary_assets"] = len(primary_codes)
+            row["component_assets"] = len(components)
+            row["all_tree_assets"] = len(assets)
     return table1, per_asset, table6
 
 
@@ -210,6 +295,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("snapshot", "api-readback", "controlled-dir", "output"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument(
+        "--base-scope", type=Path, help="Opt in to explicit component_scope reporting"
+    )
     args = parser.parse_args()
     inputs = [args.snapshot, args.api_readback] + [
         args.controlled_dir / name
@@ -225,7 +313,12 @@ def main():
         snapshot,
         json.loads(args.api_readback.read_text()),
         *(read_csv(path) for path in inputs[2:]),
+        component_scope=json.loads(args.base_scope.read_text()).get("component_scope")
+        if args.base_scope
+        else None,
     )
+    if args.base_scope:
+        inputs.append(args.base_scope)
     args.output.mkdir(parents=True, exist_ok=True)
     for name, table in zip(
         (

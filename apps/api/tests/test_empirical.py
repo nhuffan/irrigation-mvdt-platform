@@ -4,8 +4,6 @@ from copy import deepcopy
 from uuid import uuid4
 
 import pytest
-from test_research import observation, sample, scope
-
 from scripts.evaluate_research_dataset import evaluate
 from scripts.export_research_results import summarize_retrieval, summarize_usability
 from scripts.prepare_empirical_scope import (
@@ -14,6 +12,7 @@ from scripts.prepare_empirical_scope import (
     compile_scope,
 )
 from scripts.research_common import validate_scope
+from test_research import observation, sample, scope
 
 
 def inputs():
@@ -321,3 +320,57 @@ def test_category_specific_document_na_requires_rationale_and_review():
     compiled_scope["not_applicable"]["RS-B"]["document"] = ""
     with pytest.raises(ValueError, match="rationale"):
         validate_scope(compiled_scope)
+
+
+def component_fixture():
+    values = list(inputs())
+    values[0]["component_scope"] = {
+        "version": "COMPONENT-SCOPE-v1",
+        "primary_sample_count": 2,
+        "inventory_evidence": "TEST",
+        "technical_evidence": "TEST",
+        "components": [
+            {
+                "asset_code": "RS-CHILD",
+                "asset_id": str(uuid4()),
+                "parent_asset_code": "RS-A",
+                "parent_asset_id": str(uuid4()),
+                "technical_record_ids": [str(uuid4())],
+            }
+        ],
+    }
+    values[2][0]["related_asset_codes"] += "|RS-CHILD"
+    return values
+
+
+def test_component_scope_does_not_rebind_old_review():
+    values = component_fixture()
+    assert values[4]["base_scope_sha256"] != base_scope_fingerprint(values[0])
+    assert compile_scope(*values)[0]["status"] == "NOT_READY"
+
+
+def test_component_sources_allowed_without_expanding_primary():
+    values = component_fixture()
+    values[4]["base_scope_sha256"] = base_scope_fingerprint(values[0])
+    report, compiled_scope = compile_scope(*values)
+    assert report["status"] == "READY_TO_FREEZE"
+    assert compiled_scope["target_asset_codes"] == ["RS-A", "RS-B"]
+    assert "RS-CHILD" not in compiled_scope["maim_required_by_asset"]
+    values[2][0]["related_asset_codes"] += "|RS-UNKNOWN"
+    assert (
+        "Source references out-of-scope asset" in compile_scope(*values)[0]["blockers"]
+    )
+
+
+@pytest.mark.parametrize("mutation", ["parent", "duplicate", "overlap"])
+def test_invalid_component_scope_rejected(mutation):
+    values = component_fixture()
+    item = values[0]["component_scope"]["components"][0]
+    if mutation == "parent":
+        item["parent_asset_code"] = "RS-MISSING"
+    elif mutation == "duplicate":
+        values[0]["component_scope"]["components"].append(deepcopy(item))
+    else:
+        values[0]["record_ids"]["technical"] = item["technical_record_ids"]
+    values[4]["base_scope_sha256"] = base_scope_fingerprint(values[0])
+    assert any("Component scope:" in b for b in compile_scope(*values)[0]["blockers"])

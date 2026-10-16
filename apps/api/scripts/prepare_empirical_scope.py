@@ -5,6 +5,7 @@ import csv
 import json
 from datetime import datetime
 from pathlib import Path
+from uuid import UUID
 
 from scripts.methodology_review import PROTOCOL, load_methodology, validate_methodology
 from scripts.research_common import digest, research_code, validate_scope
@@ -67,7 +68,52 @@ def base_scope_fingerprint(base):
         fields["methodology_protocol"] = base["methodology_protocol"]
     if "methodology_approval_policy" in base:
         fields["methodology_approval_policy"] = base["methodology_approval_policy"]
+    if "component_scope" in base:
+        fields["component_scope"] = base["component_scope"]
     return digest(fields)
+
+
+def component_codes(base, primary_codes):
+    """Validate explicit child reporting scope; never extend primary MAIM denominators."""
+    scope = base.get("component_scope")
+    if scope is None:
+        return set()
+    if (
+        scope.get("version") != "COMPONENT-SCOPE-v1"
+        or scope.get("primary_sample_count") != len(primary_codes)
+        or not scope.get("inventory_evidence")
+        or not scope.get("technical_evidence")
+    ):
+        raise ValueError("Invalid component scope declaration")
+    codes, ids, records = set(), set(), set()
+    primary_records = set(base.get("record_ids", {}).get("technical", []))
+    parents = {}
+    for item in scope.get("components", []):
+        code, uid = item["asset_code"], item["asset_id"]
+        parent, parent_id = item["parent_asset_code"], item["parent_asset_id"]
+        UUID(uid)
+        UUID(parent_id)
+        if (
+            not research_code(code)
+            or code in codes | primary_codes
+            or uid in ids
+            or parent not in primary_codes
+            or uid == parent_id
+        ):
+            raise ValueError("Invalid component identity/parent")
+        if parent in parents and parents[parent] != parent_id:
+            raise ValueError("Conflicting component parent UUID")
+        parents[parent] = parent_id
+        codes.add(code)
+        ids.add(uid)
+        for record in item["technical_record_ids"]:
+            UUID(record)
+            if record in records | primary_records:
+                raise ValueError("Duplicate/primary component technical record")
+            records.add(record)
+    if not codes or ids & set(parents.values()):
+        raise ValueError("Empty or cyclic component scope")
+    return codes
 
 
 def compile_scope(
@@ -200,6 +246,11 @@ def compile_scope(
     if not included:
         errors.append("No approved target inventory; denominator unavailable")
     codes = {t["target_asset_code"] for t in included}
+    try:
+        children = component_codes(base, codes)
+    except (ValueError, KeyError, TypeError) as error:
+        errors.append(f"Component scope: {error}")
+        children = set()
     categories = {t["category"] for t in included}
     for t in included:
         parent = t.get("parent_asset_code")
@@ -248,7 +299,7 @@ def compile_scope(
         boolean(source.get("file_available"))
         if (
             not set(filter(None, source.get("related_asset_codes", "").split("|")))
-            <= codes
+            <= codes | children
         ):
             errors.append("Source references out-of-scope asset")
     field_map = {c: set() for c in categories}
