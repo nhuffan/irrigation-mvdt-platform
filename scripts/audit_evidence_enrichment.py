@@ -48,8 +48,11 @@ def review_blockers(candidate, approval, optional_reported_field=False):
     return reasons
 
 
-def audit(queue, register, originals, dictionary, sources, approvals=None):
+def audit(queue, register, originals, dictionary, sources, approvals=None, targets=None):
     approvals = approvals or {}
+    target_map = {row["target_asset_code"]: row for row in targets or []}
+    if targets is not None and len(target_map) != len(targets):
+        raise ValueError("Duplicate target identity")
     file_map = {item['sha256']: item for item in register['files']}
     source_map = {item['source_code']: item for item in sources}
     rules = {(item['category_code'], item['attribute_key']): item for item in dictionary}
@@ -84,6 +87,11 @@ def audit(queue, register, originals, dictionary, sources, approvals=None):
         if candidate['decision'] != 'VERIFIED':
             reasons.append('CANDIDATE_NOT_VERIFIED')
         category = 'RS-CAT-' + candidate['asset_code'].removeprefix('RS-DT-')
+        if targets is not None:
+            target = target_map.get(candidate['asset_code'], {})
+            category = target.get('category', '')
+            if target.get('verification_status') != 'VERIFIED' or target.get('in_scope') != 'true':
+                reasons.append('CONTROLLED_TARGET_IDENTITY_REQUIRED')
         rule = rules.get((category, candidate['attribute_key']))
         optional_reported = bool(rule and rule.get('required_by_maim') == 'false')
         reasons.extend(review_blockers(candidate, approvals.get(cid), optional_reported))
@@ -123,6 +131,7 @@ def main():
     parser.add_argument('--evidence-dir', type=Path, required=True)
     parser.add_argument('--controlled-dir', type=Path, required=True)
     parser.add_argument('--approvals', type=Path)
+    parser.add_argument('--targets', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     result = audit(rows(args.evidence_dir / 'evidence_candidate_review.csv'),
@@ -130,7 +139,8 @@ def main():
                    args.evidence_dir / 'originals',
                    rows(args.controlled_dir / 'technical_attribute_dictionary.csv'),
                    rows(args.controlled_dir / 'source_inventory.csv'),
-                   json.loads(args.approvals.read_text()) if args.approvals else None)
+                   json.loads(args.approvals.read_text()) if args.approvals else None,
+                   rows(args.targets) if args.targets else None)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     print(result['status'], 'candidates=', result['candidate_count'], 'eligible=', result['eligible_count'])
 

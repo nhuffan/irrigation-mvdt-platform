@@ -44,6 +44,19 @@ class ReviewBoundaryTests(unittest.TestCase):
         (self.root / 'test.pdf').write_bytes(b'changed bytes')
         self.assertIn('SOURCE_BYTES_MISMATCH', self.audit()['blockers'])
 
+    def test_child_category_comes_from_reviewed_inventory(self):
+        self.row.update(asset_code='RS-DT-INTAKE-C01', kind='TECHNICAL', attribute_key='route', label='Route', unit='text')
+        self.approval.update(reviewer_role='RESEARCHER', approval_scope='OPTIONAL_REPORTED_TECHNICAL_L2', verification_level='L2')
+        self.approval['binding'] = {k:self.row[k] for k in self.approval['binding']}
+        target = {'target_asset_code':'RS-DT-INTAKE-C01', 'category':'RS-CAT-INTAKE_SLUICE', 'in_scope':'true', 'verification_status':'VERIFIED'}
+        rule = {'category_code':'RS-CAT-INTAKE_SLUICE','attribute_key':'route','attribute_label':'Route','expected_unit':'text','required_by_maim':'false'}
+        def run(targets):
+            return module.audit([self.row],self.register,self.root,[rule],[{'source_code':'RS-SRC-TEST'}],{'TEST-1':self.approval},targets)['candidates'][0]
+        self.assertTrue(run([target])['eligible_for_compiler'])
+        self.assertIn('CONTROLLED_TARGET_IDENTITY_REQUIRED',run([])['blockers'])
+        target['verification_status']='PENDING'
+        self.assertFalse(run([target])['eligible_for_compiler'])
+
     def test_ai_label_cannot_satisfy_human_review(self):
         self.approval.update(reviewer_role='AI_METHOD_REVIEWER',reviewer_is_ai=True)
         self.assertIn('HUMAN_DOMAIN_APPROVAL_REQUIRED',self.audit()['blockers'])
