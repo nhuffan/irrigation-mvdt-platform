@@ -1,3 +1,6 @@
+import { MANAGED_RESERVOIR_ID, isManagedReservoir, isResearchAsset, isResearchSource, isResearchModel, visibleDescription } from "./site-scope";
+import type { DocumentRecord, ModelRecord } from "../types/media";
+import type { DataSource } from "../types/data-source";
 import { requestLimit } from "./request-limit";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
 import type { Condition } from "@/types/condition";
@@ -29,19 +32,24 @@ async function request<T>(path: string): Promise<T> {
  });
 }
 
-export function getReservoirs(): Promise<Reservoir[]> {
-  return request("/reservoirs");
+export async function getReservoirs(): Promise<Reservoir[]> {
+  return (await request<Reservoir[]>("/reservoirs")).filter(isManagedReservoir);
 }
 
-export function getReservoir(id: string): Promise<Reservoir> {
-  return request(`/reservoirs/${encodeURIComponent(id)}`);
+export async function getReservoir(id: string): Promise<Reservoir> {
+  if (id !== MANAGED_RESERVOIR_ID) throw new ApiError(404);
+  const record = await request<Reservoir>(`/reservoirs/${encodeURIComponent(id)}`);
+  return { ...record, description: visibleDescription(record.description) };
 }
 
-export function getReservoirAssets(id: string): Promise<Asset[]> {
-  return request(`/reservoirs/${encodeURIComponent(id)}/assets`);
+export async function getReservoirAssets(id: string): Promise<Asset[]> {
+  if (id !== MANAGED_RESERVOIR_ID) throw new ApiError(404);
+  return (await request<Asset[]>(`/reservoirs/${encodeURIComponent(id)}/assets`)).filter(isResearchAsset);
 }
-export function getAsset(id: string): Promise<Asset> {
-  return request(`/assets/${encodeURIComponent(id)}`);
+export async function getAsset(id: string): Promise<Asset> {
+  const asset = await request<Asset>(`/assets/${encodeURIComponent(id)}`);
+  if (!isResearchAsset(asset)) throw new ApiError(404);
+  return { ...asset, description: visibleDescription(asset.description) };
 }
 
 export function getAssetTechnical(id: string): Promise<TechnicalAttribute[]> {
@@ -74,33 +82,47 @@ export function getAssetCurrentCondition(
   return request(`/assets/${encodeURIComponent(id)}/current-condition`);
 }
 
-export function getAssetDocuments(
+export async function getAssetDocuments(
   id: string,
 ): Promise<import("@/types/media").DocumentRecord[]> {
-  return request(`/assets/${encodeURIComponent(id)}/documents`);
+  return (await request<DocumentRecord[]>(`/assets/${encodeURIComponent(id)}/documents`)).filter(doc => isResearchSource(doc.source));
 }
-export function getSourceDocuments(
+export async function getSourceDocuments(
   id: string,
 ): Promise<import("@/types/media").DocumentRecord[]> {
-  return request(`/data-sources/${encodeURIComponent(id)}/documents`);
+  const source = await request<DataSource>(`/data-sources/${encodeURIComponent(id)}`);
+  if (!isResearchSource(source)) throw new ApiError(404);
+  return (await request<DocumentRecord[]>(`/data-sources/${encodeURIComponent(id)}/documents`)).filter(doc => isResearchSource(doc.source));
 }
-export function getDocument(
+export async function getDocument(
   id: string,
 ): Promise<import("@/types/media").DocumentRecord> {
-  return request(`/documents/${encodeURIComponent(id)}`);
+  const doc = await request<DocumentRecord>(`/documents/${encodeURIComponent(id)}`);
+  if (!isResearchSource(doc.source)) throw new ApiError(404);
+  return doc;
 }
-export function getModels(
+export async function getModels(
   id: string,
 ): Promise<import("@/types/media").ModelRecord[]> {
-  return request(`/reservoirs/${encodeURIComponent(id)}/models`);
+  if (id !== MANAGED_RESERVOIR_ID) throw new ApiError(404);
+  return (await request<ModelRecord[]>(`/reservoirs/${encodeURIComponent(id)}/models`)).filter(isResearchModel);
 }
-export function getModelLinks(
+export async function getModelLinks(
   id: string,
 ): Promise<import("@/types/media").ModelAssetLink[]> {
-  return request(`/models/${encodeURIComponent(id)}/asset-links`);
+  await getModel(id);
+  const allowed = new Set((await getReservoirAssets(MANAGED_RESERVOIR_ID)).map(a => a.id));
+  return (await request<import("../types/media").ModelAssetLink[]>(`/models/${encodeURIComponent(id)}/asset-links`)).filter(link => allowed.has(link.asset_id));
 }
-export function getAssetModelLinks(
+export async function getAssetModelLinks(
   id: string,
 ): Promise<import("@/types/media").ModelAssetLink[]> {
-  return request(`/assets/${encodeURIComponent(id)}/model-links`);
+  const allowed = new Set((await getModels(MANAGED_RESERVOIR_ID)).map(m => m.id));
+  return (await request<import("../types/media").ModelAssetLink[]>(`/assets/${encodeURIComponent(id)}/model-links`)).filter(link => allowed.has(link.model_id));
+}
+
+export async function getModel(id: string): Promise<ModelRecord> {
+  const model = await request<ModelRecord>(`/models/${encodeURIComponent(id)}`);
+  if (!isResearchModel(model)) throw new ApiError(404);
+  return model;
 }

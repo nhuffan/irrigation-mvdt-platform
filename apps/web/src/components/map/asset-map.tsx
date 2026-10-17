@@ -118,7 +118,7 @@ export function AssetMap({
 
             `Category: ${asset.category.name}`,
             `${asset.data_status} · ${assetLocation(asset).location_status.replaceAll("_", " ")}`,
-            locationLayer(asset) === "DEV" ? "DEV example — not research evidence" : assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Map-symbol reference location only. Not surveyed geometry." : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
+            assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Map-symbol reference location only. Not surveyed geometry." : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
           ]) {
             const line = document.createElement("p");
             line.textContent = value;
@@ -329,7 +329,6 @@ export function AssetMap({
           <p className="eyebrow">Location layers</p>
           <div><span className="status-dot" style={{ background: "#2563eb" }} />RS verified geometry</div>
           <div><span className="status-dot reference-dot" />RS reference location</div>
-          <div><span className="status-dot" style={{ background: "#8055ad" }} />DEV geometry</div>
           <div><span className="status-dot context-dot" />Context only{!contextVisible ? " (hidden)" : ""}</div>
           <div><span className="status-dot context-dot" />NO LOCATION · registry only</div>
           <div><span className="status-dot" style={{ background: "#059669" }} />Selected asset</div>

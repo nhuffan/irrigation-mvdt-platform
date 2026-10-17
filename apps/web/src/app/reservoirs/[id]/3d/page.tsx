@@ -19,6 +19,7 @@ export default async function ThreeDPage({
       notFound();
     throw error;
   });
+  if (query.model && !models.some(m => m.id === query.model)) notFound();
   return (
     <main className={query.paper==="1"?"page-shell model-page clean-paper":"page-shell model-page"}>
       <Link className="text-link" href={`/reservoirs/${id}`}>

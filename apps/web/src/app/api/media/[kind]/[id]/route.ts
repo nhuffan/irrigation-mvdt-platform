@@ -1,3 +1,4 @@
+import { ApiError, getDocument, getModel } from "@/lib/api";
 import type { NextRequest } from "next/server";
 export async function GET(
   request: NextRequest,
@@ -9,6 +10,7 @@ export async function GET(
   const base =
     process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
   try {
+    if (kind === "documents") await getDocument(id); else await getModel(id);
     const upstream = await fetch(
       `${base}/${kind}/${id}/content?download=${request.nextUrl.searchParams.get("download") === "true"}`,
       {
@@ -35,7 +37,8 @@ export async function GET(
       if (value) headers.set(key, value);
     }
     return new Response(upstream.body, { status: upstream.status, headers });
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError && [404, 422].includes(error.status)) return new Response("Not found", { status: 404 });
     return new Response("Unable to load file", { status: 502 });
   }
 }

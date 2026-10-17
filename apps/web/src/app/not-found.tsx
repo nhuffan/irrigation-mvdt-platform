@@ -8,7 +8,7 @@ export default function NotFound() {
         This address does not match an available record or page.
       </p>
       <Link className="button" href="/">
-        Back to registry
+        Back to reservoir
       </Link>
     </main>
   );

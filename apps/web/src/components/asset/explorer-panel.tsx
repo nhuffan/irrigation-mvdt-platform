@@ -1,6 +1,6 @@
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import Link from "next/link";
-import { modelHref, reviewedPreview, dataset } from "@/lib/explorer-state";
+import { modelHref, reviewedPreview } from "@/lib/explorer-state";
 import { hierarchy } from "@/lib/asset-location";
 import type { Asset } from "@/types/asset";
 import type { ExplorerData } from "@/lib/explorer-data";
@@ -11,7 +11,7 @@ import { AssetEvidenceSummary } from "./asset-evidence-summary";
 export function ExplorerPanel({asset,assets,data,onSelect,paper}:{asset:Asset;assets:Asset[];data:ExplorerData;onSelect:(asset:Asset)=>void;paper?:boolean}) {
  const technical=reviewedPreview(data);const {ancestors,children}=hierarchy(assets,asset);
  return <aside id="selected-asset-panel" className={`panel explorer-panel${paper && technical?.length ? " evidence-first-panel" : ""}`} aria-label="Selected asset information" tabIndex={-1}>
- <p className="eyebrow">Asset information · {dataset(asset)==="research"?"RS":dataset(asset)==="development"?"DEV":"Unclassified"}</p>
+ <p className="eyebrow">Asset information · RS</p>
  <nav aria-label="Asset hierarchy">{ancestors.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}><AssetDisplayName asset={a}/> / </button>)}</nav>
  <h2><AssetDisplayName asset={asset}/></h2><p className="muted">{asset.category.name}</p><AssetMetadata asset={asset}/>
  {children.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}>Component · <AssetDisplayName asset={a}/></button>)}

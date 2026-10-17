@@ -12,7 +12,7 @@ export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
           <p className="eyebrow">Asset inventory</p>
           <h2>Assets</h2>
         </div>
-        <span className="muted">{assets.length} records across all dataset scopes</span>
+        <span className="muted">{assets.length} research assets</span>
       </div>
       <AssetExplorer reservoir={reservoir} assets={assets} records={records} />
     </section>

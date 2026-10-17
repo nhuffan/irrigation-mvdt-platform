@@ -42,3 +42,8 @@
 
 - Tiêu đề, nhãn điều khiển và thông báo giao diện dùng tiếng Anh. Tên asset, tiêu đề tài liệu, tên thông số và mô tả giá trị cần dịch hiển thị English — Tiếng Việt; tiếng Anh đứng trước.
 - Chỉ dịch ở lớp hiển thị; giữ nguyên tên canonical, tên file tải xuống, số đo/đơn vị, locator và dữ liệu nguồn. Giữ bố cục component Technical information khi chỉnh ngôn ngữ.
+
+## Phạm vi giao diện vận hành
+
+- Web hiện quản lý một hồ theo cấu hình NEXT_PUBLIC_RESERVOIR_ID (mặc định Dầu Tiếng). Trang chủ mở thẳng hồ; không có bước Reservoir registry.
+- Chỉ hiển thị tài sản/tài liệu/model nghiên cứu trong hồ đang quản lý; không đưa lựa chọn Development, fixture DEV hoặc Example vào giao diện. Giữ dữ liệu test ở backend cho kiểm thử; không tự xóa database để dọn UI.

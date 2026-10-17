@@ -1,4 +1,5 @@
 "use client";
+import { RESERVOIR_HREF } from "@/lib/site-scope";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 export function AppHeader() {
@@ -17,8 +18,9 @@ export function AppHeader() {
         </Link>
         <nav aria-label="Main navigation">
           {[
-            ["/", "Registry"],
+            [RESERVOIR_HREF, "Overview"],
             ["/map", "GIS Map"],
+            [`${RESERVOIR_HREF}/3d`, "3D"],
           ].map(([href, label]) => (
             <Link
               key={href}

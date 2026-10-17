@@ -4,7 +4,6 @@ import { ReservoirAssets } from "@/components/asset/reservoir-assets";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ApiError, getReservoir } from "@/lib/api";
-import { MvdtReadiness } from "@/components/reservoir/mvdt-readiness";
 export const dynamic = "force-dynamic";
 export default async function ReservoirPage({
   params,
@@ -33,19 +32,15 @@ export default async function ReservoirPage({
             {reservoir.province ?? "Unknown province"}
           </p>
         </div>
-        <span className="level-badge">MVDT Level {reservoir.mvdt_level}</span>
+
       </div>
       <Link className="text-link" href={`/reservoirs/${id}/3d`}>
         Open 3D models →
       </Link>
-      <details className="reservoir-metadata"><summary>Reservoir context & recorded readiness</summary><div className="registry-grid">
-        <MvdtReadiness
-          level={reservoir.mvdt_level}
-          status={reservoir.data_status}
-        />
+      <details className="reservoir-metadata"><summary>Reservoir context</summary><div className="registry-grid">
         <section className="panel">
           <p className="eyebrow">Location</p>
-          <h2>Geographic reference</h2>
+          <h2>Geographic reference</h2><p className="summary-note">Reservoir navigation context only; not verified asset geometry.</p>
           <dl className="detail-list">
             <div>
               <dt>Latitude</dt>

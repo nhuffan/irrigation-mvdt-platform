@@ -3,7 +3,7 @@ import { AppHeader } from "@/components/app-header";
 import "./globals.css";
 export const metadata: Metadata = {
   title: "Irrigation MVDT · Reservoir Portal",
-  description: "Reservoir registry and GIS explorer",
+  description: "Reservoir asset management, GIS and 3D workspace",
 };
 export default function RootLayout({
   children,
@@ -14,7 +14,7 @@ export default function RootLayout({
         <AppHeader />
         {children}
         <footer className="site-footer">
-          Research and development records are labeled separately. Development coordinates and readiness levels are illustrative, not verified research evidence.
+          Source-reported information and reference locations retain their stated evidence limitations.
         </footer>
       </body>
     </html>
