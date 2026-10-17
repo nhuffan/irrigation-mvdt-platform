@@ -26,7 +26,7 @@
 
 ## Git workflow
 
-- Làm việc, commit và push trực tiếp lên `main`. Không tạo branch riêng theo stage hoặc feature trừ khi người dùng yêu cầu rõ ràng.
+- Làm việc trực tiếp trên `main`; không tạo branch riêng trừ khi người dùng yêu cầu. Chỉ commit hoặc push sau khi người dùng đồng ý rõ ràng; hoàn thành stage không tự động cho phép commit/push.
 - Trước khi sửa, kiểm tra working tree và đồng bộ remote; giữ nguyên thay đổi đang có của người dùng. Trước khi push, chạy các kiểm tra phù hợp và cập nhật `STAGE_OUTPUTS.md` khi hoàn thành stage.
 - Không force-push hoặc viết lại lịch sử `main`.
 

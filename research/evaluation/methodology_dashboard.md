@@ -1,0 +1,72 @@
+# Methodology & Evidence dashboard and secondary observation map
+
+This stage stops discovery/admission. It reads the existing approved technical dataset; it does not add assets, sources, O&M events, media, geometry or approvals. The existing GIS, 40/60 inspectors, 3D and asset navigation retain their layout.
+
+## Research summary
+
+`/methodology` and GET `/api/research-summary` combine live API readback with a sanitized controlled export in `apps/web/src/data/methodology.json`. The export reuses `scripts/export_asset_evidence_tables.py` and the methodology readiness compiler. No raw source notes, storage keys, absolute paths, receipts or private evidence originals are served. Evaluation references are filenames/hashes, not download links.
+
+Coverage uses direct L2 for totals, with descendant L2 shown separately. Missing endpoint responses remain null/Unavailable. Per-asset document edges may overlap; unique files are counted by SHA-256. Controlled sources, registered DB sources, expected-file sources and retained documents are distinct denominators. Source links resolve against the API before being shown.
+
+F01–F21 retain controlled status, dataset version, date and four-primary-asset scope. There is no new browser certification. F02/F05 retain FAIL/PENDING_EVIDENCE, F15 historical PASS only, methodology NOT_READY and dataset NOT_FROZEN. Retrieval and custom questionnaire content is a protocol with measurement fields, not participant data, a SUS instrument or experimental findings.
+
+Live alignment compares technical values, source/locator/authority, IDs, hierarchy and coverage. It is not a live recomputation of the full DB/media fingerprint. Controlled source/document metrics explicitly remain dated snapshot figures. A mismatch or unavailable response raises a warning; it does not rebind approvals.
+
+## Map investigation and choice (2026-10-18)
+
+1. Operator: the `www` host failed TLS hostname validation; the [canonical introduction page](https://thuyloimiennam.vn/vi/gioi-thieu) works. Both advertised map labels resolve to the [same operator map page](https://thuyloimiennam.vn/vi/gioi-thieu/ban-do-he-thong-thuy-loi-dau-tieng---phuoc-hoa). That page embeds a public PDF through Google Viewer and references an original canal PNG. Direct attachment checks return HTTP200, PDF 8,540,770 bytes / one page 3117.74173×3912.00945 pt, PNG 2,127,492 bytes /1883×896 px. GeoPDF viewport/GEO metadata is present in the PDF; this does not validate its accuracy or give reuse permission. Headers did not prohibit framing, but the site declares copyright and no explicit redistribution/embed license was established. Outcome: source link only; no rehosted image, GeoPDF overlay or extracted geometry.
+2. [SIWRP map catalogue](https://siwrp.org.vn/news/ban-do_520.html) advertises an experimental Mekong Delta flood map. The [technology page](https://siwrp.org.vn/news/ung-dung-khoa-hoc-cong-nghe_386.html) describes GIS applications. No permitted Dầu Tiếng imagery WMTS/WMS/XYZ endpoint was established at these supplied pages. Their flood/other-basin content is not used as a Dầu Tiếng basemap.
+3. Esri: [MapLibre raster tutorial](https://developers.arcgis.com/maplibre-gl-js/maps/raster-tile-basemaps/display-multiple-basemap-layers/) and [licensing](https://developers.arcgis.com/javascript/latest/licensing/) require applicable account/service terms and attribution. No configured Esri service authorization/quota was established for this implementation. No undocumented anonymous World Imagery tile endpoint is used.
+4. Selected fallback: NASA GIBS documented WMTS. [Access basics](https://nasa-gibs.github.io/gibs-api-docs/access-basics/) and [map library integration](https://nasa-gibs.github.io/gibs-api-docs/map-library-usage/) document direct client integration. [NASA data-use guidance](https://www.earthdata.nasa.gov/engage/open-data-services-software/data-use-policy), [GIBS acknowledgements](https://nasa-gibs.github.io/gibs-api-docs/#data-use-guidance-and-acknowledgements) and [USGS Landsat use policy](https://www.usgs.gov/faqs/are-there-any-restrictions-use-or-redistribution-landsat-data) support the open NASA/USGS imagery choice, with attribution retained. No account/token, new package or paid quota was added. A numeric guaranteed service quota/availability SLA was not established: mount only on viewport intersection, request visible tiles only, avoid prefetch/bulk/offline redistribution, remove renderer on unmount and expose network fallback.
+
+Confirmed [EPSG3857 WMTS capabilities](https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/1.0.0/WMTSCapabilities.xml):
+
+| Layer | Time key | Matrix set | Context limits |
+| --- | --- | --- | --- |
+| Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual | 2000-12-01 | GoogleMapsCompatible_Level12 | Annual historical composite, nominal30m, actual acquisition varies by pixel. Default. |
+| MODIS_Terra_CorrectedReflectance_TrueColor | 2024-02-20 | GoogleMapsCompatible_Level9 | Daily historical browse, nominal250m, clouds/haze/gaps possible. |
+
+The [WELD metadata](https://gibs.earthdata.nasa.gov/layer-metadata/v1.0/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual.json) identifies GWELDYR V031, Annual Global30m. Regional sample tiles returned HTTP200/JPEG256×256 and were inspected locally; the WELD tile shows reservoir/land coverage. The initially investigated WELD2010 key was outside published capabilities and returned404; it is not used. Both chosen time keys occur in capabilities. Tile source/CORS checks are recorded separately; these HTTP checks do not prove browser rendering or site accuracy.
+
+The independent `Satellite & Irrigation Context` map is appended **after** `ReservoirAssets` on `/map`, full available width,560px desktop/480px mobile. It lazy-imports MapLibre, has independent camera/zoom/pan/keyboard/fullscreen, cooperative gestures for page scrolling, explicit layer/date/resolution, attribution, source links, timeout/error/retry. Only API references with AVAILABLE review, evidence/date, EPSG:4326 and finite Point coordinates qualify; the two existing reviewed references are not canonical geometry. The initial camera uses registry context metadata, not an approved reservoir extent. No coordinates are inferred for the other eight assets and no LOCAL GLB coordinates are transformed. No irrigation network accuracy or present-day appearance is claimed.
+
+## High-resolution provider setup (current secondary map)
+
+The user subsequently supplied their own MapTiler browser key and authorized configuring it in ignored `.env.local`. **MapTiler is now configured and selected by default**; live metadata and target tiles authenticate successfully. Street/cartographic and NASA historical layers remain available. Original asset GIS and methodology data are unchanged. Browser/WebGL acceptance remains NOT_RETESTED; HTTP tile checks are narrower evidence.
+
+Place your own browser credential in ignored `apps/web/.env.local`:
+
+```dotenv
+NEXT_PUBLIC_SATELLITE_PROVIDER=maptiler
+NEXT_PUBLIC_MAPTILER_KEY=<your-authorized-browser-key>
+```
+
+Use the [MapTiler API-key guide](https://docs.maptiler.com/guides/credentials/api-key/) to allow your development/deployment origins (the guide specifies `localhost`/`127.0.0.1` without protocol/port for local restrictions). Confirm satellite access and request quota in your own plan. Restart your own `pnpm dev:web` process after editing env. `NEXT_PUBLIC_*` values are public client credentials and are frozen into production output: restrict origins and rebuild for deployment; never commit actual keys or print keyed URLs. Do not provide server/private credentials here.
+
+The configured MapTiler path reads the maintained Satellite style (`/maps/satellite/style.json`), then follows the single used raster source to its [TileJSON](https://docs.maptiler.com/cloud/api/tiles/). The documented satellite-v4 tileset example returned404 in live testing; the official style instead resolves satellite-v2. No tileset version is hardcoded. Returned tile URLs/zoom range/credits are used, and one ordinary viewport-center tile is decoded to verify256/512px square dimensions rather than guessing from older examples. No server proxy, cache/rehost or borrowed demo token. Returned credits are retained/sanitized, linked MapTiler/OSM text and a linked MapTiler logo are shown; see [required attribution](https://docs.maptiler.com/guides/map-design/attribution/add-attribution/). Review [Cloud terms](https://www.maptiler.com/terms/cloud/) and [request accounting](https://docs.maptiler.com/guides/account/sessions-vs-requests/) for the actual account: the supplied key accepted metadata and four target tile requests, but account-wide entitlement, monthly usage/billing and origin restrictions were not independently inspected. Confirm those settings in the owner console; do not treat a successful request as proof of remaining quota.
+
+Alternatively set `NEXT_PUBLIC_SATELLITE_PROVIDER=esri` and `NEXT_PUBLIC_ARCGIS_API_KEY=<your-authorized-browser-key>`. The documented authenticated `ibasemaps-api.arcgis.com` World_Imagery service is used, with metadata LOD/CRS validation, retained service credits and linked Powered by Esri. Owner privileges/referrers and applicable terms must be established; see [Esri raster MapLibre tutorial](https://developers.arcgis.com/maplibre-gl-js/maps/raster-tile-basemaps/display-multiple-basemap-layers/), [service data](https://developers.arcgis.com/rest/basemap-styles/service-data/), [key configuration](https://developers.arcgis.com/documentation/security-and-authentication/api-key-authentication/api-key-credentials/location-platform/). `auto` prefers a configured Esri key, then MapTiler. No plugin/package is required. This alternate path is mock-tested, **not live certified**.
+
+For MapLibre256px raster sources, tile requests use `round(cameraZoom+1)`: source maxzoom alone is insufficient. New camera caps are WELD11/source12, MODIS8/source9, street18/source19. A512px provider tile uses the same camera/tile zoom; satellite camera max is the lesser of16 (the current observed local-detail cap),18 and the source limit adjusted by tile size. Reset, reference-fit and layer switching obey these caps. A visible limit message reports camera/tile levels. Service LOD is not proof of native aerial resolution; actual imagery clarity may vary. Old camera max14/source12 or9 caused overscaling (no CSS filter blur was found); old zoom16/18 were not reachable. Browser/network proof at those zooms remains NOT_RETESTED.
+
+Provider401/403/429, missing/invalid metadata, empty tile, decode failure, timeout or network errors switch once to the street fallback; street failure gives retry/source-link without a recursive loop. Layer switch/unmount aborts pending requests and disposes timers, resize observers and renderer. Errors shown to users never contain response bodies/keyed URLs. The [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/) requires visible attribution, normal browser cache/referer and limited viewport usage; no bulk, offline, prefetch or headless zoom scans are implemented. This fallback is raster cartography, not a vector/imagery accuracy claim.
+
+Verification after credential activation:72 unit tests pass (22 synthetic provider tests). Live Satellite TileJSON reports service levels0–22; HTTP target tiles12/14/16/18 all return200/JPEG512×512 with CORS:* at the existing reviewed DAM reference. Keyed URLs are redacted in evidence. Local inspection shows regional coverage at12 and roads/canals at16;18 is visibly soft/resampled and is not evidence of more native detail. Camera zoom is conservatively capped16. No8cm/building-level/current-date claim is made. Browser/WebGL, both-map visual order, responsive screenshots, interactions and actual in-browser request zoom remain **NOT_RETESTED**, because local browser access is disabled. The existing dev process received the env update and server-rendered selection is Satellite without manually restarting the user service.
+
+## Reproduction
+
+From repository root, with the existing API Python environment and database available:
+
+```sh
+uv run --project apps/api python scripts/capture_methodology_readback.py before
+uv run --project apps/api python scripts/export_methodology_dashboard.py \
+  --snapshot research/evaluation/evidence/METHODOLOGY-MAP/db-before.json \
+  --api-readback research/evaluation/evidence/METHODOLOGY-MAP/api-readback.json \
+  --output research/evaluation/results/METHODOLOGY-MAP
+uv run --project apps/api python scripts/capture_methodology_readback.py after
+pnpm --dir apps/web test:methodology
+```
+
+The capture uses a READ ONLY database transaction and hashes retained document/model bytes. Before/after fingerprints and storage hashes must match. Export stops on invalid controlled table/API readback; the readiness report may correctly remain NOT_READY. Private snapshots, full Tables1/4/6, readiness and coverage/readback manifest stay under ignored evaluation evidence/results directories. The small sanitized JSON is versioned with the UI; regenerate it deliberately when the approved dataset changes.
+
+Browser acceptance: **NOT_RETESTED**, because local browser use is disabled in Work settings. Desktop1440×900/mobile390×844 screenshots, actual map tile/auth failures, zoom/pan/fullscreen, scroll behavior and both-map visual order remain to be checked in a browser. DOM/source order, HTTP API, coverage, content types and CORS are narrower checks only.

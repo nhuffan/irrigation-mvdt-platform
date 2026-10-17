@@ -20,6 +20,7 @@ export function AppHeader() {
           {[
             [RESERVOIR_HREF, "Overview"],
             ["/map", "GIS Map"],
+            ["/methodology", "Methodology & Evidence"],
             [`${RESERVOIR_HREF}/3d`, "3D"],
           ].map(([href, label]) => (
             <Link

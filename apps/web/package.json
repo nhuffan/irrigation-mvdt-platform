@@ -10,7 +10,9 @@
     "predev": "node ./scripts/copy-maplibre-worker.mjs && node ./scripts/copy-cesium.mjs",
     "prebuild": "node ./scripts/copy-maplibre-worker.mjs && node ./scripts/copy-cesium.mjs",
     "test:media": "node --test tests/model-picking.test.mjs",
-    "test:explorer": "node --test tests/explorer-state.test.mjs"
+    "test:explorer": "node --test tests/explorer-state.test.mjs",
+    "test:methodology": "node --test tests/methodology.test.mjs",
+    "test:satellite": "node --test tests/satellite-provider.test.mjs"
   },
   "dependencies": {
     "cesium": "1.146.0",

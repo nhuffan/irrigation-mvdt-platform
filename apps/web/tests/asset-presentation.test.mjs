@@ -13,7 +13,7 @@ test('controlled aliases are presentation-only and unknown components keep real 
 });
 test('reference is separate from verified, no fake completeness score',()=>{
  assert.equal(rows(empty,'REFERENCE_LOCATION').Location,'Reference');assert.equal(rows().Location,'Missing');
- assert.equal(Object.keys(rows()).length,9);assert.equal(rows().Maintenance,'0 verified');
+ assert.equal(Object.keys(rows()).length,9);assert.equal(rows().Maintenance,'Absent — no verified events');
 });
 test('failed responses stay unavailable instead of zero',()=>{
  const r=rows({technical:null,events:null,condition:null,conditionError:true,documents:null,links:null});
@@ -25,7 +25,7 @@ test('levels need bound reviewed provenance and sources deduplicate by source id
 });
 test('candidates are excluded from category counts and model links never imply full semantics',()=>{
  const d={...empty,events:[{event_type:'MAINTENANCE',verification_status:'UNVERIFIED'}],links:[{verification_status:'VERIFIED'}]};
- assert.equal(rows(d).Maintenance,'0 verified');assert.equal(rows(d)['3D'],'Representative mapping');
+ assert.equal(rows(d).Maintenance,'Absent — no verified events');assert.equal(rows(d)['3D'],'Representative mapping');
 });
 test('search matches bilingual alias while preserving canonical search',()=>{
  const asset={...a,id:'x',category:{code:'DAM',name:'Dam'}};

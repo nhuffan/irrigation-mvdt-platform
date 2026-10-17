@@ -1060,3 +1060,66 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
   }
   .panel-closed > .workspace-grid { grid-template-areas: "content"; }
 }
+
+/* Additive research views. Existing GIS, inspectors and 3D layout are unchanged. */
+.methodology-page > section { margin: 20px 0; scroll-margin-top: 18px; }
+.methodology-page p { line-height: 1.6; margin: 10px 0; }
+.methodology-jump, .methodology-status, .methodology-semantics { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 16px 0; }
+.methodology-jump a { padding: 8px 12px; border: 1px solid #cbdad1; background: white; border-radius: 8px; }
+.methodology-status { font-size: 12px; color: #536d62; }
+.methodology-semantics span { border: 1px solid #d7e2dc; background: #eff5f1; border-radius: 6px; padding: 6px 8px; font-size: 11px; }
+.methodology-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 16px 0; }
+.methodology-table { max-width: 100%; overflow-x: auto; margin: 12px 0; }
+.methodology-table table { border-collapse: collapse; width: 100%; font-size: 13px; text-align: left; }
+.methodology-table caption { text-align: left; color: #64796f; padding: 10px 0; }
+.methodology-table th, .methodology-table td { vertical-align: top; padding: 12px; border-bottom: 1px solid #e2e9e5; min-width: 90px; }
+.methodology-table thead { background: #f1f5f2; }
+.methodology-table small, .methodology-table code { display: block; margin-top: 5px; font-size: 11px; color: #61756b; }
+.methodology-table code, .methodology-hashes code { overflow-wrap: anywhere; word-break: break-word; }
+.methodology-child { display: inline-block; margin-left: 14px; font-weight: normal; }
+.methodology-result { display: inline-block; border: 1px solid #cbd9d1; border-radius: 5px; padding: 3px 7px; font-size: 11px; font-weight: 700; }
+.result-pass { color: #176548; background: #eaf7ee; }
+.result-fail { color: #a0372b; background: #fff0ec; border-color: #e9b4a8; }
+.methodology-process { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; counter-reset: step; list-style: none; padding: 0; }
+.methodology-process li { border: 1px solid #d7e2dc; border-radius: 8px; padding: 16px; background: #f8faf8; }
+.methodology-process li::before { counter-increment: step; content: counter(step) ". "; color: #4f7869; }
+.methodology-process span { display: block; margin-top: 10px; font-size: 11px; color: #576e62; }
+.methodology-hashes dt { margin-top: 12px; font-weight: 600; font-size: 12px; }
+.methodology-hashes dd { margin: 4px 0 12px; font-size: 12px; }
+.methodology-hashes dd code { display: block; }
+.methodology-provenance { border-bottom: 1px solid #e2e9e5; padding: 14px 0; }
+.methodology-provenance ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); list-style: none; padding: 0; gap: 12px; }
+.methodology-provenance li { border: 1px solid #d7e2dc; border-radius: 8px; padding: 12px; overflow-wrap: anywhere; }
+.methodology-page .notice { background: #fff7e4; border: 1px solid #e8d6a1; border-radius: 8px; padding: 12px 16px; }
+.observation-section { width: 100%; margin-top: 32px; }
+.observation-section .panel-section-body { padding: 16px; }
+.observation-toolbar { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+.observation-toolbar label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; }
+.observation-toolbar select { max-width: 100%; background: white; padding: 10px; border: 1px solid #cad9d1; border-radius: 8px; color: #16352f; }
+.observation-layer-note, .observation-attribution, .observation-notes { font-size: 12px; line-height: 1.6; margin: 12px 0; color: #526c60; }
+.observation-map-frame { position: relative; border: 1px solid #cbdad1; border-radius: 10px; overflow: hidden; background: #e7eeeb; }
+.observation-canvas { height: 560px; width: 100%; }
+.observation-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; text-align: center; padding: 24px; background: #eef4f0ed; color: #395d4d; }
+.observation-reference { display: block; width: 26px; height: 26px; padding: 0; cursor: pointer; border: 2px dashed #b77810; border-radius: 50%; background: #fff8e6; color: #804900; font-size: 11px; font-weight: 700; text-align: center; }
+.observation-attribution a, .observation-notes a { text-decoration: underline; }
+.observation-canvas:fullscreen { height: 100vh; }
+@media (max-width: 760px) {
+  .methodology-metrics, .methodology-process { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .methodology-provenance ul { grid-template-columns: 1fr; }
+  .observation-toolbar { align-items: stretch; flex-direction: column; }
+  .observation-toolbar label, .observation-toolbar select { width: 100%; }
+  .observation-canvas { height: 480px; }
+}
+@media (max-width: 430px) {
+  .methodology-metrics, .methodology-process { grid-template-columns: 1fr; }
+  .methodology-status { align-items: flex-start; }
+}
+@media (max-width: 760px) {
+  .app-header .header-inner { flex-wrap: wrap; }
+  .app-header nav { width: 100%; min-width: 0; flex-wrap: wrap; }
+}
+/* Secondary-map provider state and source resolution; primary GIS is unaffected. */
+.observation-provider-status { padding: 10px 12px; margin: 12px 0; border: 1px solid #ddc58d; border-radius: 8px; background: #fff8e9; color: #745016; font-size: 12px; line-height: 1.6; }
+.observation-resolution { padding: 8px 12px; margin: 10px 0; border: 1px solid #d7e2dc; border-radius: 8px; background: #f1f6f3; color: #3a5e4c; font-size: 12px; }
+.observation-provider-logo { padding: 4px; background: white; border-radius: 3px; }
+.observation-provider-logo img { width: 88px; height: auto; }

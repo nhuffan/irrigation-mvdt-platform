@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { ApiError, getAsset, getReservoir } from "@/lib/api";
+import { ApiError, getAsset, getReservoir, getReservoirAssets } from "@/lib/api";
+import { ObservationMap } from "@/components/map/observation-map";
 import { MANAGED_RESERVOIR_ID } from "@/lib/site-scope";
 import { ReservoirAssets } from "@/components/asset/reservoir-assets";
 export const dynamic = "force-dynamic";
@@ -13,5 +14,6 @@ export default async function MapPage({ searchParams }: { searchParams: Promise<
     });
   }
   const reservoir = await getReservoir(MANAGED_RESERVOIR_ID);
-  return <main className="map-shell"><p className="eyebrow">Asset GIS</p><h1>{reservoir.name}</h1><ReservoirAssets reservoir={reservoir} /></main>;
+  const observationAssets = await getReservoirAssets(reservoir.id);
+  return <main className="map-shell"><p className="eyebrow">Asset GIS</p><h1>{reservoir.name}</h1><ReservoirAssets reservoir={reservoir} /><ObservationMap reservoir={reservoir} assets={observationAssets} /></main>;
 }

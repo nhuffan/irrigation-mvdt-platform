@@ -1,0 +1,1840 @@
+{
+  "schema_version": "METHODOLOGY-DASHBOARD-v1",
+  "dataset_version": "DT-R1",
+  "reservoir_id": "63adca21-9195-44e2-81a2-0475bd6829f3",
+  "captured_at": "2026-10-17T18:57:41.644897+00:00",
+  "database_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c",
+  "methodology": {
+    "status": "NOT_READY",
+    "dataset_status": "NOT_FROZEN",
+    "fingerprint": "df015c9272805954ab027f7663d1a1f0905c3c1ac5fd51bf3f581cd19eb596db",
+    "unresolved_gate_count": 71,
+    "as_of_date": null
+  },
+  "assets": [
+    {
+      "asset_code": "RS-DT-DAM",
+      "asset_id": "bd4aff6e-8117-426d-906e-953a2b5a4ae9",
+      "technical_l2": 7,
+      "linked_controlled_sources": 2,
+      "linked_document_records": 1,
+      "linked_distinct_sha256": 1,
+      "reference_locations": 1,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "primary",
+      "parent_asset_code": "",
+      "name": "Đập / Dam",
+      "technical_ids": [
+        "34605ef8-23e1-5e67-a699-91cd6d846d7a",
+        "7e6f08e6-7b86-5e24-861b-968ea40a184a",
+        "8e066ac8-9925-5751-850d-ab51692f8bd6",
+        "ce1c15fe-ea6c-52ac-a399-609806451063",
+        "d1281d47-f144-5c32-9444-44f60fb85b23",
+        "f5d38ee9-ae2f-5f06-8ed9-b53612d848ec",
+        "fda8a762-0568-57bb-93a6-9c6838d09c3c"
+      ],
+      "technical_readback": [
+        {
+          "id": "34605ef8-23e1-5e67-a699-91cd6d846d7a",
+          "key": "reported_main_dam_crest_length",
+          "number": 1100.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_length",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "7e6f08e6-7b86-5e24-861b-968ea40a184a",
+          "key": "reported_main_dam_crest_elevation",
+          "number": 28.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_elevation",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "8e066ac8-9925-5751-850d-ab51692f8bd6",
+          "key": "reported_wall_length_on_dam_crest",
+          "number": 361.5,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "55952bc5-b8a4-4bdf-9363-b7af8926c39f",
+          "level": "L2",
+          "locator": "PDF:p3:section-4:wall-length",
+          "source_code": "RS-SRC-007",
+          "authority": "SUPPORTING"
+        },
+        {
+          "id": "ce1c15fe-ea6c-52ac-a399-609806451063",
+          "key": "reported_core_wall_top_elevation",
+          "number": 28.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "55952bc5-b8a4-4bdf-9363-b7af8926c39f",
+          "level": "L2",
+          "locator": "PDF:p2:section-4:wall-top-elevation",
+          "source_code": "RS-SRC-007",
+          "authority": "SUPPORTING"
+        },
+        {
+          "id": "d1281d47-f144-5c32-9444-44f60fb85b23",
+          "key": "reported_core_wall_thickness",
+          "number": 0.6,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "55952bc5-b8a4-4bdf-9363-b7af8926c39f",
+          "level": "L2",
+          "locator": "PDF:p2:section-4:wall-thickness",
+          "source_code": "RS-SRC-007",
+          "authority": "SUPPORTING"
+        },
+        {
+          "id": "f5d38ee9-ae2f-5f06-8ed9-b53612d848ec",
+          "key": "reported_main_dam_max_height",
+          "number": 28.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_max_height",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "fda8a762-0568-57bb-93a6-9c6838d09c3c",
+          "key": "reported_main_dam_crest_width",
+          "number": 8.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_width",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        }
+      ],
+      "document_ids": [
+        "83ccfb63-2f62-5ffb-8bd4-8bb598de5d04"
+      ],
+      "location_status": "REFERENCE_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-007",
+          "locator": "PDF:p2:section-4:wall-thickness",
+          "authority": "SUPPORTING",
+          "attribute_key": "reported_core_wall_thickness"
+        },
+        {
+          "source_code": "RS-SRC-007",
+          "locator": "PDF:p2:section-4:wall-top-elevation",
+          "authority": "SUPPORTING",
+          "attribute_key": "reported_core_wall_top_elevation"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_elevation",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_main_dam_crest_elevation"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_length",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_main_dam_crest_length"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_crest_width",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_main_dam_crest_width"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p20:printed9:Table2:MainDam:reported_main_dam_max_height",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_main_dam_max_height"
+        },
+        {
+          "source_code": "RS-SRC-007",
+          "locator": "PDF:p3:section-4:wall-length",
+          "authority": "SUPPORTING",
+          "attribute_key": "reported_wall_length_on_dam_crest"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-INTAKE",
+      "asset_id": "a643398a-7859-4be2-a1f5-5b60ed471347",
+      "technical_l2": 0,
+      "linked_controlled_sources": 0,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "primary",
+      "parent_asset_code": "",
+      "name": "Cống lấy nước / Intake sluice",
+      "technical_ids": [],
+      "technical_readback": [],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": []
+    },
+    {
+      "asset_code": "RS-DT-INTAKE-C01",
+      "asset_id": "2cbfff8a-95f8-5dda-87e6-50bd14e2373b",
+      "technical_l2": 6,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-INTAKE",
+      "name": "Cống số 1 — Kênh Đông",
+      "technical_ids": [
+        "4f47208f-2c20-50f6-84ec-eca83f9a111a",
+        "50476406-5a9c-51e3-85c8-3a062122333f",
+        "6e705652-0356-50d5-9e6c-d954d18b11a6",
+        "962c8919-ba72-5a99-ae47-95b4f3efa379",
+        "ac6504a7-31c8-5fde-aefd-19297d15ebb1",
+        "c54a1db4-394d-5ac4-a748-b110fee03272"
+      ],
+      "technical_readback": [
+        {
+          "id": "4f47208f-2c20-50f6-84ec-eca83f9a111a",
+          "key": "reported_canal_route",
+          "number": null,
+          "text": "Kênh Đông",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_canal_route; printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "50476406-5a9c-51e3-85c8-3a062122333f",
+          "key": "reported_discharge",
+          "number": 93.0,
+          "text": null,
+          "unit": "m3/s",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "6e705652-0356-50d5-9e6c-d954d18b11a6",
+          "key": "reported_n",
+          "number": 3.0,
+          "text": null,
+          "unit": "count",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "962c8919-ba72-5a99-ae47-95b4f3efa379",
+          "key": "reported_sill_elevation",
+          "number": 13.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_sill_elevation; printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "ac6504a7-31c8-5fde-aefd-19297d15ebb1",
+          "key": "reported_opening_height",
+          "number": 4.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "c54a1db4-394d-5ac4-a748-b110fee03272",
+          "key": "reported_opening_width",
+          "number": 3.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_canal_route; printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_canal_route"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_discharge"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_n"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_height"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.1; existing condition column; SIWRR printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_width"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert1:reported_sill_elevation; printed47 / PDF index46 / cống 1",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_sill_elevation"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-INTAKE-C02",
+      "asset_id": "86a89616-6018-5f4f-883c-f8b3fc33668c",
+      "technical_l2": 6,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-INTAKE",
+      "name": "Cống số 2 — Kênh Tây",
+      "technical_ids": [
+        "0ad18ac3-abc4-505b-8723-211cfb717909",
+        "60ce60a9-6b01-5ac1-9cf8-5d89a3013a31",
+        "6b3344d0-d16a-5d56-aa54-502ad42c93e7",
+        "9ce33e53-e37f-5985-8ac1-f8e59d27ec58",
+        "ac7034d6-81b6-5951-a83c-f94b328b183d",
+        "d1e94b46-67da-583d-95a5-aac8cfd3279b"
+      ],
+      "technical_readback": [
+        {
+          "id": "0ad18ac3-abc4-505b-8723-211cfb717909",
+          "key": "reported_discharge",
+          "number": 93.0,
+          "text": null,
+          "unit": "m3/s",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "60ce60a9-6b01-5ac1-9cf8-5d89a3013a31",
+          "key": "reported_opening_width",
+          "number": 3.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "6b3344d0-d16a-5d56-aa54-502ad42c93e7",
+          "key": "reported_opening_height",
+          "number": 4.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "9ce33e53-e37f-5985-8ac1-f8e59d27ec58",
+          "key": "reported_n",
+          "number": 3.0,
+          "text": null,
+          "unit": "count",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "ac7034d6-81b6-5951-a83c-f94b328b183d",
+          "key": "reported_sill_elevation",
+          "number": 13.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_sill_elevation; printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "d1e94b46-67da-583d-95a5-aac8cfd3279b",
+          "key": "reported_canal_route",
+          "number": null,
+          "text": "Kênh Tây",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_canal_route; printed47 / PDF index46 / cống 2",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_canal_route; printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_canal_route"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_discharge"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_n"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_height"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.2; existing condition column; SIWRR printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_width"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert2:reported_sill_elevation; printed47 / PDF index46 / cống 2",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_sill_elevation"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-INTAKE-C03",
+      "asset_id": "b463d566-c23a-546c-8140-381e49e7d5d9",
+      "technical_l2": 6,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-INTAKE",
+      "name": "Cống số 3 — Kênh Tân Hưng",
+      "technical_ids": [
+        "32bc9485-6b0b-5c78-9e9d-c3115391066f",
+        "798b5ab9-a6f3-5870-b302-4aa529ae10a2",
+        "ba4d2235-260d-5649-b1f6-514b0e4e04b4",
+        "e42a3f4d-7400-560f-a806-485d0fc104f2",
+        "e7a451f9-4bdd-599e-abfa-7af0efb20fbf",
+        "f07269b4-cb0f-5304-9be5-d38c2b396ca2"
+      ],
+      "technical_readback": [
+        {
+          "id": "32bc9485-6b0b-5c78-9e9d-c3115391066f",
+          "key": "reported_sill_elevation",
+          "number": 15.75,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_sill_elevation; printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "798b5ab9-a6f3-5870-b302-4aa529ae10a2",
+          "key": "reported_opening_height",
+          "number": 3.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "ba4d2235-260d-5649-b1f6-514b0e4e04b4",
+          "key": "reported_canal_route",
+          "number": null,
+          "text": "Kênh Tân Hưng",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_canal_route; printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "e42a3f4d-7400-560f-a806-485d0fc104f2",
+          "key": "reported_discharge",
+          "number": 12.8,
+          "text": null,
+          "unit": "m3/s",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "e7a451f9-4bdd-599e-abfa-7af0efb20fbf",
+          "key": "reported_opening_width",
+          "number": 3.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        },
+        {
+          "id": "f07269b4-cb0f-5304-9be5-d38c2b396ca2",
+          "key": "reported_n",
+          "number": 1.0,
+          "text": null,
+          "unit": "count",
+          "verification_status": "VERIFIED",
+          "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+          "level": "L2",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "source_code": "RS-SRC-020",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_canal_route; printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_canal_route"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_discharge; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_discharge"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_n; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_n"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_opening_height; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_height"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_opening_width; PDF p25 / printed p25; Table 2.2 continued; Culvert No.3; existing condition column; SIWRR printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_opening_width"
+        },
+        {
+          "source_code": "RS-SRC-020",
+          "locator": "PDF:p47:printed47:index46:culvert3:reported_sill_elevation; printed47 / PDF index46 / cống 3",
+          "authority": "UNKNOWN — historical source-reported technical values; not current measurement or independent domain attestation",
+          "attribute_key": "reported_sill_elevation"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-MGMT",
+      "asset_id": "a5318c03-c03c-47bf-a945-c8bf44aabc1a",
+      "technical_l2": 0,
+      "linked_controlled_sources": 0,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 1,
+      "scope": "primary",
+      "parent_asset_code": "",
+      "name": "Khu nhà quản lý/vận hành đầu mối Dầu Tiếng",
+      "technical_ids": [],
+      "technical_readback": [],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": []
+    },
+    {
+      "asset_code": "RS-DT-MGMT-DINING",
+      "asset_id": "32a21e90-63ee-5f22-8daf-cff41d832241",
+      "technical_l2": 3,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-MGMT",
+      "name": "Nhà ăn",
+      "technical_ids": [
+        "6554c772-14dd-5ee8-8ca0-1c2c61e6af94",
+        "6bec2b6d-1180-5999-a44c-1e5af9eee8f3",
+        "cd3cc4dc-eaa9-5029-8b0a-0599967303f9"
+      ],
+      "technical_readback": [
+        {
+          "id": "6554c772-14dd-5ee8-8ca0-1c2c61e6af94",
+          "key": "reported_column_material",
+          "number": null,
+          "text": "Bê tông cốt thép (BTCT)",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "4d812c7a-569b-52c3-aab6-7a2b7ebf6ede",
+          "level": "L2",
+          "locator": "PDF:p3:C Nhà ăn:Cột:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;observation31/03/2026; not present-day condition, completed repair or geometry",
+          "source_code": "RS-SRC-022",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        },
+        {
+          "id": "6bec2b6d-1180-5999-a44c-1e5af9eee8f3",
+          "key": "reported_mezzanine_presence",
+          "number": null,
+          "text": "Tầng lửng được nhắc trong biên bản",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "4d812c7a-569b-52c3-aab6-7a2b7ebf6ede",
+          "level": "L2",
+          "locator": "PDF:p3:C Nhà ăn:Tường trần:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; observation31/03/2026; no current-state/geometry/completed-repair assertion",
+          "source_code": "RS-SRC-022",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED"
+        },
+        {
+          "id": "cd3cc4dc-eaa9-5029-8b0a-0599967303f9",
+          "key": "reported_railing_material",
+          "number": null,
+          "text": "Gạch xây",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "4d812c7a-569b-52c3-aab6-7a2b7ebf6ede",
+          "level": "L2",
+          "locator": "PDF:p3:C Nhà ăn:Lan can:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;observation31/03/2026; not present-day condition, completed repair or geometry",
+          "source_code": "RS-SRC-022",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-022",
+          "locator": "PDF:p3:C Nhà ăn:Cột:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;observation31/03/2026; not present-day condition, completed repair or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "reported_column_material"
+        },
+        {
+          "source_code": "RS-SRC-022",
+          "locator": "PDF:p3:C Nhà ăn:Tường trần:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; observation31/03/2026; no current-state/geometry/completed-repair assertion",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED",
+          "attribute_key": "reported_mezzanine_presence"
+        },
+        {
+          "source_code": "RS-SRC-022",
+          "locator": "PDF:p3:C Nhà ăn:Lan can:cột Hiện trạng; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;observation31/03/2026; not present-day condition, completed repair or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "reported_railing_material"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-MGMT-OFFICE",
+      "asset_id": "547d5cb8-0a7d-58ef-8ca5-4c102a76a68b",
+      "technical_l2": 5,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-MGMT",
+      "name": "Nhà làm việc",
+      "technical_ids": [
+        "22000ded-3d98-5040-9432-53fb5e5ab8e8",
+        "2f0ab345-641f-5ced-98d6-fd880a4d0777",
+        "7602f321-1cc0-55e4-a9cb-f9730509a800",
+        "b36d3a51-0381-5a2b-bbcf-529337b03e25",
+        "dd7123a0-34e9-59a5-b502-8193b4a35e30"
+      ],
+      "technical_readback": [
+        {
+          "id": "22000ded-3d98-5040-9432-53fb5e5ab8e8",
+          "key": "reported_roof_gutter_structure",
+          "number": null,
+          "text": "Sàn, thành sê nô và dầm ngăn bằng BTCT",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p10:HT.02:SÊ NÔ:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; document2026; exact observation date unknown; no current-state/geometry/completed-repair assertion",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED"
+        },
+        {
+          "id": "2f0ab345-641f-5ced-98d6-fd880a4d0777",
+          "key": "reported_water_tank_capacity",
+          "number": 1500.0,
+          "text": null,
+          "unit": "L",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p10:HT.02:13 CẤP THOÁT NƯỚC:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        },
+        {
+          "id": "7602f321-1cc0-55e4-a9cb-f9730509a800",
+          "key": "reported_roof_material",
+          "number": null,
+          "text": "Mái lợp ngói trên hệ xà gồ thép hộp, tường thu hồi xây gạch, dầm sàn mái BTCT",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p10:HT.02:I.1 MÁI:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        },
+        {
+          "id": "b36d3a51-0381-5a2b-bbcf-529337b03e25",
+          "key": "reported_main_door_material",
+          "number": null,
+          "text": "Nhôm kính",
+          "unit": "text",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p10:HT.02:CỬA ĐI:Cửa chính D1:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; document2026; exact observation date unknown; no current-state/geometry/completed-repair assertion",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED"
+        },
+        {
+          "id": "dd7123a0-34e9-59a5-b502-8193b4a35e30",
+          "key": "drawing_floor_elevation",
+          "number": 28.48,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p5:03A:NHÀ LÀM VIỆC:Cos nền; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p5:03A:NHÀ LÀM VIỆC:Cos nền; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "drawing_floor_elevation"
+        },
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p10:HT.02:CỬA ĐI:Cửa chính D1:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; document2026; exact observation date unknown; no current-state/geometry/completed-repair assertion",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED",
+          "attribute_key": "reported_main_door_material"
+        },
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p10:HT.02:SÊ NÔ:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED; document2026; exact observation date unknown; no current-state/geometry/completed-repair assertion",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED",
+          "attribute_key": "reported_roof_gutter_structure"
+        },
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p10:HT.02:I.1 MÁI:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "reported_roof_material"
+        },
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p10:HT.02:13 CẤP THOÁT NƯỚC:cột HIỆN TRẠNG CÔNG TRÌNH; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "reported_water_tank_capacity"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-MGMT-SAIL",
+      "asset_id": "66d67076-daf2-5070-aa3a-926aa5cbcafc",
+      "technical_l2": 1,
+      "linked_controlled_sources": 1,
+      "linked_document_records": 0,
+      "linked_distinct_sha256": 0,
+      "reference_locations": 0,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "component",
+      "parent_asset_code": "RS-DT-MGMT",
+      "name": "Nhà cánh buồm",
+      "technical_ids": [
+        "676e3592-2c6a-5ca9-8993-1eb026ec35cd"
+      ],
+      "technical_readback": [
+        {
+          "id": "676e3592-2c6a-5ca9-8993-1eb026ec35cd",
+          "key": "drawing_floor_elevation",
+          "number": 28.76,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+          "level": "L2",
+          "locator": "PDF:p5:03A:NHÀ CÁNH BUỒM:Cos nền; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "source_code": "RS-SRC-021",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification"
+        }
+      ],
+      "document_ids": [],
+      "location_status": "NO_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-021",
+          "locator": "PDF:p5:03A:NHÀ CÁNH BUỒM:Cos nền; SOURCE_REPORTED / HISTORICAL_DOCUMENTED;2026 document year only; not current2026 state, national datum or geometry",
+          "authority": "UNKNOWN — SOURCE_REPORTED / HISTORICAL_DOCUMENTED; no current-condition/datum/geometry certification",
+          "attribute_key": "drawing_floor_elevation"
+        }
+      ]
+    },
+    {
+      "asset_code": "RS-DT-SPILLWAY",
+      "asset_id": "9cc2f301-f40f-4f2b-aeef-dc45251d279c",
+      "technical_l2": 10,
+      "linked_controlled_sources": 2,
+      "linked_document_records": 1,
+      "linked_distinct_sha256": 1,
+      "reference_locations": 1,
+      "canonical_geometry_present": 0,
+      "verified_current_condition": 0,
+      "verified_om_records": 0,
+      "representative_3d_links": 0,
+      "scope": "primary",
+      "parent_asset_code": "",
+      "name": "Tràn xả lũ / Spillway",
+      "technical_ids": [
+        "0c4fc255-9fa7-594e-9071-694420aa67c4",
+        "1bb6ca28-134c-5edc-add5-63ed0a90052f",
+        "44eedb50-c38d-503b-9d94-9af54d8429d0",
+        "464adb6c-2d7a-5158-88c7-4a1d7c58c36f",
+        "4ae68532-5e73-57eb-a970-ae4607f22cf3",
+        "942c50e8-ec3e-5369-9d7b-36cf3f4b60ae",
+        "9ae5f6f4-42b2-5448-b941-04b84221f6fd",
+        "a8d82996-6be4-5fdb-8901-28eb4e4eb561",
+        "ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9",
+        "f8221ab6-df82-517d-8644-bd8c4e2cd160"
+      ],
+      "technical_readback": [
+        {
+          "id": "0c4fc255-9fa7-594e-9071-694420aa67c4",
+          "key": "reported_spillway_hydraulic_station_count",
+          "number": 3.0,
+          "text": null,
+          "unit": "count",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p4:SPILLWAY system",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "1bb6ca28-134c-5edc-add5-63ed0a90052f",
+          "key": "reported_gate_cylinder_stroke",
+          "number": 4650.0,
+          "text": null,
+          "unit": "mm",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p9:Main gate cylinder",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "44eedb50-c38d-503b-9d94-9af54d8429d0",
+          "key": "reported_gate_cylinder_rod_diameter",
+          "number": 125.0,
+          "text": null,
+          "unit": "mm",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p9:Main gate cylinder",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "464adb6c-2d7a-5158-88c7-4a1d7c58c36f",
+          "key": "reported_historic_design_discharge",
+          "number": 2800.0,
+          "text": null,
+          "unit": "m3/s",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_historic_design_discharge",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "4ae68532-5e73-57eb-a970-ae4607f22cf3",
+          "key": "reported_spillway_radial_gate_count",
+          "number": 6.0,
+          "text": null,
+          "unit": "count",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p4:SPILLWAY system",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "942c50e8-ec3e-5369-9d7b-36cf3f4b60ae",
+          "key": "reported_gate_height",
+          "number": 6.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_gate_height",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "9ae5f6f4-42b2-5448-b941-04b84221f6fd",
+          "key": "reported_gate_cylinder_test_pressure",
+          "number": 270.0,
+          "text": null,
+          "unit": "bar",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p9:Main gate cylinder test specification",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "a8d82996-6be4-5fdb-8901-28eb4e4eb561",
+          "key": "reported_gate_width",
+          "number": 10.0,
+          "text": null,
+          "unit": "m",
+          "verification_status": "VERIFIED",
+          "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+          "level": "L2",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_gate_width",
+          "source_code": "RS-SRC-019",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority"
+        },
+        {
+          "id": "ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9",
+          "key": "reported_gate_cylinder_design_pressure",
+          "number": 200.0,
+          "text": null,
+          "unit": "bar",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p9:Main gate cylinder design",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        },
+        {
+          "id": "f8221ab6-df82-517d-8644-bd8c4e2cd160",
+          "key": "reported_gate_cylinder_inner_diameter",
+          "number": 250.0,
+          "text": null,
+          "unit": "mm",
+          "verification_status": "VERIFIED",
+          "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+          "level": "L2",
+          "locator": "PDF:p9:Main gate cylinder",
+          "source_code": "RS-SRC-018",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation"
+        }
+      ],
+      "document_ids": [
+        "6c2975db-da89-546c-b1c7-f421827c1fc2"
+      ],
+      "location_status": "REFERENCE_LOCATION",
+      "provenance": [
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p9:Main gate cylinder design",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_gate_cylinder_design_pressure"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p9:Main gate cylinder",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_gate_cylinder_inner_diameter"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p9:Main gate cylinder",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_gate_cylinder_rod_diameter"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p9:Main gate cylinder",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_gate_cylinder_stroke"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p9:Main gate cylinder test specification",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_gate_cylinder_test_pressure"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_gate_height",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_gate_height"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_gate_width",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_gate_width"
+        },
+        {
+          "source_code": "RS-SRC-019",
+          "locator": "PDF:p19:printed8:section2.1.2:spillway:reported_historic_design_discharge",
+          "authority": "UNKNOWN — historic engineering report; field approval does not promote source authority",
+          "attribute_key": "reported_historic_design_discharge"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p4:SPILLWAY system",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_spillway_hydraulic_station_count"
+        },
+        {
+          "source_code": "RS-SRC-018",
+          "locator": "PDF:p4:SPILLWAY system",
+          "authority": "UNKNOWN — reported contractor manual; no independent domain attestation",
+          "attribute_key": "reported_spillway_radial_gate_count"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "194f91e8-4403-4568-afe8-1cae7ab79151",
+      "code": "RS-SRC-001",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 1
+    },
+    {
+      "id": "c69b90c3-de23-408a-bf3c-d7fd1b3bdf12",
+      "code": "RS-SRC-002",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 1
+    },
+    {
+      "id": "783cbcfc-536e-47f8-b5e1-cec757e4f9d1",
+      "code": "RS-SRC-003",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 1
+    },
+    {
+      "id": "df27cab4-abc0-4ed3-ba07-48fb75ef9b30",
+      "code": "RS-SRC-004",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "0893c9a9-29a1-4a3c-8236-ddbcc4adc89b",
+      "code": "RS-SRC-005",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 1
+    },
+    {
+      "id": "973416c9-5120-46dd-81c8-0f92ec1a5ddc",
+      "code": "RS-SRC-006",
+      "expected_file": false,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "55952bc5-b8a4-4bdf-9363-b7af8926c39f",
+      "code": "RS-SRC-007",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 1
+    },
+    {
+      "id": "763a71ad-ff6c-4ab9-86f4-36ffd70f95dc",
+      "code": "RS-SRC-008",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "2a606e24-39b4-4316-9aea-1b1206c7cf53",
+      "code": "RS-SRC-009",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "REFERENCE",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "e9804bcf-f92e-41f9-80a2-9ca61fd44ace",
+      "code": "RS-SRC-010",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "REFERENCE",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "f9441ceb-df5b-4cc1-8f97-a68f5258a8a1",
+      "code": "RS-SRC-011",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "0e3a4c25-8460-42d1-b2db-54c1e9b38537",
+      "code": "RS-SRC-012",
+      "expected_file": false,
+      "verification_status": "UNVERIFIED",
+      "authority": "REFERENCE",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "196c5d34-7a98-41ab-9a53-ba18e9623677",
+      "code": "RS-SRC-013",
+      "expected_file": false,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "b33bdf8e-bf10-487e-81bb-4b58e02a704f",
+      "code": "RS-SRC-014",
+      "expected_file": false,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "6558c4a5-72d1-46ce-8892-087f0e543e73",
+      "code": "RS-SRC-015",
+      "expected_file": false,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "5b6b8fce-cbc6-4bf0-afbb-70a1c1bd4139",
+      "code": "RS-SRC-016",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "REFERENCE",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": null,
+      "code": "RS-SRC-017",
+      "expected_file": true,
+      "verification_status": "NOT_ADMITTED",
+      "authority": "REFERENCE",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
+      "retained_document_records": 0
+    },
+    {
+      "id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
+      "code": "RS-SRC-018",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN",
+      "review_status": "NOT_REVIEWED",
+      "retained_document_records": 1
+    },
+    {
+      "id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
+      "code": "RS-SRC-019",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN",
+      "review_status": "NOT_REVIEWED",
+      "retained_document_records": 0
+    },
+    {
+      "id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
+      "code": "RS-SRC-020",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN",
+      "review_status": "NOT_REVIEWED",
+      "retained_document_records": 0
+    },
+    {
+      "id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
+      "code": "RS-SRC-021",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN",
+      "review_status": "NOT_REVIEWED",
+      "retained_document_records": 0
+    },
+    {
+      "id": "4d812c7a-569b-52c3-aab6-7a2b7ebf6ede",
+      "code": "RS-SRC-022",
+      "expected_file": true,
+      "verification_status": "UNVERIFIED",
+      "authority": "UNKNOWN",
+      "review_status": "NOT_REVIEWED",
+      "retained_document_records": 0
+    }
+  ],
+  "documents": {
+    "retained_records": 6,
+    "distinct_sha256": 6,
+    "reviewed_distinct_sha256": 6
+  },
+  "evaluation": [
+    {
+      "check_id": "F01",
+      "function": "Reservoir GIS",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:25:44.353440+00:00",
+      "evidence": [
+        {
+          "label": "F01-marker.png",
+          "sha256": "c09e95ce6172a67738d524d21c302ae3f19505bd333a2f69bb912d5c0c9989cc"
+        },
+        {
+          "label": "F01-reservoir.png",
+          "sha256": "4a4f0adc49f12f34df6d74a729c275b150def8debc58c8d6017b5d4c66e2b806"
+        }
+      ]
+    },
+    {
+      "check_id": "F02",
+      "function": "Asset GIS and geometry accuracy",
+      "dataset_version": "DT-R1",
+      "status": "FAIL",
+      "checked_at": "2026-10-10T17:25:44.353619+00:00",
+      "evidence": [
+        {
+          "label": "F02-missing-research-geometry.png",
+          "sha256": "4a4f0adc49f12f34df6d74a729c275b150def8debc58c8d6017b5d4c66e2b806"
+        }
+      ]
+    },
+    {
+      "check_id": "F03",
+      "function": "Asset identity and hierarchy",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584867+00:00",
+      "evidence": [
+        {
+          "label": "F03-F04-F05-dam.png",
+          "sha256": "2ffcf73467bba78afb3f52a18044e1ef7dcb0d85468ab5fb068e352d4dd16d06"
+        },
+        {
+          "label": "F03-F04-F05-intake.png",
+          "sha256": "cadb52d1bfacd17b7a8e20c59f15578e8f67e10c9c66d794739d71f081395c60"
+        },
+        {
+          "label": "F03-F04-F05-spillway.png",
+          "sha256": "cc116a9e7a7e09a86e1349c642667b0143ad156d7cd3f2b8dd3f7607a761ad1c"
+        },
+        {
+          "label": "F03-F04-F05-mgmt.png",
+          "sha256": "d282e48177fba8935d09ba28fe842d69894b89e1435b3f3f3993e7c2d469b380"
+        }
+      ]
+    },
+    {
+      "check_id": "F04",
+      "function": "Latest VERIFIED condition",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:25:44.353620+00:00",
+      "evidence": [
+        {
+          "label": "F03-F04-F05-dam.png",
+          "sha256": "2ffcf73467bba78afb3f52a18044e1ef7dcb0d85468ab5fb068e352d4dd16d06"
+        }
+      ]
+    },
+    {
+      "check_id": "F05",
+      "function": "Descending O&M timeline",
+      "dataset_version": "DT-R1",
+      "status": "FAIL",
+      "checked_at": "2026-10-10T17:25:44.353622+00:00",
+      "evidence": [
+        {
+          "label": "F03-F04-F05-dam.png",
+          "sha256": "2ffcf73467bba78afb3f52a18044e1ef7dcb0d85468ab5fb068e352d4dd16d06"
+        }
+      ]
+    },
+    {
+      "check_id": "F06",
+      "function": "Source provenance",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:25:44.353623+00:00",
+      "evidence": [
+        {
+          "label": "F06-technical-source.png",
+          "sha256": "17bfae8a8116c2e607d1714e527e9bf152a5ca606b35b31761c73dfb794cfab2"
+        }
+      ]
+    },
+    {
+      "check_id": "F07",
+      "function": "PDF preview",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:25:44.353624+00:00",
+      "evidence": [
+        {
+          "label": "F07-pdf-preview.png",
+          "sha256": "635ee977f464424f5c338fe831f4a53a37f4206de300d8dae3fc6003876d7747"
+        }
+      ]
+    },
+    {
+      "check_id": "F08",
+      "function": "PNG/JPEG/WebP/GIF preview",
+      "dataset_version": "DT-R1",
+      "status": "N/A",
+      "checked_at": "2026-10-10T17:25:44.353625+00:00",
+      "evidence": [
+        {
+          "label": "db-before.json",
+          "sha256": "a81318e14613c4063411fe586676fe3a22c1cee7345be94e207608306f18179b"
+        }
+      ]
+    },
+    {
+      "check_id": "F09",
+      "function": "Document download and Range",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-11T03:16:51.745265+00:00",
+      "evidence": [
+        {
+          "label": "verification.json",
+          "sha256": "c89c1a8b4eef97cc7867695d988c45090cb19fbcec3b80f21a04516b52ba03a5"
+        },
+        {
+          "label": "F09-download-complete.png",
+          "sha256": "13075066e01d0ce6eb70be203bee0ad83f2e27e44d19d3985337c786dabe4283"
+        },
+        {
+          "label": "http-range.json",
+          "sha256": "e3a407e901cb1943113cef78dc85574737aa80252ada7bcf4d9a3def421e03ea"
+        }
+      ]
+    },
+    {
+      "check_id": "F10",
+      "function": "Missing file error",
+      "dataset_version": "DT-R1",
+      "status": "N/A",
+      "checked_at": "2026-10-10T17:25:44.353627+00:00",
+      "evidence": [
+        {
+          "label": "db-before.json",
+          "sha256": "a81318e14613c4063411fe586676fe3a22c1cee7345be94e207608306f18179b"
+        }
+      ]
+    },
+    {
+      "check_id": "F11",
+      "function": "Unsupported file download",
+      "dataset_version": "DT-R1",
+      "status": "N/A",
+      "checked_at": "2026-10-10T17:25:44.353628+00:00",
+      "evidence": [
+        {
+          "label": "db-before.json",
+          "sha256": "a81318e14613c4063411fe586676fe3a22c1cee7345be94e207608306f18179b"
+        }
+      ]
+    },
+    {
+      "check_id": "F12",
+      "function": "Cesium model render",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584976+00:00",
+      "evidence": [
+        {
+          "label": "F12-F17-local-render-deeplink.png",
+          "sha256": "da7cb1545eb8b105b5de4ed2957debd5680dc8a42680ab4a97bf8b96e0e4d69d"
+        }
+      ]
+    },
+    {
+      "check_id": "F13",
+      "function": "Camera reset/rotate/zoom",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584979+00:00",
+      "evidence": [
+        {
+          "label": "F13-reset.png",
+          "sha256": "59e5b7761875a410546844d2edb86f8f051b48245761b9d60295009e74145d2d"
+        },
+        {
+          "label": "F13-rotate.png",
+          "sha256": "034718219341d191437c295e2097211715419563e7deb1e71174fa47ba1fbdbf"
+        },
+        {
+          "label": "F13-zoom-F15-before.png",
+          "sha256": "c96bb296d3d0a1a01a5e3f0c13457dc4dafea1be5024007057a290f45c726630"
+        }
+      ]
+    },
+    {
+      "check_id": "F14",
+      "function": "Object picking to correct Asset ID",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584980+00:00",
+      "evidence": [
+        {
+          "label": "F14-roof-picked.png",
+          "sha256": "62bafea526940316750d8d58b13347334dcc8733a7c926fdbd6002cfdacabca9"
+        }
+      ]
+    },
+    {
+      "check_id": "F15",
+      "function": "Selection highlight",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-14T18:13:24.540905+00:00",
+      "evidence": [
+        {
+          "label": "browser_checkpoint.json",
+          "sha256": "9e37c2f5aa3dcbe4518dfb39b88eb877ab6128023f278c0fea14e8c3e65db62b"
+        },
+        {
+          "label": "int-F14-click.jpg",
+          "sha256": "3bf751b95265ea104da37856a08deae64b7ed4e936ffc14f8579cc560a155a1b"
+        },
+        {
+          "label": "int-F18-unlinked.jpg",
+          "sha256": "8b3e514be8ecbbb738c3bd946561b9add7a62fcde49920814d6827ef42701c25"
+        },
+        {
+          "label": "S5-raw.png",
+          "sha256": "8e4ed9b593f085cc3d245f1a5e1a0a09246b57b021d9b2e0aa9dc86b7ca753d8"
+        }
+      ]
+    },
+    {
+      "check_id": "F16",
+      "function": "Clear selection",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584982+00:00",
+      "evidence": [
+        {
+          "label": "F16-clear-selection.png",
+          "sha256": "90da5d5cadd0fac2c6d945068955d11a674bb6a3a32bce10173cb20521f2a9a9"
+        }
+      ]
+    },
+    {
+      "check_id": "F17",
+      "function": "Deep link selection",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584983+00:00",
+      "evidence": [
+        {
+          "label": "F03-F04-F05-mgmt.png",
+          "sha256": "d282e48177fba8935d09ba28fe842d69894b89e1435b3f3f3993e7c2d469b380"
+        },
+        {
+          "label": "F12-F17-local-render-deeplink.png",
+          "sha256": "da7cb1545eb8b105b5de4ed2957debd5680dc8a42680ab4a97bf8b96e0e4d69d"
+        }
+      ]
+    },
+    {
+      "check_id": "F18",
+      "function": "Unlinked object",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584984+00:00",
+      "evidence": [
+        {
+          "label": "F18-unlinked-water.png",
+          "sha256": "491b55e7610b3a40ae5680135ad9fb6109cc1d55ba535e7401b54776bea64767"
+        },
+        {
+          "label": "F18-unlinked-tree.png",
+          "sha256": "852f5debce5a274ef60fb74ad0784239efccfcc502c04448fb90fc7b9190e14e"
+        }
+      ]
+    },
+    {
+      "check_id": "F19",
+      "function": "Flow A GIS–Asset–OM–Source–Document",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:25:44.353629+00:00",
+      "evidence": [
+        {
+          "label": "F01-marker.png",
+          "sha256": "c09e95ce6172a67738d524d21c302ae3f19505bd333a2f69bb912d5c0c9989cc"
+        },
+        {
+          "label": "F03-F04-F05-dam.png",
+          "sha256": "2ffcf73467bba78afb3f52a18044e1ef7dcb0d85468ab5fb068e352d4dd16d06"
+        },
+        {
+          "label": "F06-technical-source.png",
+          "sha256": "17bfae8a8116c2e607d1714e527e9bf152a5ca606b35b31761c73dfb794cfab2"
+        },
+        {
+          "label": "F19-source-documents.png",
+          "sha256": "3a35935c98c08c1a6467b231feed4c0241a6dd5628794b81de3fa1404870bd86"
+        },
+        {
+          "label": "F07-pdf-preview.png",
+          "sha256": "635ee977f464424f5c338fe831f4a53a37f4206de300d8dae3fc6003876d7747"
+        }
+      ]
+    },
+    {
+      "check_id": "F20",
+      "function": "Flow B GIS–3D–Asset–OM",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584985+00:00",
+      "evidence": [
+        {
+          "label": "F20-gis-to-rs-model.png",
+          "sha256": "90da5d5cadd0fac2c6d945068955d11a674bb6a3a32bce10173cb20521f2a9a9"
+        },
+        {
+          "label": "F20-selected-mgmt.png",
+          "sha256": "6d1c8b258e0f20b0e7565319bc5dd74c4070e854c225dea8fbdb99043f77851a"
+        },
+        {
+          "label": "F20-asset-om.png",
+          "sha256": "1a2d19109e59f193a103f57bb55988f2aaddf2e810a82c74ae1bd8efa47973fa"
+        }
+      ]
+    },
+    {
+      "check_id": "F21",
+      "function": "Flow C Asset–3D–Asset",
+      "dataset_version": "DT-R1",
+      "status": "PASS",
+      "checked_at": "2026-10-10T17:32:12.584986+00:00",
+      "evidence": [
+        {
+          "label": "F03-F04-F05-mgmt.png",
+          "sha256": "d282e48177fba8935d09ba28fe842d69894b89e1435b3f3f3993e7c2d469b380"
+        },
+        {
+          "label": "F12-F17-local-render-deeplink.png",
+          "sha256": "da7cb1545eb8b105b5de4ed2957debd5680dc8a42680ab4a97bf8b96e0e4d69d"
+        },
+        {
+          "label": "F21-return-mgmt.png",
+          "sha256": "e3a779b4214a9a8b23dd10dd99a7ce3ad8a254b08806fb11bc6981ca96ddb177"
+        }
+      ]
+    }
+  ],
+  "protocol": {
+    "tasks": [
+      {
+        "id": "T1",
+        "prompt": "Locate the latest inspection."
+      },
+      {
+        "id": "T2",
+        "prompt": "Find the latest verified condition."
+      },
+      {
+        "id": "T3",
+        "prompt": "Identify the document supporting a maintenance record."
+      },
+      {
+        "id": "T4",
+        "prompt": "Find all scoped repairs."
+      },
+      {
+        "id": "T5",
+        "prompt": "Locate the asset using reviewed GIS evidence."
+      },
+      {
+        "id": "T6",
+        "prompt": "Identify its linked 3D object or state no mapping."
+      }
+    ],
+    "retrieval_fields": [
+      "dataset_version",
+      "task_version",
+      "participant_id",
+      "participant_group",
+      "task_id",
+      "workflow",
+      "start_time",
+      "end_time",
+      "completion_time_seconds",
+      "success",
+      "number_of_steps",
+      "wrong_document_opened",
+      "participant_confidence",
+      "baseline_method",
+      "evidence_reference",
+      "notes"
+    ],
+    "answer_key_fields": [
+      "dataset_version",
+      "task_version",
+      "task_id",
+      "target_asset_id",
+      "expected_answer",
+      "source_reference",
+      "timeout_seconds",
+      "task_variant",
+      "reviewer",
+      "reviewed_at"
+    ],
+    "questionnaire_fields": [
+      "dataset_version",
+      "participant_id",
+      "participant_group",
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6",
+      "Q7",
+      "Q8",
+      "difficult_information",
+      "most_useful",
+      "missing_om",
+      "three_d_use",
+      "improvements",
+      "evidence_reference"
+    ],
+    "questionnaire": [
+      "Asset information was easy to locate.",
+      "GIS helped explain asset location.",
+      "O&M history was easy to follow.",
+      "Source/document linkage improved traceability.",
+      "3D helped explain asset context.",
+      "The system could support routine O&M information retrieval.",
+      "The interface was understandable.",
+      "I would prefer this workflow over fragmented file search."
+    ],
+    "collection_status": "NOT_COLLECTED",
+    "results": null
+  },
+  "input_hashes": {
+    "mgmt_parent_scope_decision.json": "4cd24997e4f4aa50ec9fdee6aeb4be88ef3a728cf6a19e3bdba285cd10da0227",
+    "maintenance_asset_mapping_review.csv": "01a8b9e2c3d6e82a64efc4bdddec84af128b4cd4bf6d1177dd61fa31348053ae",
+    "model_review.csv": "606df25f315ebab4fd4937c274ca650306ac6b36e6470462fa8190b1ada4f8e6",
+    "maintenance_2021_2025_review.csv": "2ab4cd0ddc29acc501f5a8358da04dc9e0b79b5318c45ed2366bb2c947a86f27",
+    "ai_consistency_review.csv": "17b9ed1e31d4aa145033d2f03cd55048308e71a3683d30bb69891fe6f400af17",
+    "three_d_eligibility_review.csv": "a0e9625f521964624269707f987caef338731612655f9367f6af3e880a84f973",
+    "id_map.csv": "5483353845dc3c780c0761c08d6f1b8c357fb442597a19d681ff3d06840f3db6",
+    "target_assets.csv": "5f2b8ed181c738009017587c3bfa4edb3353fec4d0b2b6f1a6644e3b6764a5e3",
+    "b02_candidate_records.csv": "6f3d2de3152c867fbd9090dcfe93f6fc789ee75c8056d06602770c2b4a4bf062",
+    "model_asset_mapping_review.csv": "88c6770984edceb4f7e1ef3b8ff0f3da6f669781de6493d259676199d1c82ef3",
+    "domain_maim_review.json": "9d6a2e513b90db0cb3af0a4ab8d94855551295d455bb5b8f02d00989551b0769",
+    "claim_sources.csv": "fd664d3f30ba805c4a89f0c130a76cc8ef0844e059fcc6950cc8d242b5d82f65",
+    "B01B-maim-review.json": "2d3031c29a018036fa8a8cba8f15776aaf161518f6ab85f1a9ef1bcc871d3788",
+    "source_inventory.csv": "92e1e2af2904dd612f9ddf2541d284d64c5ac49f1882cb03a0fe6b992bea9c49",
+    "source_boundary_review.csv": "fb52c1a8153bbd0daefd37982dd340b7811e174ba6193b74a43eaafbd944aced",
+    "mc_r_gate_resolution.csv": "07971935fd13408169e147588bf8999e0ef0c5ba7080aaa834416c4ee06b0c44",
+    "model_placement_review.csv": "c27b55e123bc5f089a0cdd9b4a139f80a8382c20ba4d549f0b6b198c7634016e",
+    "methodology_review.json": "34bf9d06b4fcc7b45b953de13e1d1814a0e3e87646fd9d927ef2853a03844afc",
+    "model_conversion_manifest.json": "56f48143204f8e4967c5371eeaa336f32188e436d3f76a47d16ee7a927f11895",
+    "maim_review.csv": "6326919fbaddc140ba3b4c1d3ddf6030eeb717b989727913c11645a410ef054d",
+    "technical_attribute_dictionary.csv": "6852e3b40c3550d549c4d16de2cb93924e35f0ee9368506d1587adff6b5cdc2f",
+    "b02_conflict_review.csv": "cb0b64af354ee372337def242c9ae93009a7b88363ad9051d44e43817dd8f0a3",
+    "fv_applicability_review.csv": "aae0e4b077866d5f7fc41a2ef070d72991f342cb6616bb74e14795cc7bfef135",
+    "researcher_methodology_confirmation.csv": "7c2772720a4cb6ae62c313e45101d535c361da69a38fea0133c57bb29b634861",
+    "document_review.csv": "4a2a248efd243c222b9696878d998568842c4373c6d3559684257ec7254c8b16",
+    "source_review.csv": "402d87d7788e3586c3b1145727127a93c34091d25e7af5146085d46bac4b7a83",
+    "gate_reconciliation.json": "ca89d82b39ce6e6dbc05128c79a97e31ee690737c44d30b80be92b35ce7699cb",
+    "B01B-user-review.json": "f219deb97ac20a94d462b038971799f4edb745464cf61a969bef484e9850fc59",
+    "model_object_inventory.csv": "6044baf573ed15a3b74f5894c6883d2824b7327bad7efdafac1f959fe7828f8a",
+    "B02-R-maim-review.json": "7bec27a2e4558f7170e191e43914c4fff224af2b127c939773e8cac8b193e096",
+    "base-scope.json": "dd2f222313d391e3d5e5cf607986e339983be9c1674c7de9cde680dea9156375",
+    "component_inventory.csv": "0aaf25da56b8dec97ba6b9d0fc2d3b6ed6c27df9c5bec00af629c7566acb1458",
+    "b02_crosscheck_matrix.csv": "baf9d4ddecc1a786acbaec2fd50842b351177dfd189f3b7e7bc9e3928879dc61",
+    "asset_identity_review.csv": "be63aacb50801439fd8aa5b9c2b37a7fe127c09aea5ab6ce87cdc6c192bdaeb1",
+    "maim_closure_review.csv": "7ab2e37e9f2f0d090bf6e8956f597fc27cebda8588a3df4218061f4eb0da561c",
+    "case_study_review.json": "a0f250d200a48f013c78b5b0dde4f2d5bd3a124767a7a3d0f39b0899f3f9d644",
+    "readiness_gates.csv": "6a7bb53b49d5b81ed290524331d3170686f88a23e4fc9b78997bd8b40a9919c4",
+    "component_technical_scope.json": "0722b797f99f7aad16397b67ce723c52bb3ee067bed85e77d6a18065f0e0e9a3",
+    "maim_requirements.csv": "2e8f208493801f88d19d7d577b69f586f6118fbe799bef1b7ee5f5a66a882e46",
+    "evidence_index.csv": "26b30c0b863e58acf7001786ae8c30d7d9b5a1dfcb0527d2d6a1ac824f3c1aa6",
+    "geometry_review.csv": "aec7f4cdc43ffa4d20f5998fee809d856f985769d1b0eb895bf76b8057b25ac5",
+    "reviewer_independence_review.csv": "2683ff6798fd627db8a7869c176b634f2677410f7d8e734ff46d1ed847bfab3b",
+    "functional_validation.csv": "2abe03e071e7ada602830a4558f2f6f393dac446580a1e2d2040a0c5fbf7f350",
+    "b02_verification_log.csv": "feb5eb8662e6f2b87eed31e427a32efd002c20d6deb83e48579fe5e7b76cc75f"
+  },
+  "protocol_hashes": {
+    "retrieval_tasks.md": "c726f7760269df1bba6360f1fa9227c3e281cb3ce4231b48c69768375580d7d4",
+    "questionnaire.md": "ad3ab0425b7e74b35f28067b825d05991aab6672f8fa97349c69139b8016629b",
+    "stage5b_protocol.md": "2ed799955b38cca39b09c9db010ef7f6c42b4fd7b29b304c707381290f4f912d"
+  },
+  "exporter": "scripts/export_asset_evidence_tables.py",
+  "exporter_sha256": "3acf01def4d2d382b93173c4e93dbe89f90ffcdcf115f8c682f9619291c29582"
+}
