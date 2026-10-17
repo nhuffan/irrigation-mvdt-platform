@@ -30,8 +30,8 @@ export function Workspace({ title, children, panel, tools }: { title: string; ch
     </div>
     {tools}
     <div className="workspace-grid">
-      <div className="workspace-canvas">{children}</div>
       <div className="workspace-inspector" hidden={!layout.panelOpen}>{panel}</div>
+      <div className="workspace-canvas">{children}</div>
     </div>
   </section>;
 }

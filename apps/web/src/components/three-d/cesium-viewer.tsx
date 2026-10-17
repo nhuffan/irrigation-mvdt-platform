@@ -1,9 +1,11 @@
 "use client";
+import { cameraFitDistance, initialCameraObject } from "@/lib/model-camera";
+import { PanelSection, PanelDisclosure } from "@/components/ui/panel-section";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { Workspace } from "@/components/workspace";
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
 import type { ModelRecord, ModelAssetLink } from "@/types/media";
 import { loadCesium } from "./cesium-loader";
@@ -14,23 +16,27 @@ import { AssetSidePanel } from "./asset-side-panel";
 export default function CesiumViewer({
   model,
   links,
-  initialObject,
+  initialObject, modelControls, modelDetails,
 }: {
   model: ModelRecord;
   links: ModelAssetLink[];
   initialObject?: string;
+  modelControls?: ReactNode;
+  modelDetails?: ReactNode;
 }) {
+  const defaultObject = initialCameraObject(initialObject, model.coordinate_mode, links);
   const container = useRef<HTMLDivElement>(null);
   const selectionEffect = useRef<((key: string | null, focus?: boolean) => void) | null>(null);
-  const selectedRef = useRef<string | null>(initialObject ?? null);
+  const selectedRef = useRef<string | null>(defaultObject);
   const [highlighted, setHighlighted] = useState(false);
+  const showAll = useRef<(() => void) | null>(null);
   const reset = useRef<(() => void) | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<string | null>(
-    initialObject ?? null,
+    defaultObject,
   );
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
@@ -41,6 +47,7 @@ export default function CesiumViewer({
   useEffect(() => {
     let disposed = false;
     let viewer: Viewer | undefined;
+    let stopCameraEvents: (() => void) | undefined;
     let stopResize: (() => void) | undefined;
     let primitive: Model | undefined;
     let handler: ScreenSpaceEventHandler | undefined;
@@ -139,6 +146,11 @@ export default function CesiumViewer({
         }
         primitive = loaded;
         v.scene.primitives.add(loaded);
+        const distance = (radius: number) => {
+          const frustum = v.camera.frustum;
+          const verticalFov = frustum instanceof C.PerspectiveFrustum ? frustum.fovy ?? Math.PI / 3 : Math.PI / 3;
+          return cameraFitDistance(radius, verticalFov, v.scene.canvas.clientWidth / Math.max(v.scene.canvas.clientHeight, 1));
+        };
         const frame = () => {
           if (disposed || !loaded.ready) return;
           if (local) {
@@ -147,7 +159,7 @@ export default function CesiumViewer({
               new C.HeadingPitchRange(
                 C.Math.toRadians(25),
                 C.Math.toRadians(-35),
-                Math.max(loaded.boundingSphere.radius * 3, 20),
+                distance(loaded.boundingSphere.radius),
               ),
             );
           } else {
@@ -156,7 +168,7 @@ export default function CesiumViewer({
               offset: new C.HeadingPitchRange(
                 C.Math.toRadians(25),
                 C.Math.toRadians(-25),
-                Math.max(loaded.boundingSphere.radius * 3, 20),
+                distance(loaded.boundingSphere.radius),
               ),
             });
           }
@@ -177,26 +189,44 @@ export default function CesiumViewer({
         v.scene.postRender.addEventListener(() => {
           if (selectionFrames > 0) { selectionFrames--; v.scene.requestRender(); }
         });
+        const focusObject = (key: string | null) => {
+          const ids = selectedPrimitives(loaded, model.id, key);
+          if (!ids.length) return false;
+          const spheres = ids.map(p => p.object.detail?.primitive?.drawCommand?.boundingVolume).filter((b): b is import("cesium").BoundingSphere => !!b && Number.isFinite(b.radius) && b.radius > 0);
+          if (spheres.length !== ids.length) return false;
+          const bounds = C.BoundingSphere.fromBoundingSpheres(spheres);
+          v.camera.lookAtTransform(C.Matrix4.fromTranslation(bounds.center), new C.HeadingPitchRange(C.Math.toRadians(25), C.Math.toRadians(-35), distance(bounds.radius)));
+          v.scene.requestRender();
+          return true;
+        };
         const applySelection = (key: string | null, focus = false) => {
           if (!loaded.ready || disposed) return;
           const ids = selectedPrimitives(loaded, model.id, key);
           tint.selected = ids.length ? [{ pickIds: ids }] : [];
           selectionFrames = 3;
           setHighlighted(ids.length > 0);
-          if (focus && ids.length) {
-            const spheres = ids.map(p => p.object.detail?.primitive?.drawCommand?.boundingVolume).filter((b): b is import("cesium").BoundingSphere => !!b && Number.isFinite(b.radius) && b.radius > 0);
-            if (spheres.length === ids.length) {
-              const bounds = C.BoundingSphere.fromBoundingSpheres(spheres);
-              v.camera.lookAtTransform(C.Matrix4.fromTranslation(bounds.center), new C.HeadingPitchRange(C.Math.toRadians(25), C.Math.toRadians(-50), Math.max(bounds.radius * 2.6, 1)));
-            }
-          }
+          if (focus) focusObject(key);
           v.scene.requestRender();
+        };
+        // Pick volumes may become available after readyEvent. Focus once, never chase the user's camera.
+        let initialFocusFrames = defaultObject ? 60 : 0;
+        const cancelInitialFocus = () => { initialFocusFrames = 0; };
+        v.scene.canvas.addEventListener("pointerdown", cancelInitialFocus);
+        v.scene.canvas.addEventListener("wheel", cancelInitialFocus, { passive: true });
+        stopCameraEvents = () => {
+          v.scene.canvas.removeEventListener("pointerdown", cancelInitialFocus);
+          v.scene.canvas.removeEventListener("wheel", cancelInitialFocus);
         };
         // Streaming textures may rebuild draw commands and allocate fresh pick IDs.
         // Keep the selected-ID texture bound to the current primitive IDs, not stale colors.
         let lastIds: ReturnType<typeof selectedPrimitives> = [];
         v.scene.postRender.addEventListener(() => {
           if (disposed || !loaded.ready) return;
+          if (initialFocusFrames > 0) {
+            initialFocusFrames--;
+            if (focusObject(selectedRef.current)) initialFocusFrames = 0;
+            else v.scene.requestRender();
+          }
           const current = selectedPrimitives(loaded, model.id, selectedRef.current);
           if (current.length !== lastIds.length || current.some((id, i) => id !== lastIds[i])) {
             lastIds = current;
@@ -204,7 +234,11 @@ export default function CesiumViewer({
           }
         });
         selectionEffect.current = applySelection;
-        reset.current = frame;
+        showAll.current = () => { initialFocusFrames = 0; frame(); };
+        reset.current = () => {
+          initialFocusFrames = 0;
+          if (!focusObject(selectedRef.current ?? defaultObject)) frame();
+        };
         const ready = () => {
           if (!disposed) {
             clearTimeout(timer);
@@ -247,74 +281,49 @@ export default function CesiumViewer({
       disposed = true;
       clearTimeout(timer);
       reset.current = null;
+      showAll.current = null;
+      stopCameraEvents?.();
       selectionEffect.current = null;
       if (handler && !handler.isDestroyed()) handler.destroy();
       stopResize?.();
       if (viewer && !viewer.isDestroyed()) viewer.destroy();
       else if (primitive && !primitive.isDestroyed()) primitive.destroy();
     };
-  }, [model, attempt]);
+  }, [model, attempt, defaultObject]);
   const link = uniqueObjectLink(links, selected);
   return (
-    <>
-      {model.coordinate_mode === "LOCAL" && (
-        <p className="muted">Local model preview · No geographic placement has been verified.</p>
-      )}
-      <Workspace title="3D" tools={<><p className="summary-note">{model.coordinate_mode} · Representative model; no child-building identity inferred.</p>       <div className="viewer-toolbar">
-        <button onClick={() => reset.current?.()} disabled={status !== "ready"}>
-          Reset camera
-        </button>
-        <button onClick={() => selectionEffect.current?.(selected, true)} disabled={!highlighted}>Focus selected object</button>
-        <button onClick={() => setSelected(null)}>Clear selection</button>
-        <span className="muted">
-          Drag to rotate/pan · Wheel to zoom · Click an object
-        </span>
-      </div>
-      <p className="selection-feedback" role="status">{selected ? highlighted ? "Selected mesh highlighted · amber tint · original materials preserved" : "Selection has no reliable mesh identifier; visual highlight unavailable." : "No object selected"}</p>
-</>} panel={<>
-        {link ? (
-          <AssetSidePanel key={link.id} link={link} placement={model.coordinate_mode} />
-        ) : (
-          <aside className="panel">
-            <h2>Asset selection</h2>
-            <p className="muted mt-3">
-              {selected
-                ? "No unique asset mapping is established for this object; identity is missing or ambiguous."
-                : "Select a model object to view its asset information."}
-            </p><TechnicalMetadataPopover fields={{"Object key":selected}}/>
-          </aside>
-        )}
-            <details className="source-info mt-4">
-        <summary>Linked objects · keyboard navigation</summary>
-        <ul className="object-list">
-          {links.map((item) => (
-            <li key={item.id}>
-              <button onClick={() => setSelected(item.object_key)}>
-                {evidenceDisplayText(item.object_name ?? item.object_key)} · Representative link
-              </button>
-            </li>
-          ))}
-        </ul>
-      </details>
-      </>}>
-        <div className="viewer-frame">
-          <div ref={container} className="cesium-container" />
-          {status === "loading" && (
-            <p className="viewer-status" role="status">
-              Loading 3D model…
-            </p>
-          )}
-          {status === "error" && (
-            <div className="viewer-status" role="alert">
-              <p>{message}</p>
-              <button onClick={() => setAttempt((n) => n + 1)}>
-                Try again
-              </button>
-            </div>
-          )}
+    <Workspace title="3D" panel={<>
+      <PanelSection title="Model" description="Local reference & representation">
+        {modelControls}
+        <div className="context-badges"><span className="presentation-badge">{model.coordinate_mode}</span><span className="presentation-badge">{model.format}</span><span className="presentation-badge">Representative model</span></div>
+      </PanelSection>
+      <PanelSection title="View controls" description="Drag to orbit · Scroll to zoom">
+        <div className="view-control-grid">
+          <button onClick={() => reset.current?.()} disabled={status !== "ready"}>Reset view</button>
+          <button onClick={() => showAll.current?.()} disabled={status !== "ready"}>Entire model</button>
+          <button onClick={() => selectionEffect.current?.(selected, true)} disabled={!highlighted}>Focus selected</button>
+          <button onClick={() => setSelected(null)} disabled={!selected}>Clear selection</button>
         </div>
-      </Workspace>
-
-    </>
+      </PanelSection>
+      {link ? <AssetSidePanel key={link.id} link={link} placement={model.coordinate_mode}/> : <PanelSection title="Selected object">
+        <p className="empty-state">{selected ? "No unique asset mapping is established for this object; identity is missing or ambiguous." : "Select a model object to view its asset information."}</p>
+        <TechnicalMetadataPopover fields={{"Object key":selected}}/>
+      </PanelSection>}
+      <PanelDisclosure title={`Linked objects · ${links.length}`}>
+        <ul className="object-list">{links.map(item => <li key={item.id}><button onClick={() => { setSelected(item.object_key); selectionEffect.current?.(item.object_key, true); }}>{evidenceDisplayText(item.object_name ?? item.object_key)}</button></li>)}</ul>
+      </PanelDisclosure>
+      <PanelDisclosure title="Model source & limitations">
+        <p className="summary-note">{model.coordinate_mode === "LOCAL" ? "Local preview only. Geographic placement is unverified." : "Placement follows stored model parameters."} Representative links do not establish a specific child building identity.</p>
+        {modelDetails}
+      </PanelDisclosure>
+    </>}>
+      <div className="viewport-heading"><h2>Model viewport</h2><span>{model.coordinate_mode} · {status === "ready" ? "Ready" : status === "error" ? "Unavailable" : "Loading"}</span></div>
+      <div className="viewer-frame">
+        <div ref={container} className="cesium-container"/>
+        {status === "loading" && <p className="viewer-status" role="status">Loading 3D model…</p>}
+        {status === "error" && <div className="viewer-status" role="alert"><p>{message}</p><button onClick={() => setAttempt(n => n + 1)}>Try again</button></div>}
+      </div>
+      <p className="selection-feedback" role="status">{selected ? highlighted ? "Object selected · amber highlight" : "Object identifier selected · mesh highlight unavailable" : "No object selected"}</p>
+    </Workspace>
   );
 }

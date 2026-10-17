@@ -1,4 +1,5 @@
 "use client";
+import { PanelSection, PanelDisclosure } from "@/components/ui/panel-section";
 import { AssetDisplayName, TechnicalMetadataPopover, StatusBadge } from "@/components/asset/presentation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -37,19 +38,14 @@ export function AssetSidePanel({ link, placement }: { link: ModelAssetLink; plac
     };
   }, [link.asset_id]);
   return (
-    <aside className="panel">
-      <p className="eyebrow">Selected object</p>
-      <h2>Representative object</h2><StatusBadge>{placement}</StatusBadge><p>Representative mapping only</p><TechnicalMetadataPopover fields={{"Object key":link.object_key,"Object name":link.object_name,"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Mapping status":link.verification_status}}/>
-      <VerificationBadge status={link.verification_status} />
-      <p className="muted text-sm mt-3">
-        This is a representative link to the recorded asset, not proof of a specific child building identity. Mapping verification is separate from asset condition.
-      </p>
+    <PanelSection title="Linked asset" actions={<StatusBadge>{placement}</StatusBadge>}>
+      <p className="mapping-notice">Representative link</p>
       {error ? (
         <p role="alert">Unable to load asset summary.</p>
       ) : !data ? (
         <p role="status">Loading asset summary…</p>
       ) : (
-        <dl className="detail-list">
+        <dl className="detail-list inspector-facts">
           <div>
             <dt>Asset</dt>
             <dd>
@@ -94,9 +90,12 @@ export function AssetSidePanel({ link, placement }: { link: ModelAssetLink; plac
           </div>
         </dl>
       )}
-      <Link className="text-link mt-4" href={`/assets/${link.asset_id}`}>
-        Open full Asset Detail →
-      </Link>
-    </aside>
+      <PanelDisclosure title="Mapping details">
+        <TechnicalMetadataPopover fields={{"Object key":link.object_key,"Object name":link.object_name,"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Mapping status":link.verification_status}}/>
+        <VerificationBadge status={link.verification_status}/>
+        <p className="summary-note">This representative link does not prove a specific child building identity. Mapping verification is separate from asset condition.</p>
+      </PanelDisclosure>
+      <Link className="button compact-button" href={`/assets/${link.asset_id}`}>Open Asset Detail →</Link>
+    </PanelSection>
   );
 }

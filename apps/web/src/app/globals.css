@@ -670,7 +670,7 @@ dd {
 }
 
 .explorer-summary {
-  display:flex;
+  display:grid;
   flex-wrap:wrap;
   gap:1rem;
   padding:1rem;
@@ -859,7 +859,7 @@ summary { cursor: pointer; }
 .workspace-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .workspace-toolbar strong { margin-right: auto; text-transform: capitalize; }
 .workspace-toolbar button, .map-reset { background: white; border: 1px solid #a5bdb3; border-radius: 6px; padding: 9px 12px; min-height: 40px; cursor: pointer; color: #174c41; }
-.workspace-grid { display: grid; grid-template-columns: minmax(0,1fr) clamp(280px,24vw,380px); gap: 12px; align-items: stretch; }
+.workspace-grid { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 12px; align-items: stretch; }
 .workspace-grid > *, .asset-summary-grid > *, .asset-properties-layout > *, .registry-grid > * { min-width: 0; }
 .workspace-inspector { max-height: max(480px,calc(100dvh - 220px)); overflow: auto; padding: 12px; background: white; border-radius: 8px; overflow-wrap: anywhere; }
 .workspace-inspector[hidden] { display: none; }
@@ -893,7 +893,7 @@ summary { cursor: pointer; }
 .viewer-toolbar { gap: 8px; margin: 0 0 8px; }
 .viewer-toolbar button { min-height: 40px; }
 .selection-feedback { margin: 4px 0 8px; }
-.asset-properties-layout { grid-template-columns: 540px minmax(0,1fr); gap: 18px; margin-top: 16px; }
+.asset-properties-layout { grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 18px; margin-top: 16px; }
 .component-tree { top: 12px; max-height: calc(100dvh - 24px); overflow: auto; }
 .asset-properties .technical-grid { grid-template-columns: repeat(auto-fit,minmax(min(100%,340px),1fr)); }
 .asset-properties > .om-nav { position: sticky; top: 0; z-index: 5; background: #f5f7f5; margin: 0; padding: 8px 0; }
@@ -943,8 +943,108 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
   .workspace-toolbar strong { flex-basis: 100%; }
 }
 
-/* Keep the widened asset sidebar above the detail content on smaller screens. */
-@media (max-width: 1100px) {
+/* Stack the 40/60 columns on narrow screens. */
+@media (max-width: 900px) {
   .asset-properties-layout { grid-template-columns: minmax(0,1fr); }
   .component-tree { position: static; max-height: 280px; }
 }
+
+/* Shared left-inspector workspace and clearly separated information groups. */
+.canvas-workspace { padding: 0; overflow: hidden; background: #edf2ef; border-color: #d5dfd9; }
+.workspace-toolbar { padding: 12px 16px; margin: 0; border-bottom: 1px solid #d5dfd9; background: white; }
+.workspace-grid { padding: 14px; gap: 16px; }
+.workspace-inspector { padding: 0; background: transparent; display: flex; flex-direction: column; gap: 12px; scrollbar-gutter: stable; }
+.workspace-inspector > * { flex-shrink: 0; }
+.workspace-inspector .explorer-panel { display: flex; flex-direction: column; gap: 12px; padding: 0; }
+.workspace-canvas { min-width: 0; }
+.panel-section, .panel-disclosure { border: 1px solid #d7e2dc; border-radius: 12px; background: white; overflow: hidden; }
+.panel-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #e5ece7; }
+.panel-section-heading h2 { font-size: 14px; font-weight: 700; letter-spacing: .01em; }
+.panel-section-heading p { font-size: 11px; color: #667a70; margin-top: 3px; line-height: 1.4; }
+.panel-section-body { padding: 14px 16px; min-width: 0; }
+.panel-disclosure > summary { padding: 14px 16px; font-weight: 650; font-size: 13px; color: #284b3e; }
+.panel-disclosure[open] > summary { border-bottom: 1px solid #e5ece7; }
+.panel-section-body > .panel { border: 0; padding: 0; }
+.panel-section-body .panel-disclosure { margin: 12px 0; }
+.panel-section-body .panel-section-body { padding: 12px; }
+.context-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.view-control-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.view-control-grid button { border: 1px solid #c6d6ce; background: #f6f9f7; border-radius: 8px; min-height: 42px; padding: 9px 10px; font-size: 12px; color: #23563f; cursor: pointer; }
+.view-control-grid button:first-child { background: #174c41; color: white; border-color: #174c41; }
+.view-control-grid button:hover:enabled { filter: brightness(.96); }
+.model-select { display: grid; gap: 6px; font-size: 11px; color: #60786b; }
+.model-select select { width: 100%; min-width: 0; color: #16352f; font-size: 12px; border-color: #c8d8cf; }
+.viewport-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; background: #243c37; color: #f2f7f4; border-radius: 10px 10px 0 0; }
+.viewport-heading h2 { font-size: 14px; }
+.viewport-heading span { font-size: 11px; color: #c2d8ca; }
+.viewport-heading + .viewer-frame { border-radius: 0 0 10px 10px; }
+.mapping-notice { display: inline-block; background: #fff5df; color: #84570d; border: 1px solid #eadbb5; padding: 6px 9px; border-radius: 6px; font-size: 11px; margin-bottom: 12px; }
+.inspector-facts { margin: 0; gap: 0; }
+.inspector-facts > div { padding: 10px 0; border-bottom: 1px solid #ecf0ed; }
+.inspector-facts dt { margin-bottom: 4px; font-size: 11px; }
+.inspector-facts dd { font-size: 13px; }
+.inspector-facts > div:first-child dd { font-size: 15px; font-weight: 650; }
+.compact-button { font-size: 12px; padding: 10px 12px; margin-top: 12px; min-height: 40px; }
+.empty-state { padding: 12px; background: #f5f8f6; border: 1px dashed #c8d8cf; border-radius: 8px; color: #60766b; font-size: 12px; line-height: 1.6; }
+.explorer-summary { grid-template-columns: repeat(5,minmax(0,1fr)); gap: 12px; padding: 0; margin: 16px 0; background: transparent; border: 0; }
+.metric-card { border: 1px solid #d7e2dc; background: white; border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.metric-card > span { display: block; color: #647b6f; font-size: 11px; line-height: 1.4; }
+.metric-card > strong { display: block; font-size: 24px; line-height: 1.3; color: #1f5943; margin-top: 7px; }
+.metric-card small { display: block; font-size: 10px; color: #72877a; margin-top: 5px; }
+.explorer-summary .metric-card > strong { display: block; font-size: 24px; }
+.explorer-summary .metric-card > span { min-width: 0; }
+.hierarchy-metrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin-top: 12px; }
+.hierarchy-metrics .metric-card { background: #f6f9f7; padding: 10px; }
+.hierarchy-metrics .metric-card strong { font-size: 20px; }
+.component-tree { background: #edf2ef; border: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; scrollbar-gutter: stable; }
+.component-tree > .panel-section { flex-shrink: 0; }
+.asset-hierarchy { padding: 0; list-style: none; }
+.asset-hierarchy li { padding: 10px 12px; background: #f8faf9; border: 1px solid #e1e9e3; border-radius: 8px; margin: 8px 0; }
+.asset-hierarchy ul { padding-left: 14px; list-style: none; }
+.asset-hierarchy p { font-size: 11px; }
+.asset-hierarchy [aria-current="page"] { color: #087459; }
+.component-actions { display: grid; gap: 8px; margin: 12px 0; }
+.component-actions button { padding: 10px; border: 1px solid #d7e2dc; border-radius: 7px; text-align: left; }
+.explorer-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin: 0; gap: 12px; }
+.explorer-filters label { display: grid; align-content: start; gap: 6px; color: #62786c; font-size: 11px; }
+.explorer-filters label:first-child { grid-column: 1/-1; }
+.explorer-filters label:has(input[type="checkbox"]) { display: flex; flex-wrap: nowrap; align-items: center; }
+.explorer-filters input[type="search"], .explorer-filters select { width: 100%; min-width: 0; min-height: 40px; font-size: 12px; }
+.workspace-inspector .asset-table tr { padding: 10px; margin-bottom: 8px; border: 1px solid #e1e9e3; border-radius: 8px; background: #f9fbfa; }
+.workspace-inspector .asset-table tr.selected-asset { background: #e9f5ef; border-color: #85b8a0; }
+.workspace-inspector .asset-table-wrap { border: 0; }
+.explorer-record { padding: 12px; border: 1px solid #e1e9e3; background: #f8faf9; border-radius: 8px; margin-bottom: 10px; }
+.explorer-record h4 { font-size: 12px; line-height: 1.5; font-weight: 600; }
+.preview-value { font-size: 16px; color: #20523d; margin-top: 10px; }
+.resource-group + .resource-group { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e1e9e3; }
+.resource-group h4 { font-size: 12px; font-weight: 650; margin-bottom: 8px; }
+.resource-group p { font-size: 12px; line-height: 1.5; }
+@media(max-width:900px) {
+  .workspace-grid { grid-template-columns: minmax(0,1fr); }
+  .workspace-inspector { max-height: 40dvh; border: 0; }
+  .workspace-grid > .workspace-canvas { min-height: 360px; }
+  .explorer-summary { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .is-expanded .workspace-inspector { order: 0; }
+  .is-expanded .workspace-canvas { order: 1; }
+  .component-tree { padding: 0; max-height: 320px; }
+}
+@media(max-width:480px) {
+  .workspace-grid { padding: 8px; gap: 10px; }
+  .explorer-summary { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .metric-card { padding: 12px; }
+  .metric-card > strong, .explorer-summary .metric-card > strong { font-size: 21px; }
+  .panel-section-body, .panel-section-heading, .panel-disclosure > summary { padding: 12px; }
+}
+
+.document-workspace { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 18px; margin-top: 16px; align-items: start; }
+.document-inspector, .document-content { min-width: 0; }
+.document-inspector { position: sticky; top: 12px; }
+.document-content .document-preview { margin-top: 0; }
+@media(max-width:900px) { .document-workspace { grid-template-columns: minmax(0,1fr); } .document-inspector { position: static; } }
+
+.selected-asset-name { font-size: 19px; line-height: 1.45; font-weight: 650; margin-bottom: 6px; }
+/* Keep expanded 3D headers/status within the workspace height. */
+.workspace-canvas:has(.viewer-frame) { display: flex; flex-direction: column; min-height: 0; }
+.workspace-canvas > .viewport-heading, .workspace-canvas > .selection-feedback { flex-shrink: 0; }
+.is-expanded .workspace-canvas:has(.viewer-frame) > .viewer-frame { flex: 1; height: auto; min-height: 0; }
+@media(max-width:900px) { .is-expanded .workspace-canvas:has(.viewer-frame) > .viewer-frame { min-height: 280px; } }

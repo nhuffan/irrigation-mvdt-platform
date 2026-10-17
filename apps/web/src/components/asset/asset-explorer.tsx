@@ -1,4 +1,5 @@
 "use client";
+import { MetricCard, PanelSection, PanelDisclosure } from "@/components/ui/panel-section";
 import { Workspace } from "@/components/workspace";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -34,24 +35,26 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
   }
   return <div className={paper ? "asset-explorer paper-mode" : "asset-explorer"}>
     <div className="explorer-summary" aria-label="Dataset summary">
-      <span><strong>{scoped.length}</strong> Research assets</span>
-      <span><strong>{scoped.filter(a => assetLocation(a).location_status === "VERIFIED_GEOMETRY").length} / {scoped.filter(a => assetLocation(a).location_status === "REFERENCE_LOCATION").length} / {scoped.filter(a => assetLocation(a).location_status === "NO_LOCATION").length}</strong> Verified / reference / missing locations</span>
-      <span><strong>{total("technical")}</strong> Technical records</span><span><strong>{total("events")}</strong> Verified O&M</span><span><strong>{total("links")}</strong> 3D links</span>
+      <MetricCard label="Research assets" value={scoped.length}/>
+      <MetricCard label="Locations" value={`${scoped.filter(a => assetLocation(a).location_status === "VERIFIED_GEOMETRY").length} / ${scoped.filter(a => assetLocation(a).location_status === "REFERENCE_LOCATION").length} / ${scoped.filter(a => assetLocation(a).location_status === "NO_LOCATION").length}`} note="Verified / reference / missing"/>
+      <MetricCard label="Technical records" value={total("technical")}/>
+      <MetricCard label="Verified O&M" value={total("events")}/>
+      <MetricCard label="3D links" value={total("links")}/>
     </div>
 
-    <p className="muted mb-3">Reference locations are for navigation / presentation only, not verified GIS evidence. Basemap and reservoir center are navigation context only.</p>
+
     {params.get("asset") && !selected && <p role="alert">Selected asset is unavailable in this reservoir.</p>}
     {selected && !visible.includes(selected) && <p role="status">Selected asset is excluded by the layer filters. Its information remains open.</p>}
     <Workspace title="map" panel={<>
-    <details className="filter-drawer"><summary>Search & filters</summary><div className="explorer-filters">
+    <PanelSection title="Search & filters"><div className="explorer-filters">
     <label>Search assets <input type="search" placeholder="Name, ID or component" value={query} onChange={e => setQuery(e.target.value)} /></label>
     <label>Location <select value={locationFilter} onChange={e => setLocationFilter(e.target.value)}><option value="all">All location states</option><option value="VERIFIED_GEOMETRY">Verified geometry</option><option value="REFERENCE_LOCATION">Reference location</option><option value="NO_LOCATION">Missing location</option></select></label>
     <label>Asset type <select value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{types.map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label>
     <label><input type="checkbox" checked={contextVisible} onChange={e => setContextVisible(e.target.checked)} /> Reservoir context</label>
-    <label><input type="checkbox" checked={modelOnly} onChange={e => setModelOnly(e.target.checked)} /> With 3D</label></div></details>
-      <details open><summary>Asset registry · {visible.length}</summary><AssetRegistry assets={visible} records={records} selectedId={selected?.id} onSelect={select} /></details>
+    <label><input type="checkbox" checked={modelOnly} onChange={e => setModelOnly(e.target.checked)} /> With 3D</label></div></PanelSection>
+      <PanelDisclosure title={`Asset list · ${visible.length}`} open={!selected}><AssetRegistry assets={visible} records={records} selectedId={selected?.id} onSelect={select} /></PanelDisclosure>
       {selected ? <ExplorerPanel key={selected.id} asset={selected} assets={assets} data={records[selected.id]} onSelect={select} paper={paper} /> : <p className="muted">Select an asset to inspect its evidence. Assets without locations remain in this list.</p>}
-    </>}>
+    <PanelDisclosure title="Map evidence limits"><p className="summary-note">Reference locations are for navigation / presentation only, not verified GIS evidence. Basemap and reservoir center are navigation context only.</p></PanelDisclosure></>}>
       <div id="asset-gis"><AssetMap reservoir={reservoir} assets={visible} selectedId={selected?.id} onSelect={select} records={records} contextVisible={contextVisible} /></div>
     </Workspace>
   </div>;

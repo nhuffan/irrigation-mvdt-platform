@@ -47,3 +47,8 @@
 
 - Web hiện quản lý một hồ theo cấu hình NEXT_PUBLIC_RESERVOIR_ID (mặc định Dầu Tiếng). Trang chủ mở thẳng hồ; không có bước Reservoir registry.
 - Chỉ hiển thị tài sản/tài liệu/model nghiên cứu trong hồ đang quản lý; không đưa lựa chọn Development, fixture DEV hoặc Example vào giao diện. Giữ dữ liệu test ở backend cho kiểm thử; không tự xóa database để dọn UI.
+
+## Bố cục workspace
+
+- Trang có sidebar/inspector đặt panel bên trái, tỉ lệ40% panel /60% nội dung trên desktop; màn hình nhỏ xếp panel lên trên. Dùng card/disclosure để nhóm controls và evidence, hạn chế lặp mô tả dài.
+- Camera3D ưu tiên góc nhìn gần đối tượng đại diện khi có đúng một liên kết LOCAL; giữ deep link cụ thể và nút xem toàn mô hình. Điều chỉnh camera không thay đổi định danh, placement hay dữ liệu nguồn.

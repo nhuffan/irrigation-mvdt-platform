@@ -1,3 +1,4 @@
+import { MetricCard } from "@/components/ui/panel-section";
 import Link from "next/link";
 import { getAssetTechnical } from "@/lib/api";
 import { dataset } from "@/lib/explorer-state";
@@ -20,7 +21,7 @@ export async function AssetHierarchy({ assets, selected }: { assets: Asset[]; se
   };
   return <section aria-label="Asset hierarchy and L2 coverage">
     <h3>Asset hierarchy</h3>
-    <p>Primary L2: {display(totals.primary)} · Component L2: {display(totals.components)} · All-tree L2: {display(totals.all)}</p>
+    <div className="hierarchy-metrics"><MetricCard label="Primary L2" value={display(totals.primary)}/><MetricCard label="Component L2" value={display(totals.components)}/><MetricCard label="All-tree L2" value={display(totals.all)}/></div>
     <p className="summary-note">Descendant totals summarize child records; values and provenance stay with each child. Scope: {dataset(selected)}.</p>
     <ul className="asset-hierarchy">{scoped.filter(a => !a.parent_asset_id || !scoped.some(p => p.id === a.parent_asset_id)).map(a => render(a))}</ul>
   </section>;
