@@ -42,8 +42,7 @@ export function AssetSidePanel({ link, placement }: { link: ModelAssetLink; plac
       <h2>Representative object</h2><StatusBadge>{placement}</StatusBadge><p>Representative mapping only</p><TechnicalMetadataPopover fields={{"Object key":link.object_key,"Object name":link.object_name,"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Mapping status":link.verification_status}}/>
       <VerificationBadge status={link.verification_status} />
       <p className="muted text-sm mt-3">
-        This link identifies the asset through the selected object; other parts may
-        remain unlinked. Mapping verification is separate from the asset condition.
+        This is a representative link to the recorded asset, not proof of a specific child building identity. Mapping verification is separate from asset condition.
       </p>
       {error ? (
         <p role="alert">Unable to load asset summary.</p>

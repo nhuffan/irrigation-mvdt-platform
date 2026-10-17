@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
 import type { ModelRecord, ModelAssetLink } from "@/types/media";
 import { loadCesium } from "./cesium-loader";
+import { modelSelectionUrl, uniqueObjectLink } from "@/lib/model-deep-link";
 import { selectedPrimitives } from "@/lib/model-selection";
 import { pickedObjectKey } from "@/lib/model-picking";
 import { AssetSidePanel } from "./asset-side-panel";
@@ -30,9 +31,10 @@ export default function CesiumViewer({
   );
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
+    window.history.replaceState(null, "", modelSelectionUrl(window.location.href, model.id, selected));
     selectedRef.current = selected;
     selectionEffect.current?.(selected);
-  }, [selected]);
+  }, [selected, model.id]);
   useEffect(() => {
     let disposed = false;
     let viewer: Viewer | undefined;
@@ -246,7 +248,7 @@ export default function CesiumViewer({
       else if (primitive && !primitive.isDestroyed()) primitive.destroy();
     };
   }, [model, attempt]);
-  const link = links.find((item) => item.object_key === selected);
+  const link = uniqueObjectLink(links, selected);
   return (
     <>
       {model.coordinate_mode === "LOCAL" && (
@@ -287,7 +289,7 @@ export default function CesiumViewer({
             <h2>Asset selection</h2>
             <p className="muted mt-3">
               {selected
-                ? "No asset is linked to this object."
+                ? "No unique asset mapping is established for this object; identity is missing or ambiguous."
                 : "Select a model object to view its asset information."}
             </p><TechnicalMetadataPopover fields={{"Object key":selected}}/>
           </aside>
@@ -299,7 +301,7 @@ export default function CesiumViewer({
           {links.map((item) => (
             <li key={item.id}>
               <button onClick={() => setSelected(item.object_key)}>
-                Representative object
+                {item.object_name ?? item.object_key} · Representative link
               </button>
             </li>
           ))}

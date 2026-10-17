@@ -13,8 +13,8 @@ export function coverageRows(asset: Asset, location: AssetLocation, data: Explor
     ["Location", location.location_status === "REFERENCE_LOCATION" ? "Reference" : location.location_status === "VERIFIED_GEOMETRY" ? "Verified" : "Missing"],
     ["Technical", technicalCoverage(data)],
     ["Condition", data.conditionError ? "Unavailable" : data.condition ? "Verified" : "Missing"],
-    ...(["INSPECTION", "REPAIR", "MAINTENANCE"] as const).map(type => [type[0]+type.slice(1).toLowerCase(), events === undefined ? "Unavailable" : `${events.filter(e => e.event_type === type).length} verified`] as [string,string]),
-    ["Documents", data.documents === null ? "Unavailable" : `${data.documents.length} linked file${data.documents.length===1?"":"s"}`],
+    ...(["INSPECTION", "REPAIR", "MAINTENANCE"] as const).map(type => [type[0]+type.slice(1).toLowerCase(), events === undefined ? "Unavailable" : events.some(e => e.event_type === type) ? `${events.filter(e => e.event_type === type).length} verified` : "Absent — no verified events"] as [string,string]),
+    ["Documents", data.documents === null ? "Unavailable" : data.documents.length ? `${data.documents.length} linked file${data.documents.length===1?"":"s"}` : "Absent — no linked files"],
     ["3D", data.links === null ? "Unavailable" : data.links.length ? "Representative mapping" : "Missing"],
   ];
 }

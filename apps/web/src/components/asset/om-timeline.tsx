@@ -11,7 +11,7 @@ export function OmTimeline({ events }: { events: TimelineEvent[] }) {
       </p>
       {events.length === 0 ? (
         <div className="muted mt-4" role="status">
-          <p>Chưa có bản ghi O&M đã xác minh — No verified O&M record available.</p>
+          <p>Chưa có sự kiện O&M được xác minh — No verified O&M record available.</p>
           <p className="mt-2 text-sm">Candidate historical records may exist, but none currently meet verification requirements.</p>
         </div>
       ) : (

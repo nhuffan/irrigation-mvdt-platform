@@ -18,7 +18,7 @@ export async function AssetMedia({
   ]);
   return (
     <>
-      <section className="panel mt-6">
+      <section className="panel mt-6" id="attachments">
         <h2>Documents</h2>
         {documents.status === "fulfilled" ? (
           <DocumentList documents={documents.value} />
@@ -26,7 +26,7 @@ export async function AssetMedia({
           <SectionError title="Documents" />
         )}
       </section>
-      <section className="panel mt-6">
+      <section className="panel mt-6" id="model">
         <h2>3D representation</h2>
         {links.status !== "fulfilled" || models.status !== "fulfilled" ? (
           <SectionError title="3D representation" />
@@ -51,7 +51,7 @@ export async function AssetMedia({
           </ul>
         ) : (
           <p className="muted mt-3">
-            No 3D representation is linked to this asset.
+            Chưa có liên kết đối tượng 3D được xác định cho asset này. Mô hình đại diện của tài sản cha không xác nhận định danh công trình con.
           </p>
         )}
         <Link
