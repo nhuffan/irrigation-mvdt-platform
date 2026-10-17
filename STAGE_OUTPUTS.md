@@ -609,3 +609,9 @@ Read the supplied SUBMIT_VIE captions and checked asset provenance UI implementa
 -31 focused tests pass, including camera fit on wide/portrait viewports, invalid bounds and explicit/ambiguous initial targets, existing hierarchy/selection/layout/resize/scope behavior. ESLint/production build pass; initial build required a TypeScript fallback for optional Cesium fovy, corrected.15 HTTP route checks pass with left-panel DOM order/grouped-card assertions and10RS assets/44L2 retained. QA API8001/web3001 used; final build restored normal API configuration.
 - Browser unavailable: Local browser use is disabled in Work settings. No new rendered screenshot, responsive visual or actual WebGL camera/picking PASS claimed. Mathematical focus and HTTP checks do not recertify F15. Private evidence/results under LEFT-PANEL-UX; F02/F05 and methodology statuses unchanged.
 - Before/after DB/media equality verified; fingerprint3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c. No source/record/geometry/model admission. Task QA services stopped; existing user API8000/web3000 and healthy PostGIS retained. Changes/output committed directly on main.
+
+## Explicit left-panel placement correction output
+
+- Pinned GIS/3D workspace, asset sidebar and document inspector to named CSS grid area panel on the left; content occupies the right area with2fr/3fr columns. Added explicit full-width content area when panel is hidden and panel-before-content stacking below900px. Placement no longer depends on grid auto-placement.
+- ESLint/production build and whitespace checks pass. Confirmed the running user dev server serves the new desktop/mobile grid-area declarations. Initial live CSS check assumed single-line compiler formatting; whitespace-tolerant check passed. Browser remains disabled, so no new visual PASS claimed.
+- No services started or stopped; existing user processes preserved. No data or camera changes in this correction.
