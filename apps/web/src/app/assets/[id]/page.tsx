@@ -32,7 +32,7 @@ export default async function AssetPage({
       </Link>
       <div className="page-heading mt-8">
         <div>
-          <p className="eyebrow">Tài sản — Asset detail</p>
+          <p className="eyebrow">Asset detail</p>
           <h1><AssetDisplayName asset={asset}/></h1>
         </div>
       </div>

@@ -51,7 +51,7 @@ export async function AssetMedia({
           </ul>
         ) : (
           <p className="muted mt-3">
-            Chưa có liên kết đối tượng 3D được xác định cho asset này. Mô hình đại diện của tài sản cha không xác nhận định danh công trình con.
+            No established 3D object link for this asset. A parent representative model does not confirm a child building identity.
           </p>
         )}
         <Link

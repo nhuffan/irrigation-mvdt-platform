@@ -12,7 +12,7 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
     return <p className="muted mt-3 text-sm">Source not available.</p>;
   return (
     <details className="source-info">
-      <summary>Nguồn — Source details</summary>
+      <summary>Source details</summary>
       <dl className="source-grid"><div><dt>Source UUID</dt><dd>{source.id}</dd></div>
         <div>
           <dt>Source code</dt>

@@ -2,7 +2,7 @@ import type { Asset } from "@/types/asset";
 import { assetDisplayName } from "@/lib/asset-display";
 export function AssetDisplayName({ asset }: { asset: Asset }) { return <span className="asset-display-name">{assetDisplayName(asset)}</span>; }
 export function StatusBadge({ children }: { children: React.ReactNode }) { return <span className="presentation-badge">{children}</span>; }
-export function TechnicalMetadataPopover({ fields, label = "Chi tiết — Technical details" }: { fields: Record<string, string | number | null | undefined>; label?: string }) {
+export function TechnicalMetadataPopover({ fields, label = "Technical details" }: { fields: Record<string, string | number | null | undefined>; label?: string }) {
   const rows = Object.entries(fields).filter(([,v]) => v !== null && v !== undefined && v !== "");
   if (!rows.length) return null;
   return <details className="technical-metadata"><summary>{label}</summary><dl>{rows.map(([key,value]) => <div key={key}><dt>{key}</dt><dd>{value}</dd></div>)}</dl></details>;

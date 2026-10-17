@@ -25,7 +25,7 @@ export default async function DocumentPage({
       </Link>
       <div className="page-heading mt-6">
         <div>
-          <p className="eyebrow">Tài liệu — Document</p>
+          <p className="eyebrow">Document</p>
           <h1>{doc.original_file_name}</h1>
         </div>
       </div>
