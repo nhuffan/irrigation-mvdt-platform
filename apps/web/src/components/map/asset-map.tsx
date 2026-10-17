@@ -1,4 +1,5 @@
 "use client";
+import { observeCanvasResize } from "@/lib/workspace-layout";
 import { AssetSymbol } from "@/components/asset/asset-symbol";
 import { assetSymbolSvg, assetSymbols } from "@/lib/asset-symbol";
 import { assetDisplayName, locationSourceTitle } from "@/lib/asset-display";
@@ -37,6 +38,7 @@ export function AssetMap({
   useEffect(() => { selection.current = { selectedId, onSelect }; }, [selectedId, onSelect]);
   const highlight = useRef<((id?: string) => void) | null>(null);
   const container = useRef<HTMLDivElement>(null);
+  const resetView = useRef<(() => void) | null>(null);
   const selectAsset = useRef<((asset: Asset) => void) | null>(null);
   const [basemapUnavailable, setBasemapUnavailable] = useState(false);
   const [locationUnavailable, setLocationUnavailable] = useState(false);
@@ -49,6 +51,7 @@ export function AssetMap({
     const assets: Asset[] = JSON.parse(assetsJson);
     let disposed = false;
     let map: LibreMap | undefined;
+    let stopResize: (() => void) | undefined;
     let popup: LibrePopup | undefined;
     const symbolButtons = new Map<string, HTMLButtonElement>();
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -68,6 +71,8 @@ export function AssetMap({
           zoom: 10,
         });
         map = instance;
+        stopResize = observeCanvasResize(container.current, () => instance.resize());
+        resetView.current = () => instance.flyTo({ center: [reservoir.longitude, reservoir.latitude], zoom: 10 });
         instance.addControl(new NavigationControl(), "top-right");
         instance.addControl(new AttributionControl({ compact: false }), "bottom-right");
         instance.addControl(new ScaleControl({ unit: "metric" }), "bottom-left");
@@ -288,6 +293,8 @@ export function AssetMap({
       if (timer) clearTimeout(timer);
       if (basemapTimer) clearTimeout(basemapTimer);
       popup?.remove();
+      stopResize?.();
+      resetView.current = null;
       map?.remove();
     };
   }, [reservoir, assetsJson, records, contextVisible]);
@@ -295,6 +302,7 @@ export function AssetMap({
   return (
     <div>
       <div className="map-frame asset-map-frame">
+        <button className="map-reset" onClick={() => resetView.current?.()} disabled={mapState !== "ready"}>Reset map</button>
         <div
           ref={container}
           className="asset-map-canvas"
@@ -313,11 +321,11 @@ export function AssetMap({
             support, then reload. Asset records remain available below.
           </p>
         )}
-        <aside
+        <details
           className="map-legend asset-legend"
           aria-label="Asset geometry legend"
         >
-          <p className="eyebrow">Asset symbols</p><div className="symbol-legend">{Object.entries(assetSymbols).map(([code,symbol]) => <span key={code}><AssetSymbol category={code}/>{symbol.label}</span>)}</div>
+          <summary>Map legend</summary><p className="eyebrow">Asset symbols</p><div className="symbol-legend">{Object.entries(assetSymbols).map(([code,symbol]) => <span key={code}><AssetSymbol category={code}/>{symbol.label}</span>)}</div>
           <p className="eyebrow">Location layers</p>
           <div><span className="status-dot" style={{ background: "#2563eb" }} />RS verified geometry</div>
           <div><span className="status-dot reference-dot" />RS reference location</div>
@@ -325,7 +333,7 @@ export function AssetMap({
           <div><span className="status-dot context-dot" />Context only{!contextVisible ? " (hidden)" : ""}</div>
           <div><span className="status-dot context-dot" />NO LOCATION · registry only</div>
           <div><span className="status-dot" style={{ background: "#059669" }} />Selected asset</div>
-        </aside>
+        </details>
       </div>
       {locationUnavailable && <p className="location-unavailable" role="status">Location unavailable for this asset · Showing reservoir context only.</p>}
       {assets.length === 0 ? (

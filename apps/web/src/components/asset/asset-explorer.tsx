@@ -1,4 +1,5 @@
 "use client";
+import { Workspace } from "@/components/workspace";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Asset } from "@/types/asset";
@@ -38,18 +39,21 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
       <span><strong>{scoped.filter(a => assetLocation(a).location_status === "VERIFIED_GEOMETRY").length} / {scoped.filter(a => assetLocation(a).location_status === "REFERENCE_LOCATION").length} / {scoped.filter(a => assetLocation(a).location_status === "NO_LOCATION").length}</strong> Verified / reference / missing locations</span>
       <span><strong>{total("technical")}</strong> Technical records</span><span><strong>{total("events")}</strong> Verified O&M</span><span><strong>{total("links")}</strong> 3D links</span>
     </div>
-    <div className="explorer-filters"><label>Dataset scope <select value={scope} onChange={e => { setScope(e.target.value); setType(""); select(); }}><option value="research">Research registry (RS)</option><option value="development">Development examples (DEV)</option><option value="other">Other / unclassified</option></select></label>
+
+    <p className="muted mb-3">{scope === "development" ? "DEV · Synthetic development data; not research evidence." : "Reference locations are for navigation / presentation only, not verified GIS evidence."} Basemap and reservoir center are navigation context only.</p>
+    {params.get("asset") && !selected && <p role="alert">Selected asset is unavailable in this reservoir.</p>}
+    {selected && !visible.includes(selected) && <p role="status">Selected asset is excluded by the layer filters. Its information remains open.</p>}
+    <Workspace title="map" panel={<>
+    <details className="filter-drawer"><summary>Search & filters</summary><div className="explorer-filters"><label>Dataset scope <select value={scope} onChange={e => { setScope(e.target.value); setType(""); select(); }}><option value="research">Research registry (RS)</option><option value="development">Development data (DEV)</option><option value="other">Other / unclassified</option></select></label>
     <label>Search assets <input type="search" placeholder="Name, ID or component" value={query} onChange={e => setQuery(e.target.value)} /></label>
     <label>Location <select value={locationFilter} onChange={e => setLocationFilter(e.target.value)}><option value="all">All location states</option><option value="VERIFIED_GEOMETRY">Verified geometry</option><option value="REFERENCE_LOCATION">Reference location</option><option value="NO_LOCATION">Missing location</option></select></label>
     <label>Asset type <select value={type} onChange={e => setType(e.target.value)}><option value="">All types</option>{types.map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label>
     <label><input type="checkbox" checked={contextVisible} onChange={e => setContextVisible(e.target.checked)} /> Reservoir context</label>
-    <label><input type="checkbox" checked={modelOnly} onChange={e => setModelOnly(e.target.checked)} /> With 3D</label></div>
-    <p className="muted mb-3">{scope === "development" ? "DEV · Synthetic development data; not research evidence." : "Reference locations are for navigation / presentation only, not verified GIS evidence."} Basemap and reservoir center are navigation context only.</p>
-    {params.get("asset") && !selected && <p role="alert">Selected asset is unavailable in this reservoir.</p>}
-    {selected && !visible.includes(selected) && <p role="status">Selected asset is excluded by the layer filters. Its information remains open.</p>}
-    <div className="explorer-layout"><div className="explorer-main">
-      <AssetRegistry assets={visible} records={records} selectedId={selected?.id} onSelect={select} />
-      <div id="asset-gis" className="mt-4"><AssetMap reservoir={reservoir} assets={visible} selectedId={selected?.id} onSelect={select} records={records} contextVisible={contextVisible} /></div>
-    </div>{selected ? <ExplorerPanel key={selected.id} asset={selected} assets={assets} data={records[selected.id]} onSelect={select} paper={paper} /> : <aside className="panel explorer-panel"><h2>Explore an asset</h2><p className="muted">Select a registry row or real map geometry to inspect its evidence and digital links.</p></aside>}</div>
+    <label><input type="checkbox" checked={modelOnly} onChange={e => setModelOnly(e.target.checked)} /> With 3D</label></div></details>
+      <details open><summary>Asset registry · {visible.length}</summary><AssetRegistry assets={visible} records={records} selectedId={selected?.id} onSelect={select} /></details>
+      {selected ? <ExplorerPanel key={selected.id} asset={selected} assets={assets} data={records[selected.id]} onSelect={select} paper={paper} /> : <p className="muted">Select an asset to inspect its evidence. Assets without locations remain in this list.</p>}
+    </>}>
+      <div id="asset-gis"><AssetMap reservoir={reservoir} assets={visible} selectedId={selected?.id} onSelect={select} records={records} contextVisible={contextVisible} /></div>
+    </Workspace>
   </div>;
 }

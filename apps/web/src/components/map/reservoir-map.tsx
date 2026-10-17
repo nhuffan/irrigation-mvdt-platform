@@ -1,4 +1,5 @@
 "use client";
+import { observeCanvasResize } from "@/lib/workspace-layout";
 import { useEffect, useRef, useState } from "react";
 import {
   statusColor,
@@ -9,11 +10,13 @@ import type { Reservoir } from "@/types/reservoir";
 
 export function ReservoirMap({ reservoirs }: { reservoirs: Reservoir[] }) {
   const container = useRef<HTMLDivElement>(null);
+  const reset = useRef<(() => void) | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   useEffect(() => {
     let disposed = false;
     let disposeMap: (() => void) | undefined;
+    let stopResize: (() => void) | undefined;
     let timer: ReturnType<typeof setTimeout> | undefined;
     // Import only in the browser: MapLibre 6 uses browser APIs and ESM workers.
     void import("maplibre-gl")
@@ -35,6 +38,7 @@ export function ReservoirMap({ reservoirs }: { reservoirs: Reservoir[] }) {
             zoom: 1,
           });
           disposeMap = () => map.remove();
+          stopResize = observeCanvasResize(container.current, () => map.resize());
           map.addControl(new NavigationControl(), "top-right");
           map.on("load", () => {
             if (!disposed) {
@@ -111,6 +115,7 @@ export function ReservoirMap({ reservoirs }: { reservoirs: Reservoir[] }) {
             popups.push(popup);
             bounds.extend([reservoir.longitude, reservoir.latitude]);
           }
+          reset.current = () => { if (!bounds.isEmpty()) map.fitBounds(bounds, {padding: 70, maxZoom: 9}); };
           if (!bounds.isEmpty())
             map.fitBounds(bounds, { padding: 70, maxZoom: 9, duration: 0 });
           disposeMap = () => {
@@ -129,11 +134,13 @@ export function ReservoirMap({ reservoirs }: { reservoirs: Reservoir[] }) {
     return () => {
       disposed = true;
       if (timer) clearTimeout(timer);
+      stopResize?.();
+      reset.current = null;
       disposeMap?.();
     };
   }, [reservoirs]);
   return (
-    <div className="map-frame">
+    <div className="map-frame"><button className="map-reset" disabled={!loaded} onClick={() => reset.current?.()}>Reset map</button>
       <div
         ref={container}
         className="map-canvas"

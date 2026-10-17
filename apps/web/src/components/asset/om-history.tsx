@@ -17,6 +17,7 @@ export function OmHistory({
   records: HistoryItem[];
   emptyMessage: string;
 }) {
+  if (!records.length) return <details className="empty-history" id={sectionId}><summary>{title} · No records</summary><p className="muted">{emptyMessage}</p></details>;
   return (
     <section className="panel mt-6" id={sectionId}>
       <div className="section-heading">

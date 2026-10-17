@@ -37,7 +37,7 @@ function ModelView({
   }, [model.id, attempt]);
   return (
     <>
-      <section className="panel mt-4">
+      <details className="model-metadata"><summary>Model metadata · {model.coordinate_mode} · {model.verification_status}</summary>
         <h2>{model.name}</h2>
         <VerificationBadge status={model.verification_status} />
         <p className="muted mt-3">
@@ -49,7 +49,7 @@ function ModelView({
           verified asset mapping.
         </p>
         <SourceInfo source={model.source} />
-      </section>
+      </details>
       {error ? (
         <div role="alert" className="panel">
           Unable to load model asset links.{" "}
@@ -73,7 +73,7 @@ export function ModelBrowser({
   initialObject?: string;
 }) {
   const [id, setId] = useState(
-    models.find((m) => m.id === initialModel)?.id ?? models[0]?.id,
+    models.find((m) => m.id === initialModel)?.id ?? models.find(m => m.model_code.startsWith("RS-"))?.id ?? models[0]?.id,
   );
   if (!models.length)
     return (

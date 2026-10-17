@@ -4,19 +4,14 @@ import { StatusBadge } from "@/components/reservoir/status-badge";
 export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const reservoirs = await getReservoirs();
+  const development = reservoirs.filter(r => /^(DEMO|DEV)/.test(r.code));
+  const visible = reservoirs.filter(r => !development.includes(r));
   return (
     <main className="page-shell">
       <div className="page-heading">
         <div>
           <p className="eyebrow">Reservoir registry</p>
-          <h1>
-            Water infrastructure,
-            <br />
-            in one place.
-          </h1>
-          <p className="muted mt-4">
-            Explore reservoir locations and data readiness.
-          </p>
+          <h1>Reservoir registry</h1>
         </div>
         <Link className="button" href="/map">
           Explore GIS map <span aria-hidden="true">↗</span>
@@ -24,13 +19,13 @@ export default async function HomePage() {
       </div>
       <div className="section-heading">
         <h2>Registered reservoirs</h2>
-        <span className="muted">{reservoirs.length} reservoirs</span>
+        <span className="muted">{visible.length} reservoirs</span>
       </div>
-      {reservoirs.length === 0 ? (
+      {visible.length === 0 ? (
         <section className="panel">No reservoirs available.</section>
       ) : (
         <div className="registry-grid">
-          {reservoirs.map((r) => (
+          {visible.map((r) => (
             <article className="panel reservoir-card" key={r.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="eyebrow">{r.code}</p>
@@ -59,6 +54,7 @@ export default async function HomePage() {
           ))}
         </div>
       )}
+    {development.length > 0 && <details className="reservoir-metadata"><summary>Development data · {development.length} reservoirs</summary><p className="summary-note">Synthetic records for development, not research evidence.</p>{development.map(r => <p key={r.id}><Link className="text-link" href={`/reservoirs/${r.id}`}>{r.code} · {r.name}</Link></p>)}</details>}
     </main>
   );
 }

@@ -20,7 +20,7 @@ export default async function ThreeDPage({
     throw error;
   });
   return (
-    <main className={query.paper==="1"?"page-shell clean-paper":"page-shell"}>
+    <main className={query.paper==="1"?"page-shell model-page clean-paper":"page-shell model-page"}>
       <Link className="text-link" href={`/reservoirs/${id}`}>
         ← Reservoir & GIS
       </Link>

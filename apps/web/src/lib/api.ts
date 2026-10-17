@@ -1,3 +1,4 @@
+import { requestLimit } from "./request-limit";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
 import type { Condition } from "@/types/condition";
 import type { Inspection } from "@/types/inspection";
@@ -16,13 +17,16 @@ export class ApiError extends Error {
   }
 }
 
+const limitRequest = requestLimit(4);
 async function request<T>(path: string): Promise<T> {
+ return limitRequest(async () => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     cache: "no-store",
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) throw new ApiError(response.status);
   return response.json();
+ });
 }
 
 export function getReservoirs(): Promise<Reservoir[]> {

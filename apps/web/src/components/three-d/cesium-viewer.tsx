@@ -1,4 +1,6 @@
 "use client";
+import { Workspace } from "@/components/workspace";
+import { observeCanvasResize } from "@/lib/workspace-layout";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import { useEffect, useRef, useState } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
@@ -38,6 +40,7 @@ export default function CesiumViewer({
   useEffect(() => {
     let disposed = false;
     let viewer: Viewer | undefined;
+    let stopResize: (() => void) | undefined;
     let primitive: Model | undefined;
     let handler: ScreenSpaceEventHandler | undefined;
     const timer = setTimeout(() => {
@@ -84,6 +87,7 @@ export default function CesiumViewer({
           requestRenderMode: true,
         });
         viewer = v;
+        stopResize = observeCanvasResize(container.current, () => { v.resize(); v.scene.requestRender(); });
         if (v.scene.globe) {
           v.scene.globe.baseColor = C.Color.fromCssColorString("#263c48");
         }
@@ -244,6 +248,7 @@ export default function CesiumViewer({
       reset.current = null;
       selectionEffect.current = null;
       if (handler && !handler.isDestroyed()) handler.destroy();
+      stopResize?.();
       if (viewer && !viewer.isDestroyed()) viewer.destroy();
       else if (primitive && !primitive.isDestroyed()) primitive.destroy();
     };
@@ -254,7 +259,7 @@ export default function CesiumViewer({
       {model.coordinate_mode === "LOCAL" && (
         <p className="muted">Local model preview · No geographic placement has been verified.</p>
       )}
-      <div className="viewer-toolbar">
+      <Workspace title="3D" tools={<><p className="summary-note">{model.coordinate_mode} · Representative model; no child-building identity inferred.</p>       <div className="viewer-toolbar">
         <button onClick={() => reset.current?.()} disabled={status !== "ready"}>
           Reset camera
         </button>
@@ -265,7 +270,32 @@ export default function CesiumViewer({
         </span>
       </div>
       <p className="selection-feedback" role="status">{selected ? highlighted ? "Selected mesh highlighted · amber tint · original materials preserved" : "Selection has no reliable mesh identifier; visual highlight unavailable." : "No object selected"}</p>
-      <div className="three-d-grid">
+</>} panel={<>
+        {link ? (
+          <AssetSidePanel key={link.id} link={link} placement={model.coordinate_mode} />
+        ) : (
+          <aside className="panel">
+            <h2>Asset selection</h2>
+            <p className="muted mt-3">
+              {selected
+                ? "No unique asset mapping is established for this object; identity is missing or ambiguous."
+                : "Select a model object to view its asset information."}
+            </p><TechnicalMetadataPopover fields={{"Object key":selected}}/>
+          </aside>
+        )}
+            <details className="source-info mt-4">
+        <summary>Linked objects · keyboard navigation</summary>
+        <ul className="object-list">
+          {links.map((item) => (
+            <li key={item.id}>
+              <button onClick={() => setSelected(item.object_key)}>
+                {item.object_name ?? item.object_key} · Representative link
+              </button>
+            </li>
+          ))}
+        </ul>
+      </details>
+      </>}>
         <div className="viewer-frame">
           <div ref={container} className="cesium-container" />
           {status === "loading" && (
@@ -282,31 +312,8 @@ export default function CesiumViewer({
             </div>
           )}
         </div>
-        {link ? (
-          <AssetSidePanel key={link.id} link={link} placement={model.coordinate_mode} />
-        ) : (
-          <aside className="panel">
-            <h2>Asset selection</h2>
-            <p className="muted mt-3">
-              {selected
-                ? "No unique asset mapping is established for this object; identity is missing or ambiguous."
-                : "Select a model object to view its asset information."}
-            </p><TechnicalMetadataPopover fields={{"Object key":selected}}/>
-          </aside>
-        )}
-      </div>
-      <details className="source-info mt-4">
-        <summary>Linked objects · keyboard navigation</summary>
-        <ul className="object-list">
-          {links.map((item) => (
-            <li key={item.id}>
-              <button onClick={() => setSelected(item.object_key)}>
-                {item.object_name ?? item.object_key} · Representative link
-              </button>
-            </li>
-          ))}
-        </ul>
-      </details>
+      </Workspace>
+
     </>
   );
 }

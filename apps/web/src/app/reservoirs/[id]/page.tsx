@@ -38,7 +38,7 @@ export default async function ReservoirPage({
       <Link className="text-link" href={`/reservoirs/${id}/3d`}>
         Open 3D models →
       </Link>
-      <div className="registry-grid">
+      <details className="reservoir-metadata"><summary>Reservoir context & recorded readiness</summary><div className="registry-grid">
         <MvdtReadiness
           level={reservoir.mvdt_level}
           status={reservoir.data_status}
@@ -73,6 +73,7 @@ export default async function ReservoirPage({
           <p className="muted mt-3">{reservoir.description}</p>
         </section>
       )}
+      </details>
       <Suspense
         fallback={
           <section className="panel mt-10" role="status">
