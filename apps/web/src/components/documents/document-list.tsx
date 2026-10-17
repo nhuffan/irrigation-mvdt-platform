@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import Link from "next/link";
 import type { DocumentRecord } from "@/types/media";
@@ -13,7 +14,7 @@ export function DocumentList({ documents }: { documents: DocumentRecord[] }) {
     <ul className="document-list">
       {documents.map((doc) => (
         <li className="panel" key={doc.id}>
-          <h3>{doc.source.title}</h3>
+          <h3>{evidenceDisplayText(doc.source.title)}</h3>
           <p>{doc.original_file_name}</p>
           <p className="muted">
             {doc.source.source_type} ·{" "}

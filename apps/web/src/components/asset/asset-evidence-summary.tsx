@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import type { Asset } from "@/types/asset";
 import type { ExplorerData } from "@/lib/explorer-data";
 import { technicalSources } from "@/lib/asset-coverage";
@@ -7,9 +8,9 @@ export function AssetEvidenceSummary({asset,data}:{asset:Asset;data:ExplorerData
  const location=assetLocation(asset);
  const verifiedLinks=data.links?.filter(l=>l.verification_status==="VERIFIED");
  const rows=[
- {label:"Technical claims",value:technicalSources(data),fields:Object.fromEntries((data.technical??[]).map((t,i)=>[`Claim ${i+1}`,`${t.attribute_label} · ${t.source?.title??"Source unavailable"} · ${t.reviewed_provenance?.authority??"Authority unavailable"}`]))},
+ {label:"Technical claims",value:technicalSources(data),fields:Object.fromEntries((data.technical??[]).map((t,i)=>[`Claim ${i+1}`,`${evidenceDisplayText(t.attribute_label)} · ${t.source?evidenceDisplayText(t.source.title):"Source unavailable"} · ${t.reviewed_provenance?.authority??"Authority unavailable"}`]))},
  {label:"Location",value:location.location_status==="REFERENCE_LOCATION"?(location.source?"1 reference source":"Reference source unavailable"):location.location_status==="NO_LOCATION"?"No location evidence":"Bound geometry review",fields:{Source:location.source,Locator:location.locator,"Evidence ID":location.evidence_id,Limitation:location.accuracy_limitation}},
- {label:"Documents",value:data.documents===null?"Unavailable":`${data.documents.length} linked file${data.documents.length===1?"":"s"}`,fields:Object.fromEntries((data.documents??[]).map((d,i)=>[`File ${i+1}`,`${d.source.title} · ${d.original_file_name} · ${d.source.verification_status}`]))},
+ {label:"Documents",value:data.documents===null?"Unavailable":`${data.documents.length} linked file${data.documents.length===1?"":"s"}`,fields:Object.fromEntries((data.documents??[]).map((d,i)=>[`File ${i+1}`,`${evidenceDisplayText(d.source.title)} · ${d.original_file_name} · ${d.source.verification_status}`]))},
  {label:"O&M",value:data.events===null?"Unavailable":data.events.length?`${data.events.length} verified events`:"No verified evidence",fields:{Scope:"No verified evidence does not mean no real-world activity occurred."}},
  {label:"3D",value:data.links===null?"Unavailable":data.links.length?`${verifiedLinks!.length} verified representative links / ${data.links.length} links`:"No mapping",fields:Object.fromEntries((data.links??[]).map((l,i)=>[`Mapping ${i+1}`,`${l.object_key} · ${l.verification_status} · Representative mapping only`]))},
  ];

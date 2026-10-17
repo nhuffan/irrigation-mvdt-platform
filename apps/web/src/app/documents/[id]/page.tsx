@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -26,7 +27,7 @@ export default async function DocumentPage({
       <div className="page-heading mt-6">
         <div>
           <p className="eyebrow">Document</p>
-          <h1>{doc.original_file_name}</h1>
+          <h1>{evidenceDisplayText(doc.original_file_name)}</h1>
         </div>
       </div>
       <p className="muted">

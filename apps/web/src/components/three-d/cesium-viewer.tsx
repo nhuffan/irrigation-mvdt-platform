@@ -1,4 +1,5 @@
 "use client";
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { Workspace } from "@/components/workspace";
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
@@ -289,7 +290,7 @@ export default function CesiumViewer({
           {links.map((item) => (
             <li key={item.id}>
               <button onClick={() => setSelected(item.object_key)}>
-                {item.object_name ?? item.object_key} · Representative link
+                {evidenceDisplayText(item.object_name ?? item.object_key)} · Representative link
               </button>
             </li>
           ))}

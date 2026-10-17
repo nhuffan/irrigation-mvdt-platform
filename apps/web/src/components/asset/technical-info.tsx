@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover, StatusBadge } from "./presentation";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
 import { SourceInfo, VerificationBadge } from "./source-info";
@@ -29,9 +30,9 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                 id={`record-${record.id}`}
               >
 
-                <h3 className="font-semibold">{record.attribute_label}</h3>
+                <h3 className="font-semibold">{evidenceDisplayText(record.attribute_label)}</h3>
                 <p className="technical-value">
-                  {record.value_number ?? record.value_text ?? "Not available"}
+                  {record.value_number ?? (record.value_text ? evidenceDisplayText(record.value_text) : "Not available")}
                   <span>{record.unit === "text" ? "" : record.unit ?? ""}</span>
                 </p>
                 <VerificationBadge status={record.verification_status} />
@@ -43,7 +44,7 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                 <StatusBadge>{record.reviewed_provenance?.verification_level ?? "Level unavailable"}</StatusBadge>
                 <TechnicalMetadataPopover fields={{"Record UUID":record.id,"Asset UUID":record.asset_id,"Attribute key":record.attribute_key,"Source UUID":record.source_id,"Source code":record.source?.source_code,"Evidence ID":record.reviewed_provenance?.evidence_id,Locator:record.reviewed_provenance?.source_locator,Authority:record.reviewed_provenance?.authority,Reviewer:record.reviewed_provenance?.reviewer,"Reviewed at":record.reviewed_provenance?.reviewed_at,Verification:record.verification_status}}/>
                 <details className="field-locator"><summary>Source: {record.source?.source_code ?? "Unavailable"} · Page / locator</summary><p>{record.reviewed_provenance?.source_locator ?? "Unavailable"}</p></details>
-                {record.reviewed_provenance?.verification_level === "L2" && <p className="summary-note">L2 đã review theo nguồn — SOURCE_REPORTED / HISTORICAL_DOCUMENTED. Không chứng nhận hiện trạng hôm nay hoặc chuẩn cao độ; ngữ cảnh và giới hạn theo hồ sơ nguồn.</p>}
+                {record.reviewed_provenance?.verification_level === "L2" && <p className="summary-note">Reviewed source-reported L2 — SOURCE_REPORTED / HISTORICAL_DOCUMENTED. Current condition and elevation datum are not certified; context and limitations follow the source documents.</p>}
                 <p className="muted text-sm">Source authority: {record.source?.authority_level ?? "UNKNOWN"} · Source verification: {record.source?.verification_status ?? "UNAVAILABLE"}. Field review and source authority are separate.</p>
                 <SourceInfo source={record.source} />
               </article>

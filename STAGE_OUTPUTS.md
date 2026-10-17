@@ -584,3 +584,9 @@ Read the supplied SUBMIT_VIE captions and checked asset provenance UI implementa
 - Doubled the asset hierarchy sidebar on `/assets/[id]` from270px to540px on desktop. At1100px and below it stacks above the detail content to preserve usable space.
 - Converted generic interface titles/actions and missing-data text to English: Information Coverage, Sources & Evidence, Overview, Location, Asset hierarchy, Source details, Technical details, Asset detail and Document. Preserved asset/document names, measurement labels and values. The TechnicalInfo component itself is unchanged as requested.
 - ESLint, production build and diff whitespace checks pass. No new service started, no API/schema/research data changed. Visual browser checks not rerun; no visual PASS claimed.
+
+## English-first bilingual evidence display output
+
+- Applied English — Vietnamese display names to all10 existing research assets, including child buildings/intakes and parent breadcrumbs. Shared labels keep GIS/detail/3D navigation consistent.
+- Added display-only translations for31 technical label variants across44 retained records, their textual values and recognized document/source/model titles. Original wording follows the English translation; unknown titles retain their original text. Numeric values, units, download filenames and provenance locators are unchanged. Technical information layout and540px sidebar preserved; general interface headings/messages remain English.
+- Added the language convention to root AGENTS.md. Checked all10 names/all44 technical labels and text values preserve originals; ESLint, production build and whitespace checks pass. No data/API changes or new services; browser visual checks not rerun.

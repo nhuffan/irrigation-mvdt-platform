@@ -37,3 +37,8 @@
 - Được dùng tài liệu kỹ thuật, báo cáo khoa học và nguồn công khai đáng tin cậy để bổ sung dữ liệu có đối chiếu. Chỉ yêu cầu xác nhận khi có mâu thuẫn, thiếu căn cứ hoặc quyết định vượt thẩm quyền. Không suy diễn chỉ dẫn này thành chữ ký/phê duyệt cụ thể chưa có; ghi đúng căn cứ, phạm vi và thời điểm thực tế.
 - Không tự nâng vai trò thành DOMAIN_EXPERT hoặc INDEPENDENT_REVIEWER, không giả lập chữ ký hay phê duyệt. Quyết định PTE-01–07 và admission W2 là phê duyệt cụ thể cho thông số thiết kế/lịch sử L2, không phải xác nhận hiện trạng, geometry hay O&M.
 - Mỗi stage cập nhật STAGE_OUTPUTS.md với kết quả thực tế và giới hạn còn lại.
+
+## Ngôn ngữ hiển thị
+
+- Tiêu đề, nhãn điều khiển và thông báo giao diện dùng tiếng Anh. Tên asset, tiêu đề tài liệu, tên thông số và mô tả giá trị cần dịch hiển thị English — Tiếng Việt; tiếng Anh đứng trước.
+- Chỉ dịch ở lớp hiển thị; giữ nguyên tên canonical, tên file tải xuống, số đo/đơn vị, locator và dữ liệu nguồn. Giữ bố cục component Technical information khi chỉnh ngôn ngữ.

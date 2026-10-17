@@ -1,4 +1,5 @@
 "use client";
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import dynamic from "next/dynamic";
 import { useState, useEffect } from "react";
@@ -38,7 +39,7 @@ function ModelView({
   return (
     <>
       <details className="model-metadata"><summary>Model metadata · {model.coordinate_mode} · {model.verification_status}</summary>
-        <h2>{model.name}</h2>
+        <h2>{evidenceDisplayText(model.name)}</h2>
         <VerificationBadge status={model.verification_status} />
         <p className="muted mt-3">
           {model.coordinate_mode} · {model.format} · {model.model_type}
@@ -90,7 +91,7 @@ export function ModelBrowser({
         <select value={id} onChange={(event) => setId(event.target.value)}>
           {models.map((m) => (
             <option key={m.id} value={m.id}>
-              {m.name}
+              {evidenceDisplayText(m.name)}
             </option>
           ))}
         </select>

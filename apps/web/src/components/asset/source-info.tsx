@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import Link from "next/link";
 import type { DataSource, VerificationStatus } from "@/types/data-source";
 export function VerificationBadge({ status }: { status: VerificationStatus }) {
@@ -20,7 +21,7 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
         </div>
         <div>
           <dt>Title</dt>
-          <dd>{source.title}</dd>
+          <dd>{evidenceDisplayText(source.title)}</dd>
         </div>
         <div>
           <dt>Type</dt>

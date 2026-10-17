@@ -1,3 +1,4 @@
+import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "./presentation";
 import Link from "next/link";
 import { getAssetDocuments, getAssetModelLinks, getModels } from "@/lib/api";
@@ -35,8 +36,7 @@ export async function AssetMedia({
             {links.value.map((link) => (
               <li key={link.id}>
                 <p>
-                  {models.value.find((m) => m.id === link.model_id)?.name ??
-                    "Model"}{" "}
+                  {evidenceDisplayText(models.value.find((m) => m.id === link.model_id)?.name ?? "Model")}{" "}
                   · Representative object
                 </p>
                 <p>Representative mapping only</p><TechnicalMetadataPopover fields={{"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Object key":link.object_key,Verification:link.verification_status}}/><VerificationBadge status={link.verification_status} />
