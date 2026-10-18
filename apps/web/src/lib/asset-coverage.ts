@@ -2,7 +2,7 @@ import type { Asset, AssetLocation } from "../types/asset";
 import type { ExplorerData } from "./explorer-data";
 export function technicalCoverage(data: ExplorerData) {
   if (data.technical === null) return "Unavailable";
-  if (!data.technical.length) return "Missing";
+  if (!data.technical.length) return "0 direct records";
   const levels = [...new Set(data.technical.map(t => t.reviewed_provenance?.verification_level ?? "level unavailable"))];
   return `${data.technical.length} records · ${levels.join(" / ")}`;
 }

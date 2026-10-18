@@ -1081,8 +1081,8 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
 .result-pass { color: #176548; background: #eaf7ee; }
 .result-fail { color: #a0372b; background: #fff0ec; border-color: #e9b4a8; }
 .methodology-process { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; counter-reset: step; list-style: none; padding: 0; }
-.methodology-process li { border: 1px solid #d7e2dc; border-radius: 8px; padding: 16px; background: #f8faf8; }
-.methodology-process li::before { counter-increment: step; content: counter(step) ". "; color: #4f7869; }
+.methodology-process > li { border: 1px solid #d7e2dc; border-radius: 8px; padding: 16px; background: #f8faf8; }
+.methodology-process > li::before { counter-increment: step; content: counter(step) ". "; color: #4f7869; }
 .methodology-process span { display: block; margin-top: 10px; font-size: 11px; color: #576e62; }
 .methodology-hashes dt { margin-top: 12px; font-weight: 600; font-size: 12px; }
 .methodology-hashes dd { margin: 4px 0 12px; font-size: 12px; }
@@ -1128,3 +1128,35 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
 .observation-resolution { padding: 8px 12px; margin: 10px 0; border: 1px solid #d7e2dc; border-radius: 8px; background: #f1f6f3; color: #3a5e4c; font-size: 12px; }
 .observation-provider-logo { padding: 4px; background: white; border-radius: 3px; }
 .observation-provider-logo img { width: 88px; height: auto; }
+
+
+/* Inspectors follow the full GIS/3D column, including headings and status notes. */
+@media (min-width: 901px) {
+  .asset-explorer .workspace-grid > .workspace-inspector,
+  .model-page .workspace-grid > .workspace-inspector {
+    min-height: 0;
+    max-height: none;
+    contain: size;
+    align-self: stretch;
+  }
+  .asset-explorer .is-expanded .workspace-canvas,
+  .asset-explorer .is-expanded #asset-gis,
+  .asset-explorer .is-expanded #asset-gis > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .asset-explorer .is-expanded #asset-gis,
+  .asset-explorer .is-expanded #asset-gis > div { flex: 1; }
+  .asset-explorer .is-expanded .asset-map-frame {
+    flex: 1;
+    height: auto;
+    min-height: 360px;
+  }
+  .asset-explorer .is-expanded .asset-map-canvas {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    min-height: 0;
+  }
+}

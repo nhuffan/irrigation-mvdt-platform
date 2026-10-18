@@ -1,3 +1,4 @@
+import { publicEvidenceText } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import Link from "next/link";
 import type { DataSource, VerificationStatus } from "@/types/data-source";
@@ -21,7 +22,7 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
         </div>
         <div>
           <dt>Title</dt>
-          <dd>{evidenceDisplayText(source.title)}</dd>
+          <dd>{evidenceDisplayText(publicEvidenceText(source.title))}</dd>
         </div>
         <div>
           <dt>Type</dt>
@@ -32,12 +33,8 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
           <dd>{source.source_date ?? "Not available"}</dd>
         </div>
         <div>
-          <dt>Owner</dt>
-          <dd>{source.source_owner ?? "Not available"}</dd>
-        </div>
-        <div>
           <dt>Authority</dt>
-          <dd>{source.authority_level ?? "Not available"}</dd>
+          <dd>{publicEvidenceText(source.authority_level?.trim() || "UNKNOWN")}</dd>
         </div>
         <div>
           <dt>Source verification</dt>
@@ -47,13 +44,10 @@ export function SourceInfo({ source }: { source: DataSource | null }) {
         </div>
         <div>
           <dt>File name</dt>
-          <dd>{source.file_name ?? "Not available"}</dd>
-        </div>
-        <div className="source-notes">
-          <dt>Notes</dt>
-          <dd>{source.notes ?? "Not available"}</dd>
+          <dd>{publicEvidenceText(source.file_name)}</dd>
         </div>
       </dl>
+      <p className="summary-note">This is a source inventory entry, not proof of a retained PDF or an asset–document link. Open its documents to inspect available files.</p>
       <Link className="text-link" href={`/data-sources/${source.id}/documents`}>
         Open documents →
       </Link>

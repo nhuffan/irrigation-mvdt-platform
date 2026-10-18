@@ -20,6 +20,13 @@ from export_asset_evidence_tables import (
     read_csv,
     write_table,
 )
+from methodology_completion import (
+    DASHBOARD_SCHEMA,
+    build_completion,
+    public_json,
+    require_v1_compatible,
+    write_completion_artifacts,
+)
 from scripts.methodology_review import load_methodology
 from scripts.prepare_empirical_scope import compile_scope, read_rows
 
@@ -29,6 +36,7 @@ def sha(path):
 
 
 def export(snapshot_path, api_path, controlled, output, public):
+    previous = json.loads(public.read_text()) if public.is_file() else None
     snapshot = json.loads(snapshot_path.read_text())
     api = json.loads(api_path.read_text())
     base = json.loads((controlled / "base-scope.json").read_text())
@@ -277,19 +285,23 @@ def export(snapshot_path, api_path, controlled, output, public):
         "exporter": "scripts/export_asset_evidence_tables.py",
         "exporter_sha256": sha(ROOT / "scripts/export_asset_evidence_tables.py"),
     }
-    # Fail closed if a locator accidentally contains a machine-specific path.
-    raw = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
-    if any(
-        value in raw
-        for value in (
-            "/Users/",
-            "/Volumes/",
-            "storage_key",
-            "reviewer_name",
-            "reviewer_receipt",
-        )
-    ):
-        raise ValueError("Private metadata detected in public summary")
+    # Additive schema v2: preserve the original v1 shape and exact values.
+    v1 = json.loads(json.dumps(payload))
+    payload["schema_version"] = DASHBOARD_SCHEMA
+    payload["completion"] = build_completion(
+        payload,
+        snapshot,
+        api,
+        base,
+        sources,
+        controlled,
+        ROOT,
+        previous,
+        compiler_report=report,
+    )
+    require_v1_compatible(payload, v1)
+    raw = public_json(payload)
+    write_completion_artifacts(payload["completion"], output)
     public.parent.mkdir(parents=True, exist_ok=True)
     public.write_text(raw)
     manifest = {
@@ -309,6 +321,12 @@ def export(snapshot_path, api_path, controlled, output, public):
             "expected_file": sum(s["file_expected"] == "true" for s in sources),
         },
         "browser_acceptance": "NOT_RETESTED",
+        "completion_artifact_sha256": payload["completion"]["provenance"][
+            "completion_artifact_sha256"
+        ],
+        "methodology_package_status": payload["completion"]["provenance"][
+            "package_status"
+        ],
     }
     (output / "coverage-readback-manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n"

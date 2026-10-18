@@ -1,3 +1,4 @@
+import { linkedDocumentCounts, publicEvidenceText } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "./presentation";
 import Link from "next/link";
@@ -17,10 +18,12 @@ export async function AssetMedia({
     getAssetModelLinks(assetId),
     getModels(reservoirId),
   ]);
+  const counts = linkedDocumentCounts(documents.status === "fulfilled" ? documents.value : null);
   return (
     <>
       <section className="panel mt-6" id="attachments">
         <h2>Documents</h2>
+        <p className="summary-note">{counts.edges ?? "Unavailable"} asset–document links · {counts.distinctPdfHashes ?? "Unavailable"} distinct linked PDF hashes. These are links to this asset, not source inventory totals or proof of retained bytes.</p>
         {documents.status === "fulfilled" ? (
           <DocumentList documents={documents.value} />
         ) : (
@@ -39,7 +42,7 @@ export async function AssetMedia({
                   {evidenceDisplayText(models.value.find((m) => m.id === link.model_id)?.name ?? "Model")}{" "}
                   · Representative object
                 </p>
-                <p>Representative mapping only</p><TechnicalMetadataPopover fields={{"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Object key":link.object_key,Verification:link.verification_status}}/><VerificationBadge status={link.verification_status} />
+                <p>Coordinate mode: {models.value.find((m) => m.id === link.model_id)?.coordinate_mode ?? "Unavailable"}. Representative mapping only; no child-building identity or surveyed placement is certified.</p><TechnicalMetadataPopover fields={{"Model UUID":link.model_id,"Asset UUID":link.asset_id,"Object key":publicEvidenceText(link.object_key),Verification:link.verification_status}}/><VerificationBadge status={link.verification_status} />
                 <Link
                   className="text-link"
                   href={`/reservoirs/${reservoirId}/3d?model=${link.model_id}&object=${encodeURIComponent(link.object_key)}`}
@@ -56,7 +59,7 @@ export async function AssetMedia({
         )}
         <Link
           className="text-link mt-4"
-          href={`/reservoirs/${reservoirId}#asset-gis`}
+          href={`/reservoirs/${reservoirId}?asset=${encodeURIComponent(assetId)}#asset-gis`}
         >
           View on GIS →
         </Link>

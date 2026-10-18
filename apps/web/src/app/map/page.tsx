@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { ApiError, getAsset, getReservoir, getReservoirAssets } from "@/lib/api";
+import { publicAssets } from "@/lib/public-client-data";
 import { PageHeader } from "@/components/ui/page-header";
 import { ObservationMap } from "@/components/map/observation-map";
 import { MANAGED_RESERVOIR_ID } from "@/lib/site-scope";
@@ -22,6 +23,6 @@ export default async function MapPage({ searchParams }: {
   const assets = await getReservoirAssets(reservoir.id);
   return <main className="map-shell">
     <PageHeader eyebrow="Spatial context" title="GIS Map" description="An observation map for satellite and irrigation context. Basemap imagery and reference markers support navigation; they do not verify asset geometry or current condition." />
-    <ObservationMap reservoir={reservoir} assets={assets} />
+    <ObservationMap reservoir={reservoir} assets={publicAssets(assets)} />
   </main>;
 }

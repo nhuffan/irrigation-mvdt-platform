@@ -1,9 +1,10 @@
 """Capture private read-only DB/media/API evidence for the methodology dashboard.
 
 Run from the repository root with `uv run --project apps/api python ... before`
-(or `after`); output remains in the ignored research evidence directory.
+(or `after`); output remains in the ignored research evidence directory. Use --output-dir for a separate stage evidence directory.
 """
 
+import argparse
 import hashlib
 import json
 import sys
@@ -22,7 +23,16 @@ from scripts.import_research_data import TABLES
 from scripts.research_common import digest
 from sqlalchemy import select, text
 
-out = root / "research/evaluation/evidence/METHODOLOGY-MAP"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("phase", nargs="?", choices=("before", "after"), default="before")
+parser.add_argument(
+    "--output-dir",
+    type=Path,
+    default=root / "research/evaluation/evidence/METHODOLOGY-MAP",
+)
+args = parser.parse_args()
+phase = args.phase
+out = args.output_dir
 out.mkdir(parents=True, exist_ok=True)
 with SessionLocal() as db:
     db.execute(text("SET TRANSACTION READ ONLY"))
@@ -49,9 +59,6 @@ snapshot = {
     "storage_sha256": storage,
     "database_fingerprint": digest(rows),
 }
-phase = sys.argv[1] if len(sys.argv) > 1 else "before"
-if phase not in ("before", "after"):
-    raise SystemExit("phase must be before or after")
 (out / f"db-{phase}.json").write_text(
     json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n"
 )

@@ -1,6 +1,7 @@
 import { getExplorerData } from "@/lib/explorer-data";
 import { getReservoirAssets } from "@/lib/api";
 import type { Reservoir } from "@/types/reservoir";
+import { publicAssets, publicExplorerRecords } from "@/lib/public-client-data";
 import { AssetExplorer } from "./asset-explorer";
 export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
   const assets = await getReservoirAssets(reservoir.id);
@@ -14,7 +15,7 @@ export async function ReservoirAssets({ reservoir }: { reservoir: Reservoir }) {
         </div>
         <span className="muted">{assets.length} research assets</span>
       </div>
-      <AssetExplorer reservoir={reservoir} assets={assets} records={records} />
+      <AssetExplorer reservoir={reservoir} assets={publicAssets(assets)} records={publicExplorerRecords(records)} />
     </section>
   );
 }

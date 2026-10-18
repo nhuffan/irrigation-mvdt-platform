@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { publicEvidenceText, technicalValueDetails } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover, StatusBadge } from "./presentation";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
@@ -23,18 +25,24 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
             value is inferred.
           </p>
           <div className="technical-grid">
-            {records.map((record) => (
+            {records.map((record) => {
+              const value = technicalValueDetails(record);
+              const locator = record.reviewed_provenance?.source_locator;
+              const sourceCode = record.source?.source_code ?? record.reviewed_provenance?.source_code ?? "Unavailable";
+              return (
               <article
                 key={record.id}
                 className="om-record"
                 id={`record-${record.id}`}
               >
 
-                <h3 className="font-semibold">{evidenceDisplayText(record.attribute_label)}</h3>
+                <h3 className="font-semibold">{evidenceDisplayText(publicEvidenceText(record.attribute_label))}</h3>
                 <p className="technical-value">
-                  {record.value_number ?? (record.value_text ? evidenceDisplayText(record.value_text) : "Not available")}
-                  <span>{record.unit === "text" ? "" : record.unit ?? ""}</span>
+                  {value.value}
+                  {value.valueUnit && <span>{value.valueUnit}</span>}
                 </p>
+                {value.additionalText && <p className="muted text-sm">Source text: {value.additionalText}</p>}
+                <p className="muted text-sm">Unit: {value.unit}{value.valueState !== "AVAILABLE" && <> · Value state: {value.valueState.replaceAll("_", " ")}</>}</p>
                 <VerificationBadge status={record.verification_status} />
                 {(counts.get(record.attribute_key) ?? 0) > 1 && (
                   <p className="muted mt-2 text-xs">
@@ -42,13 +50,14 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                   </p>
                 )}
                 <StatusBadge>{record.reviewed_provenance?.verification_level ?? "Level unavailable"}</StatusBadge>
-                <TechnicalMetadataPopover fields={{"Record UUID":record.id,"Asset UUID":record.asset_id,"Attribute key":record.attribute_key,"Source UUID":record.source_id,"Source code":record.source?.source_code,"Evidence ID":record.reviewed_provenance?.evidence_id,Locator:record.reviewed_provenance?.source_locator,Authority:record.reviewed_provenance?.authority,Reviewer:record.reviewed_provenance?.reviewer,"Reviewed at":record.reviewed_provenance?.reviewed_at,Verification:record.verification_status}}/>
-                <details className="field-locator"><summary>Source: {record.source?.source_code ?? "Unavailable"} · Page / locator</summary><p>{record.reviewed_provenance?.source_locator ?? "Unavailable"}</p></details>
-                {record.reviewed_provenance?.verification_level === "L2" && <p className="summary-note">Reviewed source-reported L2 — SOURCE_REPORTED / HISTORICAL_DOCUMENTED. Current condition and elevation datum are not certified; context and limitations follow the source documents.</p>}
+                <TechnicalMetadataPopover fields={{"Record UUID":record.id,"Asset UUID":record.asset_id,"Attribute key":record.attribute_key,"Source UUID":record.source_id,"Source code":record.source?.source_code,"Evidence ID":record.reviewed_provenance?.evidence_id,Locator:locator ? publicEvidenceText(locator) : "Unavailable",Authority:publicEvidenceText(record.reviewed_provenance?.authority),Verification:record.verification_status}}/>
+                <div className="field-locator" style={{ overflowWrap: "anywhere" }}><p>Source: {record.source_id ? <Link className="text-link" href={`/data-sources/${encodeURIComponent(record.source_id)}/documents`}>{sourceCode}</Link> : sourceCode}</p><p>Exact locator: {locator ? publicEvidenceText(locator) : "Unavailable"}</p></div>
+                {record.reviewed_provenance?.verification_level === "L2" && <p className="summary-note">SOURCE_REPORTED / HISTORICAL_DOCUMENTED · Reviewed L2 from historical or design documents. This does not certify present condition, completed repairs, elevation datum or geometry; the exact source locator retains the field context.</p>}
                 <p className="muted text-sm">Source authority: {record.source?.authority_level ?? "UNKNOWN"} · Source verification: {record.source?.verification_status ?? "UNAVAILABLE"}. Field review and source authority are separate.</p>
                 <SourceInfo source={record.source} />
               </article>
-            ))}
+              );
+            })}
           </div>
         </>
       )}

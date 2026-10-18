@@ -16,7 +16,7 @@ export function coverageRows(assets: Asset[], records: ExplorerRecords) {
       direct_l2: l2Count([asset.id], technical), descendant_l2: l2Count(descendants, technical),
       verified_om: record?.events?.length ?? null,
       documents: documents == null ? null : documents.length,
-      unique_files: documents == null ? null : new Set(documents.map(d => d.checksum_sha256)).size,
+      unique_files: documents == null || documents.some(d => !d.checksum_sha256) ? null : new Set(documents.map(d => d.checksum_sha256)).size,
       links: record?.links?.length ?? null,
       condition: record?.conditionError || !record ? null : record.condition?.verification_status === "VERIFIED" ? 1 : 0,
       location: asset.location?.location_status ?? "UNKNOWN",
@@ -30,7 +30,7 @@ export function coverageTotals(rows: ReturnType<typeof coverageRows>) {
     primary_l2: knownSum(rows.filter(r => !r.parent_id).map(r => r.direct_l2)),
     component_l2: knownSum(rows.filter(r => r.parent_id).map(r => r.direct_l2)),
     all_l2: knownSum(rows.map(r => r.direct_l2)), verified_om: knownSum(rows.map(r => r.verified_om)),
-    reference_points: rows.filter(r => r.location === "REFERENCE_LOCATION").length,
+    reference_points: rows.some(r => r.location === "UNKNOWN") ? null : rows.filter(r => r.location === "REFERENCE_LOCATION").length,
     canonical_geometry: knownSum(rows.map(r => r.canonical_geometry)),
   };
 }

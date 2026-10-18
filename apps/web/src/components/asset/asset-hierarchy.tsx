@@ -1,14 +1,11 @@
 import { MetricCard } from "@/components/ui/panel-section";
 import Link from "next/link";
-import { getAssetTechnical } from "@/lib/api";
 import { dataset } from "@/lib/explorer-state";
-import { descendantIds, hierarchyCoverage, l2Count } from "@/lib/asset-hierarchy";
+import { descendantIds, hierarchyCoverage, l2Count, type TechnicalRecords } from "@/lib/asset-hierarchy";
 import type { Asset } from "@/types/asset";
 import { AssetDisplayName } from "./presentation";
-export async function AssetHierarchy({ assets, selected }: { assets: Asset[]; selected: Asset }) {
+export function AssetHierarchy({ assets, selected, records }: { assets: Asset[]; selected: Asset; records: TechnicalRecords }) {
   const scoped = assets.filter(a => dataset(a) === dataset(selected));
-  const records = Object.fromEntries(await Promise.all(scoped.map(async a =>
-    [a.id, await getAssetTechnical(a.id).catch(() => null)] as const)));
   const totals = hierarchyCoverage(scoped, records);
   const display = (n: number | null) => n === null ? "Unavailable" : n;
   const render = (asset: Asset, ancestors: string[] = []): React.ReactNode => {

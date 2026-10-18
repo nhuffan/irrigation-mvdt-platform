@@ -87,6 +87,11 @@ export async function getAssetDocuments(
 ): Promise<import("@/types/media").DocumentRecord[]> {
   return (await request<DocumentRecord[]>(`/assets/${encodeURIComponent(id)}/documents`)).filter(doc => isResearchSource(doc.source));
 }
+export async function getResearchSource(id: string): Promise<DataSource> {
+  const source = await request<DataSource>(`/data-sources/${encodeURIComponent(id)}`);
+  if (!isResearchSource(source)) throw new ApiError(404);
+  return source;
+}
 export async function getSourceDocuments(
   id: string,
 ): Promise<import("@/types/media").DocumentRecord[]> {
