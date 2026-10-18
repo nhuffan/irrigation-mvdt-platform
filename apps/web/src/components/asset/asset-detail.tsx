@@ -16,7 +16,7 @@ export async function AssetDetail({asset}:{asset:Asset}) {
  const parent=assets?.find(a=>a.id===asset.parent_asset_id);
  return <div className="asset-properties-layout">
  <aside className="component-tree">
- <PanelSection title="Current asset"><AssetDisplayName asset={asset}/><AssetMetadata asset={asset}/><Link className="text-link" href={`/map?asset=${asset.id}`}>Open on GIS →</Link></PanelSection>
+ <PanelSection title="Current asset"><AssetDisplayName asset={asset}/><AssetMetadata asset={asset}/><Link className="text-link" href={`/reservoirs/${asset.reservoir_id}?asset=${encodeURIComponent(asset.id)}#asset-gis`}>Open on GIS →</Link></PanelSection>
  <PanelSection title="Asset navigation">{assets===null?<p>Hierarchy unavailable</p>:<Suspense fallback={<p>Loading hierarchy coverage…</p>}><AssetHierarchy assets={assets} selected={asset}/></Suspense>}</PanelSection>
  </aside>
  <div className="asset-properties"><nav className="om-nav" aria-label="Evidence sections"><a href="#technical">Technical</a><a href="#sources">Sources</a><a href="#location">Location</a><a href="#timeline">O&amp;M</a><a href="#model">3D</a></nav>{parent && <nav aria-label="Parent breadcrumb"><Link className="text-link" href={`/assets/${parent.id}`}><AssetDisplayName asset={parent}/></Link> / <AssetDisplayName asset={asset}/></nav>}<section className="panel"><h2>Overview</h2><StatusBadge>{"RS"}</StatusBadge><p>{asset.category.name} · {reservoir.name}</p><PanelDisclosure title="Asset notes"><p className="muted">{asset.description??"Description unavailable."}</p></PanelDisclosure><AssetLocationSummary asset={asset}/></section>

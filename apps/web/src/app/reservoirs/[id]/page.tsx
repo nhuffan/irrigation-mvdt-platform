@@ -1,7 +1,7 @@
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import { Suspense } from "react";
 import { ReservoirAssets } from "@/components/asset/reservoir-assets";
-import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 import { notFound } from "next/navigation";
 import { ApiError, getReservoir } from "@/lib/api";
 export const dynamic = "force-dynamic";
@@ -21,22 +21,8 @@ export default async function ReservoirPage({
   });
   return (
     <main className="page-shell">
-      <Link className="text-link" href="/map">
-        ← Back to GIS map
-      </Link>
-      <div className="page-heading mt-8">
-        <div>
-          <p className="eyebrow">Reservoir overview · {reservoir.code}</p>
-          <h1>{reservoir.name}</h1>
-          <p className="muted mt-3">
-            {reservoir.province ?? "Unknown province"}
-          </p>
-        </div>
-
-      </div>
-      <Link className="text-link" href={`/reservoirs/${id}/3d`}>
-        Open 3D models →
-      </Link>
+      <PageHeader eyebrow="Reservoir" title="Overview"
+        description={<>{reservoir.name} · {reservoir.code} · {reservoir.province ?? "Unknown province"}</>} />
       <details className="reservoir-metadata"><summary>Reservoir context</summary><div className="registry-grid">
         <section className="panel">
           <p className="eyebrow">Location</p>

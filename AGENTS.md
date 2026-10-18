@@ -29,6 +29,7 @@
 - Làm việc trực tiếp trên `main`; không tạo branch riêng trừ khi người dùng yêu cầu. Chỉ commit hoặc push sau khi người dùng đồng ý rõ ràng; hoàn thành stage không tự động cho phép commit/push.
 - Trước khi sửa, kiểm tra working tree và đồng bộ remote; giữ nguyên thay đổi đang có của người dùng. Trước khi push, chạy các kiểm tra phù hợp và cập nhật `STAGE_OUTPUTS.md` khi hoàn thành stage.
 - Không force-push hoặc viết lại lịch sử `main`.
+- Không thêm mục Publication approval hoặc nhật ký xin duyệt/commit/push vào tài liệu; chỉ ghi kết quả kỹ thuật và kiểm tra của stage.
 
 
 ## Reviewer và phạm vi phê duyệt

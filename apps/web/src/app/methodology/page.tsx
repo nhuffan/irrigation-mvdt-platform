@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 import { getResearchSummary } from "@/lib/research-summary";
 import { PanelSection, PanelDisclosure, MetricCard } from "@/components/ui/panel-section";
 export const dynamic = "force-dynamic";
@@ -8,8 +9,8 @@ export default async function MethodologyPage() {
   const { controlled: c, totals, rows } = summary;
   const ordered = rows.filter(r => !r.parent_id).flatMap(p => [p, ...rows.filter(r => r.parent_id === p.id)]);
   return <main className="page-shell methodology-page">
-    <p className="eyebrow">Research</p><h1>Methodology &amp; Evidence</h1>
-    <p className="muted">A source-backed prototype for information retrieval. Historical L2 describes evidence in documents; it does not certify present asset condition.</p>
+    <PageHeader eyebrow="Research" title="Methodology & Evidence"
+      description="A source-backed prototype for information retrieval. Historical L2 describes evidence in documents; it does not certify present asset condition." />
     <nav className="methodology-jump" aria-label="Research sections">{["scope", "coverage", "process", "evaluation", "protocol", "reproducibility"].map(id => <a key={id} href={`#${id}`}>{id[0].toUpperCase() + id.slice(1)}</a>)}</nav>
     <div className="methodology-status"><span className="location-badge location-badge-none">{c.methodology.status}</span><span className="location-badge location-badge-none">{c.methodology.dataset_status}</span><span>Version {c.dataset_version} · read {summary.read_at}</span></div>
     {summary.controlled_alignment !== "RECORD_READBACK_MATCH" && <p role="alert" className="notice">Live coverage differs from the controlled export, or some responses are unavailable. Live values below retain unknowns; snapshot metrics and historical tests are not recertified.</p>}
@@ -21,7 +22,7 @@ export default async function MethodologyPage() {
       <p className="muted">L2 records retain source and locator. VERIFIED in the software record is not independent domain attestation or a claim of current condition.</p>
     </PanelSection></section>
     <section id="coverage"><PanelSection title="Data coverage" description="Live API readback. Direct L2 belongs to an asset; descendant L2 is not added to that asset's direct count.">
-      <div className="methodology-table"><table><caption>Inventory and information coverage</caption><thead><tr><th>Asset / hierarchy</th><th>Direct L2</th><th>Descendant L2</th><th>Location</th><th>Verified O&amp;M</th><th>Document edges</th><th>3D links</th></tr></thead><tbody>{ordered.map(r => <tr key={r.id}><th scope="row"><Link className={r.parent_id ? "methodology-child" : ""} href={`/assets/${r.id}`}>{r.name}</Link><small>{r.code} · {r.parent_id ? "Component" : "Primary"}</small></th><td>{show(r.direct_l2)}</td><td>{show(r.descendant_l2)}</td><td>{r.location.replaceAll("_", " ")}</td><td>{show(r.verified_om)}</td><td>{show(r.documents)}</td><td>{show(r.links)}{r.links ? " · Representative LOCAL" : ""}</td></tr>)}</tbody></table></div>
+      <div className="methodology-table"><table><caption>Inventory and information coverage</caption><thead><tr><th>Asset / hierarchy</th><th>Direct L2</th><th>Descendant L2</th><th>Location</th><th>Verified O&amp;M</th><th>Document edges</th><th>3D links</th></tr></thead><tbody>{ordered.map(r => <tr key={r.id}><th scope="row"><div className={r.parent_id ? "methodology-child" : undefined}><Link href={`/assets/${r.id}`}>{r.name}</Link><small>{r.code} · {r.parent_id ? "Component" : "Primary"}</small></div></th><td>{show(r.direct_l2)}</td><td>{show(r.descendant_l2)}</td><td>{r.location.replaceAll("_", " ")}</td><td>{show(r.verified_om)}</td><td>{show(r.documents)}</td><td>{show(r.links)}{r.links ? " · Representative LOCAL" : ""}</td></tr>)}</tbody></table></div>
       {rows.length === 0 && <p>No research assets returned by the API.</p>}
       <div className="methodology-metrics"><MetricCard label="Reference locations" value={totals.reference_points} note="Navigation only; not canonical geometry"/><MetricCard label="Canonical geometry present" value={show(totals.canonical_geometry)} note="Presence would not prove accuracy"/><MetricCard label="Verified O&M records" value={show(totals.verified_om)}/><MetricCard label="Model records" value={show(summary.model_count)} note="LOCAL representation, not surveyed placement"/></div>
       <p>Technical and material values stay with their direct asset. Parent INTAKE and MGMT do not inherit component attributes as their own measurements.</p>

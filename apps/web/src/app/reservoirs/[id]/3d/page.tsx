@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { PageHeader } from "@/components/ui/page-header";
 import { notFound } from "next/navigation";
 import { ApiError, getReservoir, getModels } from "@/lib/api";
 import { ModelBrowser } from "@/components/three-d/model-browser";
@@ -11,7 +11,7 @@ export default async function ThreeDPage({
 }) {
   const { id } = await params;
   const query = await searchParams;
-  const [reservoir, models] = await Promise.all([
+  const [, models] = await Promise.all([
     getReservoir(id),
     getModels(id),
   ]).catch((error) => {
@@ -22,15 +22,7 @@ export default async function ThreeDPage({
   if (query.model && !models.some(m => m.id === query.model)) notFound();
   return (
     <main className={query.paper==="1"?"page-shell model-page clean-paper":"page-shell model-page"}>
-      <Link className="text-link" href={`/reservoirs/${id}`}>
-        ← Reservoir & GIS
-      </Link>
-      <div className="page-heading mt-6">
-        <div>
-          <p className="eyebrow">3D representation</p>
-          <h1>{reservoir.name}</h1>
-        </div>
-      </div>
+      <PageHeader eyebrow="Representation" title="3D Models" description="A representative 3D view for exploring linked assets and evidence. Model appearance and placement do not certify surveyed geometry, building identity or present asset condition." />
       <ModelBrowser
         models={models}
         initialModel={query.model}

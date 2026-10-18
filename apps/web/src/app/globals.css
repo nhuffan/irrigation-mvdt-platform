@@ -1076,7 +1076,7 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
 .methodology-table thead { background: #f1f5f2; }
 .methodology-table small, .methodology-table code { display: block; margin-top: 5px; font-size: 11px; color: #61756b; }
 .methodology-table code, .methodology-hashes code { overflow-wrap: anywhere; word-break: break-word; }
-.methodology-child { display: inline-block; margin-left: 14px; font-weight: normal; }
+.methodology-child { padding-inline-start: 14px; font-weight: normal; }
 .methodology-result { display: inline-block; border: 1px solid #cbd9d1; border-radius: 5px; padding: 3px 7px; font-size: 11px; font-weight: 700; }
 .result-pass { color: #176548; background: #eaf7ee; }
 .result-fail { color: #a0372b; background: #fff0ec; border-color: #e9b4a8; }
@@ -1091,7 +1091,12 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
 .methodology-provenance ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); list-style: none; padding: 0; gap: 12px; }
 .methodology-provenance li { border: 1px solid #d7e2dc; border-radius: 8px; padding: 12px; overflow-wrap: anywhere; }
 .methodology-page .notice { background: #fff7e4; border: 1px solid #e8d6a1; border-radius: 8px; padding: 12px 16px; }
-.observation-section { width: 100%; margin-top: 32px; }
+/* Shared tab introductions, including Methodology's paragraph spacing. */
+.tab-page-header { margin-bottom: 20px; }
+.tab-page-header > .eyebrow { margin: 0 0 6px; line-height: 1.6; }
+.tab-page-header > h1 { margin: 0; }
+.tab-page-header > .muted { margin: 10px 0 0; }
+.observation-section { width: 100%; }
 .observation-section .panel-section-body { padding: 16px; }
 .observation-toolbar { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
 .observation-toolbar label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; }

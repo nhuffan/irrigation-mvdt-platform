@@ -1,3 +1,4 @@
+import type { StyleSpecification } from "maplibre-gl";
 import { OBSERVATION_LAYERS } from "./observation-map.ts";
 export type Provider = "maptiler" | "esri";
 export type SatelliteConfig =
@@ -6,7 +7,7 @@ export type SatelliteConfig =
 export type ObservationLayer = {
   id: string; kind: "satellite" | "historical" | "street"; provider: Provider | "nasa" | "osm";
   name: string; date: string; resolution: string; tiles: string[]; tileSize: number;
-  minzoom: number; maxzoom: number; detailMaxZoom?: number; attribution: string; sourceUrl: string;
+  minzoom: number; maxzoom: number; detailMaxZoom?: number; renderMode?: "vector"; style?: StyleSpecification; attribution: string; sourceUrl: string;
 };
 export type ProviderErrorCode = "AUTH_REQUIRED" | "QUOTA_EXCEEDED" | "COVERAGE_UNAVAILABLE" | "PROVIDER_UNAVAILABLE" | "METADATA_INVALID";
 export class SatelliteProviderError extends Error {
@@ -37,13 +38,14 @@ export const HISTORICAL_LAYERS: ObservationLayer[] = OBSERVATION_LAYERS.map(l =>
   sourceUrl: "https://nasa-gibs.github.io/gibs-api-docs/",
 }));
 // MapLibre's camera uses a 512px world tile; 256px rasters request camera z+1.
-export function cameraZoomLimit(layer: Pick<ObservationLayer, "maxzoom" | "tileSize" | "detailMaxZoom">) {
+export function cameraZoomLimit(layer: Pick<ObservationLayer, "maxzoom" | "tileSize" | "detailMaxZoom" | "renderMode">) {
+  if (layer.renderMode === "vector") return Math.min(layer.detailMaxZoom ?? 18, 18);
   return Math.max(0, Math.min(layer.detailMaxZoom ?? 18, 18, layer.maxzoom - Math.log2(512 / layer.tileSize)));
 }
 export function effectiveTileZoom(cameraZoom: number, layer: Pick<ObservationLayer, "minzoom" | "maxzoom" | "tileSize">) {
   return Math.max(layer.minzoom, Math.min(layer.maxzoom, Math.round(cameraZoom + Math.log2(512 / layer.tileSize))));
 }
-export function cappedCameraZoom(zoom: number, layer: Pick<ObservationLayer, "maxzoom" | "tileSize" | "detailMaxZoom">) {
+export function cappedCameraZoom(zoom: number, layer: Pick<ObservationLayer, "maxzoom" | "tileSize" | "detailMaxZoom" | "renderMode">) {
   return Math.max(0, Math.min(zoom, cameraZoomLimit(layer)));
 }
 export function providerFailureMessage(code: ProviderErrorCode) {
