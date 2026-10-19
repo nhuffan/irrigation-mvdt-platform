@@ -7,8 +7,6 @@ import json
 from copy import deepcopy
 
 import pytest
-from test_empirical import inputs
-
 from scripts.methodology_review import (
     PROTOCOL,
     REQUIRED_GATES,
@@ -22,6 +20,7 @@ from scripts.prepare_empirical_scope import (
     validate_compiled_scope,
 )
 from scripts.research_common import validate_scope
+from test_empirical import inputs
 
 STAMP = {"reviewer": "TEST ONLY", "reviewed_at": "2026-10-11T00:00:00+00:00"}
 
@@ -349,3 +348,181 @@ def test_legacy_compilation_still_replays_without_mc_opt_in():
     report, scope = compile_scope(*inputs())
     assert report["status"] == "READY_TO_FREEZE"
     validate_scope(scope)
+
+
+def component_mc_fixture():
+    """Synthetic supplementary child; no real inventory or reviewer decisions."""
+    data, bundle = fixture()
+    data[0]["component_scope"] = {
+        "version": "COMPONENT-SCOPE-v1",
+        "primary_sample_count": 2,
+        "inventory_evidence": "TEST synthetic child inventory",
+        "technical_evidence": "TEST synthetic child record",
+        "components": [
+            {
+                "asset_code": "RS-CHILD",
+                "asset_id": "00000000-0000-4000-8000-000000000020",
+                "parent_asset_code": "RS-A",
+                "parent_asset_id": "00000000-0000-4000-8000-000000000010",
+                "technical_record_ids": ["00000000-0000-4000-8000-000000000002"],
+            }
+        ],
+    }
+    data[4]["base_scope_sha256"] = base_scope_fingerprint(data[0])
+    approve(data, bundle)
+    return data, bundle
+
+
+def test_mc_supplementary_scope_preserves_primary_claim_and_maim_denominators():
+    data, bundle = component_mc_fixture()
+    report, compiled = compile_scope(*data, methodology=bundle)
+    assert report["status"] == "READY_TO_FREEZE"  # Synthetic declarations only.
+    assert compiled["target_asset_codes"] == ["RS-A", "RS-B"]
+    assert set(compiled["maim_required_by_asset"]) == {"RS-A", "RS-B"}
+    assert compiled["record_ids"]["technical"] == [
+        "00000000-0000-4000-8000-000000000001"
+    ]
+    assert compiled["component_scope"]["components"][0]["technical_record_ids"] == [
+        "00000000-0000-4000-8000-000000000002"
+    ]
+
+
+@pytest.mark.parametrize("formal_coverage", ["RS-CHILD", ""])
+def test_mc_component_source_review_separates_inventory_from_primary_coverage(
+    formal_coverage,
+):
+    data, bundle = component_mc_fixture()
+    child_source = deepcopy(data[2][0])
+    child_source.update(source_code="RS-CHILD-SOURCE", related_asset_codes="RS-CHILD")
+    data[2].append(child_source)
+    source_review = deepcopy(get(bundle, "source_review")[0])
+    source_review.update(
+        source_code="RS-CHILD-SOURCE",
+        related_asset_codes=formal_coverage,
+        coverage_basis="TEST child inventory retained; no primary coverage if empty",
+        evidence_ids="E-CHILD",
+    )
+    if not formal_coverage:
+        source_review["eligible_technical"] = "NO"
+    put(bundle, "source_review", get(bundle, "source_review") + [source_review])
+    put(
+        bundle,
+        "evidence_index",
+        get(bundle, "evidence_index")
+        + [{"evidence_id": "E-CHILD", "source_code": "RS-CHILD-SOURCE"}],
+    )
+    boundary = deepcopy(get(bundle, "source_boundary_review")[0])
+    boundary.update(
+        source_code="RS-CHILD-SOURCE",
+        evidence_id="E-CHILD",
+        representation_id="E-CHILD",
+    )
+    put(
+        bundle,
+        "source_boundary_review",
+        get(bundle, "source_boundary_review") + [boundary],
+    )
+    approve(data, bundle)
+    report, compiled = compile_scope(*data, methodology=bundle)
+    assert "Source references out-of-scope asset" not in report.get("blockers", [])
+    if formal_coverage:
+        assert compiled is None
+        assert (
+            "MC: source coverage outside targets: RS-CHILD-SOURCE" in report["blockers"]
+        )
+    else:
+        # An explicitly reviewed zero-primary-coverage view is not parent evidence.
+        assert report["status"] == "READY_TO_FREEZE"  # Synthetic fixture only.
+        assert compiled["target_asset_codes"] == ["RS-A", "RS-B"]
+        claim = get(bundle, "claim_sources")[0]
+        claim.update(source_code="RS-CHILD-SOURCE", evidence_id="E-CHILD")
+        put(bundle, "claim_sources", [claim])
+        approve(data, bundle)
+        report, compiled = compile_scope(*data, methodology=bundle)
+        assert compiled is None
+        assert any(
+            "MC: claim asset coverage unconfirmed:" in error
+            for error in report["blockers"]
+        )
+        assert any(
+            "MC: source ineligible for claim role:" in error
+            for error in report["blockers"]
+        )
+
+
+@pytest.mark.parametrize("claim_asset", ["RS-CHILD", "RS-A"])
+def test_mc_child_claim_not_admitted_by_component_scope_or_parent_relabel(claim_asset):
+    data, bundle = component_mc_fixture()
+    child_claim = deepcopy(get(bundle, "claim_sources")[0])
+    child_claim.update(
+        record_id="00000000-0000-4000-8000-000000000002",
+        asset_codes=claim_asset,
+    )
+    put(bundle, "claim_sources", get(bundle, "claim_sources") + [child_claim])
+    approve(data, bundle)
+    report, compiled = compile_scope(*data, methodology=bundle)
+    assert compiled is None
+    assert any(
+        "MC: unknown/duplicate scoped claim:" in error
+        and "00000000-0000-4000-8000-000000000002" in error
+        for error in report["blockers"]
+    )
+    assert data[0]["record_ids"]["technical"] == [
+        "00000000-0000-4000-8000-000000000001"
+    ]
+
+
+def test_mc_child_record_cannot_overlap_primary_allowlist_despite_fresh_declaration():
+    data, bundle = component_mc_fixture()
+    data[0]["record_ids"]["technical"].append("00000000-0000-4000-8000-000000000002")
+    data[4]["base_scope_sha256"] = base_scope_fingerprint(data[0])
+    approve(data, bundle)
+    report, compiled = compile_scope(*data, methodology=bundle)
+    assert compiled is None
+    assert (
+        "Component scope: Duplicate/primary component technical record"
+        in report["blockers"]
+    )
+
+
+def test_mc_component_with_unknown_parent_is_rejected_without_reparenting():
+    data, bundle = component_mc_fixture()
+    child = data[0]["component_scope"]["components"][0]
+    child["parent_asset_code"] = "RS-UNKNOWN-PARENT"
+    data[4]["base_scope_sha256"] = base_scope_fingerprint(data[0])
+    approve(data, bundle)
+    report, compiled = compile_scope(*data, methodology=bundle)
+    assert compiled is None
+    assert "Component scope: Invalid component identity/parent" in report["blockers"]
+    assert child["parent_asset_code"] == "RS-UNKNOWN-PARENT"
+
+
+def test_child_measurement_does_not_fill_parent_technical_requirement():
+    from scripts.evaluate_research_dataset import evaluate
+    from test_empirical import empirical_sample
+
+    snapshot = empirical_sample()
+    baseline = evaluate(snapshot)["metrics"]["technical_coverage"]
+    child = deepcopy(snapshot["assets"][0])
+    child.update(id="synthetic-child", asset_code="RS-CHILD", parent_asset_id="a")
+    snapshot["assets"].append(child)
+    measurement = deepcopy(snapshot["records"]["technical"][0])
+    measurement.update(
+        id="synthetic-child-height",
+        asset_id="synthetic-child",
+        attribute_key="height",
+        value_number=0,
+    )
+    snapshot["records"]["technical"].append(measurement)
+    result = evaluate(snapshot)
+    assert result["metrics"]["technical_coverage"] == baseline
+    assert baseline["denominator"] == 2 and baseline["value"] == 0
+    assert (
+        next(
+            row
+            for row in result["technical_requirements"]
+            if row["asset_code"] == "RS-A" and row["attribute_key"] == "height"
+        )["available"]
+        is False
+    )
+    assert {row["asset_code"] for row in result["completeness"]} == {"RS-A", "RS-B"}

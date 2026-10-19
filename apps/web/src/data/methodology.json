@@ -2,14 +2,14 @@
   "schema_version": "METHODOLOGY-DASHBOARD-v2",
   "dataset_version": "DT-R1",
   "reservoir_id": "63adca21-9195-44e2-81a2-0475bd6829f3",
-  "captured_at": "2026-10-18T15:14:43.700789+00:00",
+  "captured_at": "2026-10-19T17:17:53.788818+00:00",
   "database_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c",
   "methodology": {
     "status": "NOT_READY",
     "dataset_status": "NOT_FROZEN",
-    "fingerprint": "df015c9272805954ab027f7663d1a1f0905c3c1ac5fd51bf3f581cd19eb596db",
-    "unresolved_gate_count": 71,
-    "as_of_date": null
+    "fingerprint": "d97ddb9110f07ad7085be613198fb91e2158b2f038677f5f39e6082ac3deb795",
+    "unresolved_gate_count": 23,
+    "as_of_date": "2026-07-22"
   },
   "assets": [
     {
@@ -1290,8 +1290,8 @@
       "code": "RS-SRC-018",
       "expected_file": true,
       "verification_status": "UNVERIFIED",
-      "authority": "UNKNOWN",
-      "review_status": "NOT_REVIEWED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
       "retained_document_records": 1
     },
     {
@@ -1299,8 +1299,8 @@
       "code": "RS-SRC-019",
       "expected_file": true,
       "verification_status": "UNVERIFIED",
-      "authority": "UNKNOWN",
-      "review_status": "NOT_REVIEWED",
+      "authority": "SUPPORTING",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
       "retained_document_records": 0
     },
     {
@@ -1308,8 +1308,8 @@
       "code": "RS-SRC-020",
       "expected_file": true,
       "verification_status": "UNVERIFIED",
-      "authority": "UNKNOWN",
-      "review_status": "NOT_REVIEWED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
       "retained_document_records": 0
     },
     {
@@ -1317,8 +1317,8 @@
       "code": "RS-SRC-021",
       "expected_file": true,
       "verification_status": "UNVERIFIED",
-      "authority": "UNKNOWN",
-      "review_status": "NOT_REVIEWED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
       "retained_document_records": 0
     },
     {
@@ -1326,8 +1326,8 @@
       "code": "RS-SRC-022",
       "expected_file": true,
       "verification_status": "UNVERIFIED",
-      "authority": "UNKNOWN",
-      "review_status": "NOT_REVIEWED",
+      "authority": "UNKNOWN_AUTHORITY",
+      "review_status": "REVIEWED_WITH_LIMITATIONS",
       "retained_document_records": 0
     }
   ],
@@ -1796,35 +1796,35 @@
     "b02_candidate_records.csv": "6f3d2de3152c867fbd9090dcfe93f6fc789ee75c8056d06602770c2b4a4bf062",
     "model_asset_mapping_review.csv": "88c6770984edceb4f7e1ef3b8ff0f3da6f669781de6493d259676199d1c82ef3",
     "domain_maim_review.json": "9d6a2e513b90db0cb3af0a4ab8d94855551295d455bb5b8f02d00989551b0769",
-    "claim_sources.csv": "fd664d3f30ba805c4a89f0c130a76cc8ef0844e059fcc6950cc8d242b5d82f65",
+    "claim_sources.csv": "cf89b9a564ddb54cce76b9329c2bb59fa3df060cd9b663135c9e73670dd1fa20",
     "B01B-maim-review.json": "2d3031c29a018036fa8a8cba8f15776aaf161518f6ab85f1a9ef1bcc871d3788",
     "source_inventory.csv": "92e1e2af2904dd612f9ddf2541d284d64c5ac49f1882cb03a0fe6b992bea9c49",
-    "source_boundary_review.csv": "fb52c1a8153bbd0daefd37982dd340b7811e174ba6193b74a43eaafbd944aced",
-    "mc_r_gate_resolution.csv": "07971935fd13408169e147588bf8999e0ef0c5ba7080aaa834416c4ee06b0c44",
+    "source_boundary_review.csv": "b9c342bbdbcf9ba6ddd85e2af8f9af910010104dd046f502124970e4feeba985",
+    "mc_r_gate_resolution.csv": "ee5199ea8b89ce701f70a7b4e10ffa63908f32cbea971a2b3697a6a4956adf9d",
     "model_placement_review.csv": "c27b55e123bc5f089a0cdd9b4a139f80a8382c20ba4d549f0b6b198c7634016e",
-    "methodology_review.json": "34bf9d06b4fcc7b45b953de13e1d1814a0e3e87646fd9d927ef2853a03844afc",
+    "methodology_review.json": "160adac2f4ae5c3dc15373c4d178bab80a82af3ffd9fc465d8b86e6f75151ab1",
     "model_conversion_manifest.json": "56f48143204f8e4967c5371eeaa336f32188e436d3f76a47d16ee7a927f11895",
     "maim_review.csv": "6326919fbaddc140ba3b4c1d3ddf6030eeb717b989727913c11645a410ef054d",
     "technical_attribute_dictionary.csv": "6852e3b40c3550d549c4d16de2cb93924e35f0ee9368506d1587adff6b5cdc2f",
     "b02_conflict_review.csv": "cb0b64af354ee372337def242c9ae93009a7b88363ad9051d44e43817dd8f0a3",
     "fv_applicability_review.csv": "aae0e4b077866d5f7fc41a2ef070d72991f342cb6616bb74e14795cc7bfef135",
-    "researcher_methodology_confirmation.csv": "7c2772720a4cb6ae62c313e45101d535c361da69a38fea0133c57bb29b634861",
+    "researcher_methodology_confirmation.csv": "efef22aaa5bdd4a7ef4946d689f67acb2a4ee081406006319feeca15075ae240",
     "document_review.csv": "4a2a248efd243c222b9696878d998568842c4373c6d3559684257ec7254c8b16",
-    "source_review.csv": "402d87d7788e3586c3b1145727127a93c34091d25e7af5146085d46bac4b7a83",
+    "source_review.csv": "4314a7c841577dca36579156a06f6bcb16dab9aee1d8a9b0584a7dd9944f2718",
     "gate_reconciliation.json": "ca89d82b39ce6e6dbc05128c79a97e31ee690737c44d30b80be92b35ce7699cb",
     "B01B-user-review.json": "f219deb97ac20a94d462b038971799f4edb745464cf61a969bef484e9850fc59",
     "model_object_inventory.csv": "6044baf573ed15a3b74f5894c6883d2824b7327bad7efdafac1f959fe7828f8a",
     "B02-R-maim-review.json": "7bec27a2e4558f7170e191e43914c4fff224af2b127c939773e8cac8b193e096",
-    "base-scope.json": "dd2f222313d391e3d5e5cf607986e339983be9c1674c7de9cde680dea9156375",
+    "base-scope.json": "1421422aec6fb7255407f19a302dfcf9195ec5c0ae62c4883c27444e2efcea49",
     "component_inventory.csv": "0aaf25da56b8dec97ba6b9d0fc2d3b6ed6c27df9c5bec00af629c7566acb1458",
     "b02_crosscheck_matrix.csv": "baf9d4ddecc1a786acbaec2fd50842b351177dfd189f3b7e7bc9e3928879dc61",
     "asset_identity_review.csv": "be63aacb50801439fd8aa5b9c2b37a7fe127c09aea5ab6ce87cdc6c192bdaeb1",
     "maim_closure_review.csv": "7ab2e37e9f2f0d090bf6e8956f597fc27cebda8588a3df4218061f4eb0da561c",
-    "case_study_review.json": "a0f250d200a48f013c78b5b0dde4f2d5bd3a124767a7a3d0f39b0899f3f9d644",
-    "readiness_gates.csv": "6a7bb53b49d5b81ed290524331d3170686f88a23e4fc9b78997bd8b40a9919c4",
+    "case_study_review.json": "b34b6eeff3ac7b31dc5269783a4411cc526ee2025921e14f60f4fbb91c4ef76b",
+    "readiness_gates.csv": "c8d2a3a605e6c96161d54fde662a2182b2f3f1f3aabdde6b8dcc5ff04a59b3f7",
     "component_technical_scope.json": "0722b797f99f7aad16397b67ce723c52bb3ee067bed85e77d6a18065f0e0e9a3",
     "maim_requirements.csv": "2e8f208493801f88d19d7d577b69f586f6118fbe799bef1b7ee5f5a66a882e46",
-    "evidence_index.csv": "26b30c0b863e58acf7001786ae8c30d7d9b5a1dfcb0527d2d6a1ac824f3c1aa6",
+    "evidence_index.csv": "3afa353b220d14752881b7eaa702d8bee13607e20d4aab4803657a7b16c68e57",
     "geometry_review.csv": "aec7f4cdc43ffa4d20f5998fee809d856f985769d1b0eb895bf76b8057b25ac5",
     "reviewer_independence_review.csv": "2683ff6798fd627db8a7869c176b634f2677410f7d8e734ff46d1ed847bfab3b",
     "functional_validation.csv": "2abe03e071e7ada602830a4558f2f6f393dac446580a1e2d2040a0c5fbf7f350",
@@ -1839,7 +1839,7 @@
   "exporter_sha256": "3acf01def4d2d382b93173c4e93dbe89f90ffcdcf115f8c682f9619291c29582",
   "completion": {
     "schema_version": "METHODOLOGY-COMPLETION-v1",
-    "captured_at": "2026-10-18T15:14:43.700789+00:00",
+    "captured_at": "2026-10-19T17:17:53.788818+00:00",
     "status_definitions": [
       {
         "status": "IMPLEMENTED",
@@ -2526,7 +2526,7 @@
         "unit": "ratio",
         "scope": "Primary sample",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "target_assets.csv",
           "API assets"
@@ -2543,7 +2543,7 @@
         "unit": "ratio",
         "scope": "Controlled logical source inventory",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_inventory.csv",
           "DB data_sources"
@@ -2560,7 +2560,7 @@
         "unit": "ratio",
         "scope": "Expected-file sources only",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_inventory.csv",
           "DB documents",
@@ -2578,7 +2578,7 @@
         "unit": "ratio",
         "scope": "Controlled-source document metadata",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "DB documents",
           "storage SHA-256"
@@ -2595,7 +2595,7 @@
         "unit": "count",
         "scope": "IMPORT-reviewed retained files deduplicated by SHA-256",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "document_review.csv",
           "storage SHA-256"
@@ -2612,7 +2612,7 @@
         "unit": "count",
         "scope": "10 asset rows; shared source-derived documents count once per linked asset",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "Table 4",
           "API asset documents"
@@ -2622,14 +2622,14 @@
       {
         "id": "source_review_coverage",
         "label": "Sources with formal authority-review row",
-        "numerator": 17,
+        "numerator": 22,
         "denominator": 22,
-        "value": 0.7727272727272727,
+        "value": 1.0,
         "formula": "sources with source_review row / controlled sources",
         "unit": "ratio",
         "scope": "Controlled sources",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_review.csv"
         ],
@@ -2645,7 +2645,7 @@
         "unit": "ratio",
         "scope": "Controlled sources",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_inventory.csv",
           "DB data_sources"
@@ -2655,14 +2655,14 @@
       {
         "id": "source_review_dates_known",
         "label": "Sources with a date in formal source review",
-        "numerator": 7,
+        "numerator": 11,
         "denominator": 22,
-        "value": 0.3181818181818182,
+        "value": 0.5,
         "formula": "sources with >=1 explicitly reported source-review date / controlled sources",
         "unit": "ratio",
         "scope": "Controlled sources; source-review document/issue/revision/event/coverage dates",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_review.csv"
         ],
@@ -2678,7 +2678,7 @@
         "unit": "ratio",
         "scope": "Direct technical records across 4 primary + 6 components",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "API technical reviewed_provenance"
         ],
@@ -2694,7 +2694,7 @@
         "unit": "ratio",
         "scope": "Scoped technical + condition/inspection/repair/maintenance records",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "DB scoped records"
         ],
@@ -2710,7 +2710,7 @@
         "unit": "ratio",
         "scope": "Nonmissing technical asset/key groups",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "DB scoped technical"
         ],
@@ -2726,7 +2726,7 @@
         "unit": "ratio",
         "scope": "4 primary targets",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "DB assets"
         ],
@@ -2742,7 +2742,7 @@
         "unit": "ratio",
         "scope": "4 primary targets",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "DB scoped O&M"
         ],
@@ -2758,7 +2758,7 @@
         "unit": "ratio",
         "scope": "4 primary + 6 components",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "API asset location"
         ],
@@ -2774,7 +2774,7 @@
         "unit": "ratio",
         "scope": "Per-asset approved applicability (not yet available)",
         "status": "PENDING_REVIEW",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "maim_requirements.csv",
           "maim_review.csv",
@@ -2785,14 +2785,14 @@
       {
         "id": "source_authority_unknown",
         "label": "Sources with unknown authority",
-        "numerator": 11,
+        "numerator": 9,
         "denominator": 22,
-        "value": 0.5,
+        "value": 0.4090909090909091,
         "formula": "UNKNOWN_AUTHORITY or absent formal authority-review row / controlled source entries",
         "unit": "ratio",
         "scope": "Controlled sources",
         "status": "IMPLEMENTED",
-        "captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "captured_at": "2026-10-19T17:17:53.788818+00:00",
         "basis": [
           "source_review.csv"
         ],
@@ -2807,11 +2807,11 @@
         },
         {
           "classification": "SUPPORTING",
-          "count": 6
+          "count": 8
         },
         {
           "classification": "UNKNOWN_AUTHORITY",
-          "count": 11
+          "count": 9
         }
       ],
       "verification": [
@@ -2826,12 +2826,8 @@
       ],
       "review": [
         {
-          "classification": "NOT_REVIEWED",
-          "count": 5
-        },
-        {
           "classification": "REVIEWED_WITH_LIMITATIONS",
-          "count": 17
+          "count": 22
         }
       ],
       "dates": [
@@ -3026,7 +3022,7 @@
           "code": "RS-SRC-018",
           "source_date": null,
           "date_status": "UNKNOWN",
-          "document_date": null,
+          "document_date": "2025",
           "issue_date": null,
           "revision_date": null,
           "event_date": null,
@@ -3048,7 +3044,7 @@
           "code": "RS-SRC-020",
           "source_date": null,
           "date_status": "UNKNOWN",
-          "document_date": null,
+          "document_date": "2010-10",
           "issue_date": null,
           "revision_date": null,
           "event_date": null,
@@ -3059,7 +3055,7 @@
           "code": "RS-SRC-021",
           "source_date": null,
           "date_status": "UNKNOWN",
-          "document_date": null,
+          "document_date": "2026",
           "issue_date": null,
           "revision_date": null,
           "event_date": null,
@@ -3073,7 +3069,7 @@
           "document_date": null,
           "issue_date": null,
           "revision_date": null,
-          "event_date": null,
+          "event_date": "2026-03-31",
           "coverage_start": null,
           "coverage_end": null
         }
@@ -3256,14 +3252,14 @@
     "readiness": {
       "status": "NOT_READY",
       "dataset_status": "NOT_FROZEN",
-      "compiler_blocker_count": 71,
+      "compiler_blocker_count": 23,
       "declared_gates": [
         {
           "id": "MC_SCOPE",
           "label": "MC SCOPE",
           "category": "SCOPE",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3281,7 +3277,7 @@
           "label": "MC SOURCE POLICY",
           "category": "SOURCE",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3533,7 +3529,7 @@
           "label": "CASE study boundary",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3542,7 +3538,7 @@
           "label": "CASE target inventory",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3569,7 +3565,7 @@
           "label": "CASE asset identity",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3587,7 +3583,7 @@
           "label": "CASE dev separation",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3632,7 +3628,7 @@
           "label": "CASE FIELD reviewed by",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3641,7 +3637,7 @@
           "label": "CASE FIELD reviewed at",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3650,7 +3646,7 @@
           "label": "CASE FIELD study boundary reference",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3659,7 +3655,7 @@
           "label": "CASE FIELD eligible source types",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3668,7 +3664,7 @@
           "label": "CASE FIELD base scope sha256",
           "category": "APPROVAL",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         },
@@ -3677,7 +3673,7 @@
           "label": "DATASET AS OF",
           "category": "DATASET",
           "required": true,
-          "status": "PENDING",
+          "status": "PASS",
           "decision_owner": "RESEARCHER",
           "blocker_group": "OTHER_METHODOLOGY"
         }
@@ -3702,31 +3698,21 @@
         },
         {
           "id": "OTHER_METHODOLOGY",
-          "unresolved_gate_count": 18,
+          "unresolved_gate_count": 6,
           "gate_ids": [
-            "MC_SCOPE",
-            "MC_SOURCE_POLICY",
             "MC_APPROVAL",
-            "CASE_study_boundary",
-            "CASE_target_inventory",
             "CASE_source_authority",
-            "CASE_asset_identity",
-            "CASE_dev_separation",
             "CASE_checkpoint_a",
             "CASE_checkpoint_b",
             "CASE_checkpoint_c",
-            "CASE_checkpoint_d",
-            "CASE_FIELD_reviewed_by",
-            "CASE_FIELD_reviewed_at",
-            "CASE_FIELD_study_boundary_reference",
-            "CASE_FIELD_eligible_source_types",
-            "CASE_FIELD_base_scope_sha256",
-            "DATASET_AS_OF"
+            "CASE_checkpoint_d"
           ]
         }
       ],
       "accepted_gate_ids": [
+        "MC_SCOPE",
         "MC_BOUNDARY",
+        "MC_SOURCE_POLICY",
         "MC_REVIEWER",
         "MC_INTEGRITY",
         "MC_PROVENANCE",
@@ -3746,32 +3732,30 @@
         "F18",
         "F19",
         "F20",
-        "F21"
-      ],
-      "unresolved_gate_ids": [
-        "MC_SCOPE",
-        "MC_SOURCE_POLICY",
-        "MC_MAIM",
-        "MC_APPROVAL",
-        "F02",
-        "F05",
+        "F21",
         "CASE_study_boundary",
         "CASE_target_inventory",
-        "CASE_maim",
-        "CASE_source_authority",
         "CASE_asset_identity",
-        "CASE_geometry",
         "CASE_dev_separation",
-        "CASE_checkpoint_a",
-        "CASE_checkpoint_b",
-        "CASE_checkpoint_c",
-        "CASE_checkpoint_d",
         "CASE_FIELD_reviewed_by",
         "CASE_FIELD_reviewed_at",
         "CASE_FIELD_study_boundary_reference",
         "CASE_FIELD_eligible_source_types",
         "CASE_FIELD_base_scope_sha256",
         "DATASET_AS_OF"
+      ],
+      "unresolved_gate_ids": [
+        "MC_MAIM",
+        "MC_APPROVAL",
+        "F02",
+        "F05",
+        "CASE_maim",
+        "CASE_source_authority",
+        "CASE_geometry",
+        "CASE_checkpoint_a",
+        "CASE_checkpoint_b",
+        "CASE_checkpoint_c",
+        "CASE_checkpoint_d"
       ],
       "not_applicable_gate_ids": [
         "F08",
@@ -4574,10 +4558,10 @@
       ]
     },
     "provenance": {
-      "methodology_package_fingerprint": "df015c9272805954ab027f7663d1a1f0905c3c1ac5fd51bf3f581cd19eb596db",
-      "previous_package_fingerprint": "df015c9272805954ab027f7663d1a1f0905c3c1ac5fd51bf3f581cd19eb596db",
+      "methodology_package_fingerprint": "d97ddb9110f07ad7085be613198fb91e2158b2f038677f5f39e6082ac3deb795",
+      "previous_package_fingerprint": "d97ddb9110f07ad7085be613198fb91e2158b2f038677f5f39e6082ac3deb795",
       "package_status": "UNCHANGED",
-      "completion_artifact_sha256": "6e5f9531b25110a535c265abc075b77252b181cc69f4aa493580af1f060fad63",
+      "completion_artifact_sha256": "d83625faeedb42def04ec14753f78c298c253b2c67647bc4ca4fec1379a19bea",
       "documents": [
         {
           "id": "protocol",
@@ -4625,7 +4609,7 @@
           "id": "checkpoints",
           "label": "Methodology checkpoints",
           "href": "https://github.com/nhuffan/irrigation-mvdt-platform/blob/main/research/evaluation/methodology_checkpoint_review.md",
-          "sha256": "f51b6c00be6c04fa3bf217aeb98b1a48a7b6b4baae5892229b06db7637b01563",
+          "sha256": "dbeb01b5d37e2a14deb9a1279b72c59ba3bfd3b303dc4e01694cb928556afe06",
           "status": "PENDING_REVIEW"
         },
         {
@@ -4647,9 +4631,9 @@
     "quantitative": {
       "schema_version": "METHODOLOGY-QUANTITATIVE-v1",
       "temporal_basis": {
-        "snapshot_captured_at": "2026-10-18T15:14:43.700789+00:00",
+        "snapshot_captured_at": "2026-10-19T17:17:53.788818+00:00",
         "api_read_at": null,
-        "dataset_as_of": null,
+        "dataset_as_of": "2026-07-22",
         "dataset_status": "NOT_FROZEN",
         "rule": "Snapshot capture, runtime API read time and approved dataset as-of/freeze are separate. API read time is supplied live by the read-only adapter, not imputed into the controlled export. No approved freeze date is asserted."
       },
@@ -6973,12 +6957,8 @@
         ],
         "source_review_status": [
           {
-            "value": "NOT_REVIEWED",
-            "count": 41
-          },
-          {
             "value": "REVIEWED_WITH_LIMITATIONS",
-            "count": 3
+            "count": 44
           }
         ],
         "semantics": [
@@ -7872,7 +7852,7 @@
           "id": "source_file_review",
           "label": "Declared source file representations",
           "basis_file": "source_review.csv",
-          "entry_count": 17,
+          "entry_count": 22,
           "status_counts": [
             {
               "status": "FILE_MISSING",
@@ -7880,7 +7860,7 @@
             },
             {
               "status": "FILE_PRESENT",
-              "count": 6
+              "count": 11
             },
             {
               "status": "MULTIPLE_REPRESENTATIONS",
@@ -8580,7 +8560,7 @@
       "readiness_groups": [
         {
           "id": "EVIDENCE",
-          "finding_count": 32,
+          "finding_count": 4,
           "status": "NOT_READY"
         },
         {
@@ -8595,7 +8575,7 @@
         },
         {
           "id": "PROTOCOL",
-          "finding_count": 29,
+          "finding_count": 9,
           "status": "NOT_READY"
         }
       ],
@@ -8640,147 +8620,147 @@
           "source_code": "RS-SRC-005",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "0e3a4c25-8460-42d1-b2db-54c1e9b38537",
           "source_code": "RS-SRC-012",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "194f91e8-4403-4568-afe8-1cae7ab79151",
           "source_code": "RS-SRC-001",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "196c5d34-7a98-41ab-9a53-ba18e9623677",
           "source_code": "RS-SRC-013",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "2a606e24-39b4-4316-9aea-1b1206c7cf53",
           "source_code": "RS-SRC-009",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "37fd18bb-1f27-58fb-9530-5e61ce7a937d",
           "source_code": "RS-SRC-021",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "4d812c7a-569b-52c3-aab6-7a2b7ebf6ede",
           "source_code": "RS-SRC-022",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "55952bc5-b8a4-4bdf-9363-b7af8926c39f",
           "source_code": "RS-SRC-007",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "5b6b8fce-cbc6-4bf0-afbb-70a1c1bd4139",
           "source_code": "RS-SRC-016",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "6558c4a5-72d1-46ce-8892-087f0e543e73",
           "source_code": "RS-SRC-015",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "718ffa34-21cd-5539-99fe-27fe1e3f1a6c",
           "source_code": "RS-SRC-019",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "763a71ad-ff6c-4ab9-86f4-36ffd70f95dc",
           "source_code": "RS-SRC-008",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "783cbcfc-536e-47f8-b5e1-cec757e4f9d1",
           "source_code": "RS-SRC-003",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "973416c9-5120-46dd-81c8-0f92ec1a5ddc",
           "source_code": "RS-SRC-006",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "b33bdf8e-bf10-487e-81bb-4b58e02a704f",
           "source_code": "RS-SRC-014",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "bd5b9f7f-1e05-5746-b0a8-62918a285b97",
           "source_code": "RS-SRC-020",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "c69b90c3-de23-408a-bf3c-d7fd1b3bdf12",
           "source_code": "RS-SRC-002",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "df27cab4-abc0-4ed3-ba07-48fb75ef9b30",
           "source_code": "RS-SRC-004",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "e9804bcf-f92e-41f9-80a2-9ca61fd44ace",
           "source_code": "RS-SRC-010",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "f9441ceb-df5b-4cc1-8f97-a68f5258a8a1",
           "source_code": "RS-SRC-011",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         },
         {
           "source_id": "fa8c5d20-e1b9-52c3-94ca-2644ef56ac82",
           "source_code": "RS-SRC-018",
           "source_date": null,
           "age_days": null,
-          "status": "PENDING_REVIEW"
+          "status": "UNAVAILABLE"
         }
       ],
       "source_dates": [
@@ -8981,6 +8961,13 @@
           "basis": "Canonical DB/source inventory metadata; unknown is not replaced by review or upload date."
         },
         {
+          "source_code": "RS-SRC-018",
+          "date_kind": "document_date",
+          "date_value": "2025",
+          "status": "SOURCE_REPORTED",
+          "basis": "Formal source_review date field; original precision retained. Not canonical source age, event admission or present condition."
+        },
+        {
           "source_code": "RS-SRC-019",
           "date_kind": "source_date",
           "date_value": null,
@@ -8995,6 +8982,13 @@
           "basis": "Canonical DB/source inventory metadata; unknown is not replaced by review or upload date."
         },
         {
+          "source_code": "RS-SRC-020",
+          "date_kind": "document_date",
+          "date_value": "2010-10",
+          "status": "SOURCE_REPORTED",
+          "basis": "Formal source_review date field; original precision retained. Not canonical source age, event admission or present condition."
+        },
+        {
           "source_code": "RS-SRC-021",
           "date_kind": "source_date",
           "date_value": null,
@@ -9002,11 +8996,25 @@
           "basis": "Canonical DB/source inventory metadata; unknown is not replaced by review or upload date."
         },
         {
+          "source_code": "RS-SRC-021",
+          "date_kind": "document_date",
+          "date_value": "2026",
+          "status": "SOURCE_REPORTED",
+          "basis": "Formal source_review date field; original precision retained. Not canonical source age, event admission or present condition."
+        },
+        {
           "source_code": "RS-SRC-022",
           "date_kind": "source_date",
           "date_value": null,
           "status": "UNAVAILABLE",
           "basis": "Canonical DB/source inventory metadata; unknown is not replaced by review or upload date."
+        },
+        {
+          "source_code": "RS-SRC-022",
+          "date_kind": "event_date",
+          "date_value": "2026-03-31",
+          "status": "SOURCE_REPORTED",
+          "basis": "Formal source_review date field; original precision retained. Not canonical source age, event admission or present condition."
         }
       ],
       "input_hashes": {
@@ -9019,14 +9027,14 @@
         "controlled--b02_conflict_review.csv": "cb0b64af354ee372337def242c9ae93009a7b88363ad9051d44e43817dd8f0a3",
         "controlled--b02_crosscheck_matrix.csv": "baf9d4ddecc1a786acbaec2fd50842b351177dfd189f3b7e7bc9e3928879dc61",
         "controlled--b02_verification_log.csv": "feb5eb8662e6f2b87eed31e427a32efd002c20d6deb83e48579fe5e7b76cc75f",
-        "controlled--base-scope.json": "dd2f222313d391e3d5e5cf607986e339983be9c1674c7de9cde680dea9156375",
-        "controlled--case_study_review.json": "a0f250d200a48f013c78b5b0dde4f2d5bd3a124767a7a3d0f39b0899f3f9d644",
-        "controlled--claim_sources.csv": "fd664d3f30ba805c4a89f0c130a76cc8ef0844e059fcc6950cc8d242b5d82f65",
+        "controlled--base-scope.json": "1421422aec6fb7255407f19a302dfcf9195ec5c0ae62c4883c27444e2efcea49",
+        "controlled--case_study_review.json": "b34b6eeff3ac7b31dc5269783a4411cc526ee2025921e14f60f4fbb91c4ef76b",
+        "controlled--claim_sources.csv": "cf89b9a564ddb54cce76b9329c2bb59fa3df060cd9b663135c9e73670dd1fa20",
         "controlled--component_inventory.csv": "0aaf25da56b8dec97ba6b9d0fc2d3b6ed6c27df9c5bec00af629c7566acb1458",
         "controlled--component_technical_scope.json": "0722b797f99f7aad16397b67ce723c52bb3ee067bed85e77d6a18065f0e0e9a3",
         "controlled--document_review.csv": "4a2a248efd243c222b9696878d998568842c4373c6d3559684257ec7254c8b16",
         "controlled--domain_maim_review.json": "9d6a2e513b90db0cb3af0a4ab8d94855551295d455bb5b8f02d00989551b0769",
-        "controlled--evidence_index.csv": "26b30c0b863e58acf7001786ae8c30d7d9b5a1dfcb0527d2d6a1ac824f3c1aa6",
+        "controlled--evidence_index.csv": "3afa353b220d14752881b7eaa702d8bee13607e20d4aab4803657a7b16c68e57",
         "controlled--functional_validation.csv": "2abe03e071e7ada602830a4558f2f6f393dac446580a1e2d2040a0c5fbf7f350",
         "controlled--fv_applicability_review.csv": "aae0e4b077866d5f7fc41a2ef070d72991f342cb6616bb74e14795cc7bfef135",
         "controlled--gate_reconciliation.json": "ca89d82b39ce6e6dbc05128c79a97e31ee690737c44d30b80be92b35ce7699cb",
@@ -9037,20 +9045,20 @@
         "controlled--maim_review.csv": "6326919fbaddc140ba3b4c1d3ddf6030eeb717b989727913c11645a410ef054d",
         "controlled--maintenance_2021_2025_review.csv": "2ab4cd0ddc29acc501f5a8358da04dc9e0b79b5318c45ed2366bb2c947a86f27",
         "controlled--maintenance_asset_mapping_review.csv": "01a8b9e2c3d6e82a64efc4bdddec84af128b4cd4bf6d1177dd61fa31348053ae",
-        "controlled--mc_r_gate_resolution.csv": "07971935fd13408169e147588bf8999e0ef0c5ba7080aaa834416c4ee06b0c44",
-        "controlled--methodology_review.json": "34bf9d06b4fcc7b45b953de13e1d1814a0e3e87646fd9d927ef2853a03844afc",
+        "controlled--mc_r_gate_resolution.csv": "ee5199ea8b89ce701f70a7b4e10ffa63908f32cbea971a2b3697a6a4956adf9d",
+        "controlled--methodology_review.json": "160adac2f4ae5c3dc15373c4d178bab80a82af3ffd9fc465d8b86e6f75151ab1",
         "controlled--mgmt_parent_scope_decision.json": "4cd24997e4f4aa50ec9fdee6aeb4be88ef3a728cf6a19e3bdba285cd10da0227",
         "controlled--model_asset_mapping_review.csv": "88c6770984edceb4f7e1ef3b8ff0f3da6f669781de6493d259676199d1c82ef3",
         "controlled--model_conversion_manifest.json": "56f48143204f8e4967c5371eeaa336f32188e436d3f76a47d16ee7a927f11895",
         "controlled--model_object_inventory.csv": "6044baf573ed15a3b74f5894c6883d2824b7327bad7efdafac1f959fe7828f8a",
         "controlled--model_placement_review.csv": "c27b55e123bc5f089a0cdd9b4a139f80a8382c20ba4d549f0b6b198c7634016e",
         "controlled--model_review.csv": "606df25f315ebab4fd4937c274ca650306ac6b36e6470462fa8190b1ada4f8e6",
-        "controlled--readiness_gates.csv": "6a7bb53b49d5b81ed290524331d3170686f88a23e4fc9b78997bd8b40a9919c4",
-        "controlled--researcher_methodology_confirmation.csv": "7c2772720a4cb6ae62c313e45101d535c361da69a38fea0133c57bb29b634861",
+        "controlled--readiness_gates.csv": "c8d2a3a605e6c96161d54fde662a2182b2f3f1f3aabdde6b8dcc5ff04a59b3f7",
+        "controlled--researcher_methodology_confirmation.csv": "efef22aaa5bdd4a7ef4946d689f67acb2a4ee081406006319feeca15075ae240",
         "controlled--reviewer_independence_review.csv": "2683ff6798fd627db8a7869c176b634f2677410f7d8e734ff46d1ed847bfab3b",
-        "controlled--source_boundary_review.csv": "fb52c1a8153bbd0daefd37982dd340b7811e174ba6193b74a43eaafbd944aced",
+        "controlled--source_boundary_review.csv": "b9c342bbdbcf9ba6ddd85e2af8f9af910010104dd046f502124970e4feeba985",
         "controlled--source_inventory.csv": "92e1e2af2904dd612f9ddf2541d284d64c5ac49f1882cb03a0fe6b992bea9c49",
-        "controlled--source_review.csv": "402d87d7788e3586c3b1145727127a93c34091d25e7af5146085d46bac4b7a83",
+        "controlled--source_review.csv": "4314a7c841577dca36579156a06f6bcb16dab9aee1d8a9b0584a7dd9944f2718",
         "controlled--target_assets.csv": "5f2b8ed181c738009017587c3bfa4edb3353fec4d0b2b6f1a6644e3b6764a5e3",
         "controlled--technical_attribute_dictionary.csv": "6852e3b40c3550d549c4d16de2cb93924e35f0ee9368506d1587adff6b5cdc2f",
         "controlled--three_d_eligibility_review.csv": "a0e9625f521964624269707f987caef338731612655f9367f6af3e880a84f973",

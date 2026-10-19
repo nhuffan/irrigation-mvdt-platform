@@ -152,3 +152,8 @@ then consider the FR freeze/reproducibility stage.
 ## MC-R role-scoped extension
 
 For current closure work use [methodology closure review](methodology_closure_review.md). Its declared ROLE_SCOPED-v1 policy supersedes the legacy single-reviewer approval for that package; legacy replay remains supported.
+
+
+## Dated scope correction — 2026-10-20
+
+The original11expected-file/3technical description and later12expected-file policy receipt describe their historical scopes. Current checked scope is22controlled sources,17expected-file sources,21DBregistered research sources,6distinct retained reviewed UI PDFs and44historical/source-reported L2 (17primary+27supplementary), across4primaryassets+6components. Expected files are not retained-byte coverage. No childL2rollup, currentcondition, fullsourceauthenticity/domain approval or freeze follows from these counts. Actual researcher decision: research/evaluation/evidence/MAIM-GATE-RESOLUTION/decision-workflow/priority-closure/actual_user_decisions.json#R8; earlier text, receipts and hashes are preserved as history.
