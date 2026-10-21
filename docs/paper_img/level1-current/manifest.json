@@ -1,0 +1,77 @@
+{
+  "version": "LEVEL1-CURRENT-CAPTURES-v1",
+  "current_images": [
+    {
+      "file": "L1-01-asset-provenance.jpg",
+      "sha256": "d49a0a7bb8a94f29f303fb8f0edff5861e5025af808934a7e2d41cde118c052d",
+      "url": "http://localhost:3000/assets/9cc2f301-f40f-4f2b-aeef-dc45251d279c#technical",
+      "captured_at": "2026-10-21T08:00:43.659Z",
+      "description": "SPILLWAY historical200bar field, EVID/locator and direct/component hierarchy; original browser capture",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-02-document-preview.jpg",
+      "sha256": "19e6f044e57856cdfe829c263a52d0086e64d6558f18a67989b1c60e3cf46e04",
+      "url": "http://127.0.0.1:3000/documents/6c2975db-da89-546c-b1c7-f421827c1fc2",
+      "captured_at": "2026-10-21T07:59:20.748Z",
+      "description": "Actual Chrome PDF viewer, page9/51; native in-app PDF iframe is blank",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-03-gis-reference.jpg",
+      "sha256": "05a281017fb4f55cf3bb8c993f9913a5c55b5c5a2439dc69b1a0fc1d50138091",
+      "url": "http://127.0.0.1:3000/reservoirs/63adca21-9195-44e2-81a2-0475bd6829f3?asset=9cc2f301-f40f-4f2b-aeef-dc45251d279c",
+      "captured_at": "2026-10-21T07:48:23.942Z",
+      "description": "SPILLWAY reference selection, source/scale, legend and OSM attribution; reference location only",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-04-local-3d-picked.jpg",
+      "sha256": "cebd637219c6a977905330a2767610e69e09b613e22afad6b18316fa63974708",
+      "url": "http://localhost:3000/reservoirs/63adca21-9195-44e2-81a2-0475bd6829f3/3d?model=13654bda-e636-565b-a990-18813aca8d3c&object=G-No_Name_008",
+      "captured_at": "2026-10-21T08:00:07.252Z",
+      "description": "Actual roof mesh click resolves to MGMT parent; LOCAL/amber highlight/Cesium attribution",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-06-om-missingness.jpg",
+      "sha256": "4f0c6be30a3b85339a7c8c210d80ba66794cb80609cc8ee5f26395bfced8e2b5",
+      "url": "http://localhost:3000/assets/9cc2f301-f40f-4f2b-aeef-dc45251d279c#timeline",
+      "captured_at": "2026-10-21T08:01:14.506Z",
+      "description": "Expanded condition/inspection/repair/maintenance empty states; no performed event invented",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-07-methodology.jpg",
+      "sha256": "69576ef7b6d0e005b57444c2503adbc1a5e8ad75a98fba00ab34f7c4d4d6ed95",
+      "url": "http://localhost:3000/methodology",
+      "captured_at": "2026-10-21T08:01:26.197Z",
+      "description": "MAIM pending formal denominators unavailable; measured availability separate",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    },
+    {
+      "file": "L1-05-gis-fallback.jpg",
+      "sha256": "bbfb3a51eb4b3dc9ec4110b82b5f3e72ff883daf9265faa1647dcc01fb9dbde8",
+      "url": "http://localhost:3000/reservoirs/63adca21-9195-44e2-81a2-0475bd6829f3?asset=9cc2f301-f40f-4f2b-aeef-dc45251d279c",
+      "captured_at": "2026-10-21T07:58:25.042Z",
+      "description": "Controlled Playwright fault injection:25OSM tile requests aborted in an isolated headless browser; reference marker and panel remain functional. Not a natural provider outage.",
+      "edit": "NONE; original viewport bytes",
+      "production_build_id": "7Z_kspVyTm0sDO5k05tyy",
+      "DB_fingerprint": "3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c"
+    }
+  ],
+  "historical_paper_images_replaced": false,
+  "raw_native_browser_chrome_capture": "private only; public PDF capture excludes personal tabs/bookmarks"
+}
