@@ -10,6 +10,12 @@ class Settings(BaseSettings):
 
     reviewed_provenance_path: Path | None = None
 
+    # Local-only experimental retrieval. No provider credentials or network adapter.
+    rag_lite_enabled: bool = False
+    rag_lite_allowlist_path: Path | None = None
+    rag_lite_index_dir: Path = Path(__file__).resolve().parents[4] / "storage/rag-lite"
+    rag_lite_max_context_chars: int = 12000
+
     app_name: str = "MVDT API"
     app_env: str = "development"
 

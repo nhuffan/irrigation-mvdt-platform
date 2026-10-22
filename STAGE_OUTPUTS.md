@@ -775,3 +775,67 @@ Read the supplied SUBMIT_VIE captions and checked asset provenance UI implementa
 - Delivered the closure report, measured post-paper presentation, two-minute demo runbook, `level1_acceptance.csv` and `post_paper_delta.csv` under `research/evaluation/`. Private baseline/metric dictionary/provenance sample/snapshot manifest/read-only replay queries stay in existing ignored LEVEL1-CLOSURE evidence. Existing exporters reproduce Tables 1/4/6 and all 17 artifacts byte-identically, matching the preceding stage. Content-addressed presentation evidence snapshot `ed1e26ab7d57d040e2512e1f888ecf7a54067bbe4d8a1a00ae60af27c58e5133` materializes 177 evidence/control/report/capture files privately. Original PDF/GLB/Word and runtime credentials are not bundled. This is not DT-R1 FROZEN.
 - Full STAGE-5B-MC/ROLE_SCOPED-v1 readiness before/after browser is byte-identical: 33 PASS / 3 N/A / 9 PENDING / 2 FAIL, 23 diagnostics, zero new gate closures; F02/F05 FAIL and all 11 unresolved gates retained. Package `d97ddb9110f07ad7085be613198fb91e2158b2f038677f5f39e6082ac3deb795` / base `57cbbeac9f7582bf9f1c3293259870c47281ac13e83bc7cdfdeaf234222406ff` unchanged. Existing exact-package RESEARCHER_APPROVAL is preserved; DOMAIN_REVIEW/MAIM absent. No authority upgrade, A–D backfill, invented event/current-condition/surveyed-geometry claim or signature.
 - Final DB/media fingerprint remains `3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c`; all 49 controlled inputs, 346 initial tracked files before this append, public methodology JSON, historical paper images and original Word SHA `0fb535ba4c2408df7ecbec3141147d627ac917c44ba6cd53f8b9b49ededd9564` are preserved. The preexisting STAGE_OUTPUTS prefix is retained exactly. Task-owned API42980/web42991 stopped through original sessions, ports8000/3000 free; two test tabs and isolated fallback browser closed. Preexisting healthy PostGIS and volumes preserved. Known temporary capture duplicates are removed only after matching retained hashes. No commit or push performed.
+
+
+## Stage RAG-Lite POC output — 22 October 2026
+
+Decision: **RETRIEVAL_ONLY_READY**. A real query-to-document flow works for authorized local originals. Live LLM generation is **NOT_TESTED / NOT_CONFIGURED**; no external processing was authorized. This is optional future work outside accepted Level-1 and Stage5B. Implementation branch: `feat/rag-lite-poc`.
+
+### Baseline and preservation
+
+- Input HEAD and fetched `origin/main`: `45274428b02b2b74d664a8267a4249a19b22e247`; initial working tree clean. Branch created before editing.
+- Actual all-table PostgreSQL fingerprint before/after: `b35970f54e4c56652a1fbf401c91f980b1859e01ba90aca2949fe364b8c47494`. Method: SHA-256 over sorted table-name/count/row-hash metadata, with rows serialized by `to_jsonb` and sorted. This includes development data and `spatial_ref_sys`; it is a different algorithm from historical Level-1 fingerprints, not a replacement snapshot. All 14 table fingerprints and all six research PDF IDs/source IDs/stored and actual checksums match.
+- Accepted asset attributes, hierarchy, provenance sidecar, original PDFs, geometry/O&M, historical study protocol/results, paper tables, closure snapshot and Stage5B compiler inputs were not edited. No database migration or canonical writes. Tests used rollback-only fixtures.
+- Local production build ID: `vJv9y4tRq4PVu2rkmRepC`. Python 3.14.7; FastAPI 0.141.1; SQLAlchemy 2.1.1; pypdf 6.19.0; pytest 9.1.1; Ruff 0.16.9; Next.js 16.3.6.
+
+### Corpus and index
+
+- Human permission in this chat: all six retained research PDFs for **local indexing only**. Ignored checksum-pinned allowlist retains that authorization reference. No external provider calls or credentials.
+- All six original checksums verified. 82 physical PDF pages total; two documents have 56 usable pages, 61,711 extracted characters, 70 deterministic chunks. Four image-only documents contribute 26 pages and zero text/chunks; no OCR or invented text. A seventh development PDF candidate is NOT_AUTHORIZED, never ingested.
+- RS-DOC-041 / RS-SRC-018: 51 pages, 60 chunks; RS-DOC-017 / RS-SRC-007: 5 pages, 10 chunks. Reviewed source associations establish direct SPILLWAY/DAM scope respectively. No component/ancestor inference. Corpus-wide mode assigns no asset.
+- Extraction checked page by page. Manual page 9 / printed 7 and page 4, and summary page 2 were read directly from originals for the answer key. Whitespace normalization does not recover table semantics; extraction quality is not a domain validation. Poor relevance from common words remains possible.
+- Deterministic JSON keyword index outside canonical tables. First build measured **0.740894 s**. Replay measured **0.239134 s** and all seven cache/manifest JSON files were byte-identical. Index-file fingerprint: `59af2b9f1d7f06cb44246df908d367bd4773a46cae2f687972bc59fdf71a5f8c`. Manifest SHA-256: `bcf36500c1e2a9d6afb6e5f92b5873ac5222ea52c7b4cfea5b654dc1fc745cab`. Private paths and raw page text stay ignored.
+
+### Implemented surface
+
+- API: `GET /api/v1/experimental/rag-lite/status`, `GET .../demo-questions`, `POST .../query`. Additional explicit `reservoir_id`, `all_authorized_docs`, `query_type`, `attribute_key`, `top_k` fields make scope and exact field selection unambiguous.
+- Web: `/ai-research-preview`, same-origin `/api/rag-lite`, English controls and existing English–Vietnamese presentation helpers; exact values/units/locators remain canonical. Field demo buttons derive from live reviewed records; no hardcoded answers. Source routes point to existing `/data-sources/<UUID>/documents`.
+- Safety: feature OFF by default, separate read-only PostgreSQL transaction, statement timeout, source/checksum allowlist, current-byte validation, page-first deterministic bounded chunks, strict UUID scope, input/top-k/file/page limits, local rate limit, 8 KiB web request cap, same-origin POST, escaped React text, server-built citations, no raw-question logging. Model injection/citation tests are network-free; phrase detection is defense in depth, not a universal prompt-injection guarantee.
+- Provider-neutral interface exists, with unavailable implementation only. Tests can inject a mock. Live generation is unavailable even if a generic API key happens to exist in the environment. Future transport/permission/security review is separate.
+
+### Actual verification
+
+| Command / check | Actual outcome |
+|---|---|
+| `cd apps/api && .venv/bin/python -m pytest -q` | **447 PASS**, 0 failures, 3.72 s; includes 42 focused POC tests; one existing Starlette/httpx deprecation warning |
+| Focused changed-file Ruff check / format | **PASS** |
+| `cd apps/api && .venv/bin/ruff check .` | **FAIL: 3 preexisting import-order diagnostics** in unchanged `tests/test_empirical.py` and `tests/test_methodology_review.py`; not hidden or fixed by unrelated edits |
+| `pnpm --dir apps/web lint` | **PASS** |
+| `node --test apps/web/tests/*.test.mjs` | **118 PASS**, 0 failures; existing Node module-type warnings |
+| `pnpm --dir apps/web build` | **PASS**, production build `vJv9y4tRq4PVu2rkmRepC` |
+| `apps/api/.venv/bin/python scripts/evaluate_rag_lite.py` | **16/16 PASS** against real local API/web/corpus; results CSV is actual execution output |
+| Real index rebuild | **PASS**, byte-identical reuse, no duplicate chunks |
+| Feature OFF | API query disabled; browser displays disabled state; health, asset API, reservoir, map, 3D and methodology routes return HTTP 200 |
+| Browser UI | Three valid flows (DAM exact field, SPILLWAY original passage, C01 exact field), two negatives (parent inheritance, current condition), document navigation, final passage screenshot; no participant measurements |
+| PDF verification | Actual original-byte SHA checks and excerpt-in-physical-page checks PASS; existing in-app iframe remains blank |
+
+Documentation consolidation recheck: backend **447 PASS** in 3.82 s; frontend **118 PASS**; changed-file Python lint/format and frontend lint **PASS**. Remaining documentation links and ignored local index verified; no services started for this cleanup. Production build and corpus evaluation above are retained from the implementation run.
+
+### Fixed-cohort counts
+
+[`research/ai-poc/rag_lite_eval_cases.csv`](research/ai-poc/rag_lite_eval_cases.csv) contains 16 fixed cases; [actual results](research/ai-poc/rag_lite_eval_results.csv) are retained separately as machine-readable evidence. Expected record IDs/pages were checked by the implementing AI against persisted SQL/provenance and original extracted pages; **not** independently reviewed/signed by an engineer. This is a software pilot, not scientific sample validation.
+
+- Four primary/child direct attribute cases: **4/4** expected record hits and exact value/unit/asset matches.
+- Three physical-page document questions: **3/3** expected page hit@5. Extra explicit corpus-wide document question: **1/1** hit; no asset attribution.
+- Two parent/cross-asset boundaries and five unsupported/unknown/missing-document requests: **7/7** safe refusals with zero citations.
+- Grounded-answer provider-unavailable case: **1/1**, evidence retained and no generated answer. Exact value also checked here separately.
+- All **19/19** returned citations resolve to real asset/document/source routes. Every returned document excerpt was checked against the original physical page and original-byte checksum. This validates traceability, not answer factuality or independent engineering approval.
+- Error example: D1 includes the expected physical page 9 in its top five, but returns pages [10, 9, 11, 25, 46] overall; page 10 describes the latch cylinder and some other matches are common-word false positives. Hit@5 does not establish precision or main-cylinder identification.
+- Query latency observed through the same-origin HTTP adapter: **3.591–182.054 ms** for this single local run, excluding evaluator follow-up PDF/link verification. No scalability or superiority claim.
+- Fault cases (blank scan, checksum/index mismatch, revocation, missing file, corpus prompt injection, fabricated citations, invalid provider, timeout, unknown/malformed scope, component-code prefixes) covered by software fixtures, not falsely described as observed failures of real accepted records.
+
+### Limits and closure
+
+No live LLM answers, vector index, OCR, participant study, broad internet lookup, surveyed geometry/current condition/O&M inference, prediction or operational decisions. Retrieval can miss paraphrases and rank irrelevant text; source-language keywords and original-page review remain necessary. The existing in-app PDF iframe renders blank; download/external viewer is the disclosed fallback. Public deployment authentication/shared rate limits are outside this local POC. Historical Level-1 closure and Stage5B decisions remain independent.
+
+Operational commands are in [the feature README](research/ai-poc/README.md). All stage results are consolidated in this root file. The standalone runbook, future-work slide and nested stage report were removed; the fixed cases and measured results CSVs are retained. Task-owned API/frontend services were stopped at closure; preexisting PostGIS, volumes and unrelated services are retained.
