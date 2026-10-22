@@ -22,13 +22,15 @@ export function AppHeader() {
             ["/map", "GIS Map"],
             ["/methodology", "Methodology & Evidence"],
             [`${RESERVOIR_HREF}/3d`, "3D"],
-          ].map(([href, label]) => (
+            ["/ai-research-preview", "AI Research Preview", "Experimental / Future Work"],
+          ].map(([href, label, qualifier]) => (
             <Link
               key={href}
               href={href}
               aria-current={pathname === href ? "page" : undefined}
             >
               {label}
+              {qualifier && <span className="nav-qualifier">{qualifier}</span>}
             </Link>
           ))}
         </nav>

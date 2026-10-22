@@ -14,23 +14,11 @@ The allowlist format is `{"version":1,"authorization":"actual permission referen
 
 ## Run locally
 
-Use the existing configured database and authorization file; no migration or development seeding is required.
+Follow the single [root local startup workflow](../../README.md#chạy-local), including its API opt-in command. The existing Next.js app on port 3000 and FastAPI app on port 8000 serve both the platform and this preview. Use the existing configured database, storage and authorization file; no migration or development seeding is required.
 
-From `apps/api`, keep an existing valid checksum-pinned index. If the authorized index is absent or stale, explicitly rebuild it first with `uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3`. Do not reseed or reset the database. Then start the API:
+Keep an existing valid checksum-pinned index. Only if the authorized index is absent or stale, explicitly rebuild it from `apps/api` with `uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3` before enabling the preview. Do not reseed or reset the database.
 
-```sh
-export RAG_LITE_ALLOWLIST_PATH="$PWD/../../storage/rag-lite/allowlist.json"
-RAG_LITE_ENABLED=true uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
-```
-
-In another terminal from repository root:
-
-```sh
-pnpm --dir apps/web build
-pnpm --dir apps/web start --hostname 127.0.0.1 --port 3000
-```
-
-Open [AI Research Preview](http://localhost:3000/ai-research-preview). Select an exact asset/component, or explicitly search all authorized documents. Use an attribute key for exact SQL lookup and source-language keywords for document search. Parent/child records are not inherited. Stop both processes with Ctrl+C; restart the API without the enable flag to disable the preview.
+Open [AI Research Preview](http://localhost:3000/ai-research-preview). Select an exact asset/component, or explicitly search all authorized documents. Use an attribute key for exact SQL lookup and source-language keywords for document search. Parent/child records are not inherited. Stop both processes with Ctrl+C; set `RAG_LITE_ENABLED=false` and restart the API to disable the preview.
 
 ## API and validation
 

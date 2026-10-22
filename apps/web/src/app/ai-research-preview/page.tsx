@@ -23,7 +23,7 @@ export default async function AiResearchPreview() {
     } catch { return null; }
   })) : [];
   return <main className={`page-shell ${styles.page}`}>
-    <div className={styles.topline}><Link className="text-link" href={RESERVOIR_HREF}>← Back to reservoir</Link><span className={styles.previewLabel}>EXPERIMENTAL / FUTURE WORK</span></div>
+    <div className={styles.topline}><Link className="text-link" href={RESERVOIR_HREF}>← Back to reservoir</Link></div>
     <header className={styles.intro}><p className="eyebrow">RAG Lite — Experimental Evidence Search</p><h1>Find the evidence behind a value.</h1><p>Search historical technical fields and original document passages linked to your asset.</p></header>
     <p role="note" className={styles.notice}>Experimental historical documentary retrieval. Not current condition or operational advice. Human verification required.</p>
     {enabled ? <AskPanel initialAssetId={demos.find(id => id !== null) ?? undefined} assets={assets.map(({ id, asset_code, name, parent_asset_id }) => ({ id, asset_code, name, parent_asset_id }))} /> : <p role="status" className="panel">

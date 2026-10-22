@@ -996,3 +996,66 @@ Actual additional Chrome screenshots below use the existing visualization direct
 All resumed task-owned API variants and frontend were stopped gracefully; ports8100/3101 are free. Preexisting API8000, frontend3000 and healthy `mvdt-postgis` remain running. The two current verification tabs were closed and the temporary viewport override reset. The three older task tabs from the interrupted session were already debugger-detached and could not be closed through their old handles; they were left untouched rather than treating a failed close as success. This does not block the verified demo flows.
 
 **Final tag: `RAG_LITE_RETRIEVAL_DEMO_READY`.** All five P0 flows and the outstanding browser gates now pass. The initial access blocker is resolved; no additional RAG scope, external LLM, OCR, dataset or paper work was introduced.
+
+## Stage 6 output — 2026-10-23
+
+**Final status: `RAG_LITE_MAINLINE_INTEGRATED`.** Integration and fresh local acceptance pass. This remains an experimental, retrieval-only historical evidence search; software acceptance does not establish independent engineering or research validation. Level-1 behavior, Stage5B NOT_READY and the historical paper remain unchanged.
+
+### Mainline integration and bounded changes
+
+- Fetched/reviewed `origin/main` at `45274428b02b2b74d664a8267a4249a19b22e247` and `origin/feat/rag-lite-poc` at `b060c5495db8347e864d7d89049585865220b7a0`; the feature was ahead3/behind0, with 38 changed files and the final Chrome closure committed. Initial working tree was clean. `git switch main` followed by `git merge --ff-only origin/feat/rag-lite-poc` succeeded without conflicts; the merged feature SHA is `b060c5495db8347e864d7d89049585865220b7a0`. No force push, history rewrite or feature loss.
+- Added **AI Research Preview** with **Experimental / Future Work** to the existing navigation. Original four route destinations and exact-path active-link behavior are preserved. The header wraps at tablet widths; no page redesign. A concurrent removal of the duplicate page-top experimental badge was preserved and explicitly included at the user's request; the navigation qualifier, experimental eyebrow and historical-evidence notice remain.
+- Root README now owns the single startup path: `pnpm dev:api` and `pnpm dev:web`, using existing database/storage on ports8000/3000. API opt-in from root: `RAG_LITE_ENABLED=true RAG_LITE_ALLOWLIST_PATH="$PWD/storage/rag-lite/allowlist.json" pnpm dev:api`. Feature details link back to this path. No additional application, port, runbook, slide or nested stage report.
+- Existing Next.js `/api/rag-lite` adapter still uses the existing FastAPI `/api/v1/experimental/rag-lite/*` router; browser evidence/media links remain same-origin. No API, schema, migration, ranking, provider, index, seed or data changes in this integration diff.
+
+### Fresh automated verification
+
+Temporary logs/results/manifests are under `/tmp/rag-lite-stage6-2026-10-23/`; historical evaluation CSVs in the repository were not overwritten.
+
+| Check / command | Actual result |
+|---|---|
+| `cd apps/api && .venv/bin/python -m pytest` | **479/479 PASS**, 3.71s; existing Starlette/httpx deprecation warning retained |
+| Scoped RAG Ruff and format checks | **PASS**, 13 files already formatted; unchanged API/evaluator implementation |
+| Whole-backend `.venv/bin/ruff check .` | Same 3 preexisting I001 findings at unchanged `tests/test_empirical.py:3` and `tests/test_methodology_review.py:3,501`; no unrelated fixes |
+| `pnpm --dir apps/web lint` | **PASS**, repeated after the user-included badge removal |
+| `node --test apps/web/tests/*.test.mjs` | **136/136 PASS**, no failures; later badge-only removal changes no tested behavior |
+| Production build | **PASS** on both integration snapshots. Initial build `HEltXYez7iQTZkre9J_1Q`; final current-source build including badge removal **`yVojVHFExLdqO19E70D0v`**. All140 tracked frontend files match the final build snapshot |
+| `apps/api/.venv/bin/python scripts/evaluate_rag_lite.py --web-base http://localhost:3000 --output /tmp/rag-lite-stage6-2026-10-23/mainline-eval.csv` | **16/16 PASS**, **11/11 returned citations resolvable**, four exact value/unit/asset cases preserved; query latency7.839–84.318ms in this local run |
+| `git diff --check` | **PASS** |
+
+Builds used byte-copied frontend sources and the installed Next.js webpack CLI under temporary directories, preserving the existing dev server's `.next`. In each snapshot: `node scripts/copy-maplibre-worker.mjs && node scripts/copy-cesium.mjs`, then `API_BASE_URL=http://localhost:8000/api/v1 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1 node <repo>/apps/web/node_modules/next/dist/bin/next build --webpack`. No second frontend server was launched. Final source-manifest SHA256: `86831d8da6b079e4d3b113df58a8348e4d50e50409371d1d6dff757681e09ee0`; exact command and provenance: `web-validation-current-page-summary.json`.
+
+Fresh fixed-case physical PDF pages remain D1=10,9; D2=2; D3=4; C1=10,9. Both pressure passages report270bar for different cylinders; no preferred page was hardcoded. Boundary/negative cases refuse without citations; generation-unavailable retains its valid evidence. Evaluation CSV SHA256: `fc2fe728c67271ae484f792b623183697e2f0acf59c38e8fa1e4390dc3c225a2`; summary SHA256: `cc7ba81069aaf40ed24f5f15948aba7b8b07414987cf11e4c83e65b1ae6faa6d`. Timings and this small fixed cohort do not establish performance, general retrieval accuracy or independent domain validation.
+
+### Fresh Chrome acceptance on the shared 3000/8000 stack
+
+- **Core PASS:** registry with10 research assets/44 technical records; asset detail and original source/media links; actual GIS satellite map; actual LOCAL representative Cesium3D model and deep link; methodology NOT_READY/NOT_FROZEN and existing limitations. O&M remains functional with zero verified records and no inferred current condition. Navigation and active state work across the existing routes and preview.
+- **RAG OFF/ON PASS:** initial OFF view displayed a disabled notice and no search form while core routes remained available. Opt-in used the same API8000. SPILLWAY exact SQL returns200bar; View asset evidence loads/focuses the exact existing record after streamed content arrives (observed top265px), and source verification/authority remain distinct.
+- **Documents/boundaries PASS:** document-only pressure search exposes both grouped passages at physical pages10,9; original PDF rendered at9/51 in Chrome. C01 returns its own East Canal — Kênh Đông record; INTAKE parent returns zero inherited references. Current-condition query refuses with open limitations. Switching to All authorized PDFs clears prior results and new corpus hits carry the no-asset-attribution warning.
+- **Failures/recovery PASS:** healthy no-match differs from a disposable stale copied index, which shows Evidence retrieval unavailable and verification/recovery copy with zero references. The canonical index was untouched. Actual process-local HTTP429 shows Search unavailable, wait copy and Retry; stopping that task API and retrying shows connection-error copy. Restoring the canonical API and Retry returns the same question/scope with two valid passages.
+- **Keyboard/responsive PASS:** Enter submits, result heading receives focus, Tab reaches Expand excerpt and Enter toggles it. Actual viewport/document widths are375/375,768/768,1440/1440px, with wrapping long titles and all passages accessible; no horizontal overflow observed. No exhaustive device or screen-reader audit claimed.
+- **Cancel/late-response PASS:** disposable middleware under `/tmp` delayed only the real pressure query12s. The newer C01 result was visible at `2026-10-22T17:40:17.516Z`, before the cancelled response became ready at `17:40:28.528118Z`. Afterward, Chrome still showed the C01 question/record/asset and zero document passages. No production timing behavior was changed.
+
+Actual Chrome screenshots are outside the repository at `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`. Dimensions below are actual captured image sizes; full-page images can exceed viewport height. Captures came from the existing development frontend; production compilation is verified separately above.
+
+| Screenshot | Dimensions | SHA256 |
+|---|---|---|
+| `stage6-desktop.jpg` | 1440×1809 | `01e67770a542e0f93d054e905f9bdeb24162c74d8c81364aed00a6d225e1bd44` |
+| `stage6-tablet.jpg` | 768×2050 | `9886b913a0e939352c1a95c9eb6fac76751495dd58e4d08bbc028d3d0217b2c0` |
+| `stage6-mobile.jpg` | 375×2590 | `01412ea0a60fb1e15c06e6c1a7d1e2c84c460166d36764141e643a61a65244ff` |
+| `stage6-original-page9.jpg` | 1745×952 | `8f92a7b798ae0214916bf056f8b2494b00b2e9fe65f5ba9568cff90772972ca0` |
+| `stage6-core-overview.jpg` | 1745×952 | `c18e3cc359a39d9f70e4cbf1ddde9e936245d0073e2737897160a48a1df93fd0` |
+| `stage6-core-map.jpg` | 1745×952 | `20e30456199aca3fbfc4c78bde938b501a824bae3e671596410d98e99d0b1325` |
+| `stage6-core-3d.jpg` | 1745×952 | `b139314962565de432b0c7635e60c7264fe9926f72e941c861576208db43472f` |
+| `stage6-stale-index.jpg` | 1440×1236 | `1199a04e8479d603917b74bef99b73646ad5db88fb4dd78a71a1f26cd5a9d469` |
+| `stage6-rate-limit.jpg` | 1440×1000 | `fdbbd626d5936d9b92d5b777fd0cefa26ce046f7a7e2cc528911319877d456a2` |
+| `stage6-cancelled.jpg` | 1440×1320 | `5c22e0b729f539806e370de5eede58e75f5d41e0377cee7626280188cf532f24` |
+| `stage6-restored-off.jpg` | 1440×1000 | `4ca848e735d582e2f604696d60fb9be2096a730f94f0ed268eee4a624fd2b1bc` |
+
+### Preservation, limits and service restoration
+
+Post-browser read-only audit matches the fresh baseline across all14 database tables and all6 original PDF metadata/checksum/extraction readbacks. Database fingerprint: `b35970f54e4c56652a1fbf401c91f980b1859e01ba90aca2949fe364b8c47494`. All8 runtime authorization/index/manifest JSON files remain byte-identical, aggregate SHA256 `8d759a8ce6227e810bc4a5d016a97fec9fe36ade3ba81208aac3bd4879a8d6bf`. All87 protected research files,44 historical CSVs, API/scripts and the previous stage-output byte prefix remain unchanged. No database reset, seed, index rebuild, original-document write, source/status/authority change, dataset freeze or paper-metric update.
+
+Live enabled coverage was6 checksum-authorized PDFs /2 searchable /4 image-only /0 unavailable,56 searchable physical pages and70 chunks. No OCR, embeddings, external LLM, generated answer, current-condition prediction, operational advice or independent validation. Strict keywords/paraphrase misses, ambiguous cylinder queries, extraction quality, unknown source dates/authority and the preexisting in-app PDF iframe limitation remain; the original link rendered in Chrome.
+
+The preexisting frontend3000 (PID17105) and healthy `mvdt-postgis` were retained. The preexisting API8000 was deliberately restarted for opt-in/fault checks, then restored via `pnpm dev:api` to its original default-OFF configuration (reloader33831/worker33833, one API instance). Final health/status/preview returnHTTP200; `enabled=false`, `generation_available=false`, `mode=retrieval_only`; actual Chrome confirms the disabled notice and no search form. All temporary enabled/stale/timing API variants were stopped gracefully and their PIDs exited. No diagnostic server remains; no second web/API port, container or volume was created. The restored API remains to preserve the workload that was running before this task. Both current verification tabs were closed and the viewport override reset; unrelated services and user tabs were left intact.

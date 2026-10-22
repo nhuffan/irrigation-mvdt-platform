@@ -66,6 +66,13 @@ nav a {
   padding: 10px 16px;
   border-radius: 8px;
 }
+.app-header .nav-qualifier {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  font-weight: 400;
+  color: #698078;
+}
 nav a[aria-current] {
   background: #e9f2ec;
   color: #18563f;
@@ -1119,7 +1126,7 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
   .methodology-metrics, .methodology-process { grid-template-columns: 1fr; }
   .methodology-status { align-items: flex-start; }
 }
-@media (max-width: 760px) {
+@media (max-width: 1024px) {
   .app-header .header-inner { flex-wrap: wrap; }
   .app-header nav { width: 100%; min-width: 0; flex-wrap: wrap; }
 }
