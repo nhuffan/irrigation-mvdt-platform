@@ -43,7 +43,19 @@ export type RagCoverage = {
   indexed_chunks: number;
 };
 
+/** Retrieval integrity failures require a different recovery path from a completed search with no match. */
+export function criticalRetrievalIssue(result: RagResult): boolean {
+  return result.limitations.some(line => {
+    // Provider availability is separate from the integrity of retained retrieval evidence.
+    if (line === "Generation unavailable or invalid; original retrieval evidence retained") return false;
+    return /\b(?:missing|stale|invalid|unauthori[sz]ed|not authori[sz]ed|integrity|checksum|mismatch|revoked)\b/i.test(line);
+  });
+}
+
 export function resultHeading(result: RagResult): string {
+  if (result.status !== "ANSWERED" && criticalRetrievalIssue(result)) {
+    return result.citations.length ? "Supporting evidence found · search incomplete" : "Evidence retrieval unavailable";
+  }
   switch (result.status) {
     case "ANSWERED": return "Evidence-backed answer";
     case "RETRIEVAL_ONLY": return "Supporting evidence found";
@@ -90,7 +102,7 @@ export function citationHref(citation: RagCitation, kind: "evidence" | "original
     evidence = `/documents/${citation.document_id}`;
   } else return null;
   if (citation.url !== evidence) return null;
-  if (kind === "evidence") return evidence;
+  if (kind === "evidence") return citation.kind === "technical_attribute" ? `${evidence}#record-${citation.record_id}` : evidence;
   if (kind === "source") return `/data-sources/${citation.source_id}/documents`;
   if (citation.kind !== "document_chunk" || !Number.isSafeInteger(citation.page) || citation.page! < 1) return null;
   const original = `/api/media/documents/${citation.document_id}`;
@@ -100,9 +112,5 @@ export function citationHref(citation: RagCitation, kind: "evidence" | "original
 
 export function needsOpenLimitations(result: RagResult): boolean {
   if (!result.citations.length || result.status === "NOT_ENOUGH_EVIDENCE") return true;
-  return result.limitations.some(line => {
-    // Provider availability is separate from the integrity of retained retrieval evidence.
-    if (line === "Generation unavailable or invalid; original retrieval evidence retained") return false;
-    return /\b(?:missing|stale|invalid|unauthori[sz]ed|not authori[sz]ed|integrity|checksum|mismatch|revoked)\b/i.test(line);
-  });
+  return criticalRetrievalIssue(result);
 }

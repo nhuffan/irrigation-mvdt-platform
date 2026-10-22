@@ -1,0 +1,17 @@
+case_id,status,passed,latency_ms,hit_at_5,exact_value_unit_asset,citation_count,resolvable_citations,citation_ids,hit_at_1,hit_at_3,returned_pdf_pages
+A1,RETRIEVAL_ONLY,True,36.796,True,True,1,1,attr-ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9-39e522c7fd8d5aac,True,True,
+A2,RETRIEVAL_ONLY,True,11.432,True,True,1,1,attr-1bb6ca28-134c-5edc-add5-63ed0a90052f-dc5174a6a64e79de,True,True,
+A3,RETRIEVAL_ONLY,True,53.668,True,True,1,1,attr-d1281d47-f144-5c32-9444-44f60fb85b23-a0eeb5a2b4c5773a,True,True,
+A4,RETRIEVAL_ONLY,True,53.27,True,True,1,1,attr-4f47208f-2c20-50f6-84ec-eca83f9a111a-2157201e226d5f13,True,True,
+D1,RETRIEVAL_ONLY,True,38.698,True,,2,2,doc-ab34321b3f2fe343db157dfcede7a4931a15e89c8283c034c30ca803df855f61|doc-0dcf2e723fe4f9a17331d2d6e74970b85037317bb16cc52397221774e4647b58,False,True,10|9
+D2,RETRIEVAL_ONLY,True,30.169,True,,1,1,doc-6e329eb90e6521499cc2b981b217ceb01bc6727e784199c7071a5b09c70eacdf,True,True,2
+D3,RETRIEVAL_ONLY,True,34.949,True,,1,1,doc-1d0145f8a2afa5c013dac674c19a11bd1d2175b6862f6b21378811a9c5cec547,True,True,4
+B1,NOT_ENOUGH_EVIDENCE,True,7.103,,,0,0,,,,
+B2,NOT_ENOUGH_EVIDENCE,True,5.919,,,0,0,,,,
+N1,NOT_ENOUGH_EVIDENCE,True,3.261,,,0,0,,,,
+N2,NOT_ENOUGH_EVIDENCE,True,40.998,,,0,0,,,,
+N3,NOT_ENOUGH_EVIDENCE,True,3.631,,,0,0,,,,
+N4,NOT_ENOUGH_EVIDENCE,True,4.346,,,0,0,,,,
+N5,NOT_ENOUGH_EVIDENCE,True,11.671,,,0,0,,,,
+C1,RETRIEVAL_ONLY,True,55.037,True,,2,2,doc-ab34321b3f2fe343db157dfcede7a4931a15e89c8283c034c30ca803df855f61|doc-0dcf2e723fe4f9a17331d2d6e74970b85037317bb16cc52397221774e4647b58,False,True,10|9
+G1,GENERATION_UNAVAILABLE,True,13.367,True,True,1,1,attr-ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9-39e522c7fd8d5aac,True,True,

@@ -4,6 +4,7 @@ import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover, StatusBadge } from "./presentation";
 import type { TechnicalAttribute } from "@/types/technical-attribute";
 import { SourceInfo, VerificationBadge } from "./source-info";
+import { RecordFragmentFocus } from "./record-fragment-focus";
 export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
   const counts = new Map<string, number>();
   records.forEach((record) =>
@@ -14,6 +15,7 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
   );
   return (
     <section className="panel mt-6" id="technical">
+      <RecordFragmentFocus recordIds={records.map(record => record.id)} />
       <p className="eyebrow">Source-backed attributes</p>
       <h2>Technical information</h2>
       {records.length === 0 ? (
@@ -34,6 +36,7 @@ export function TechnicalInfo({ records }: { records: TechnicalAttribute[] }) {
                 key={record.id}
                 className="om-record"
                 id={`record-${record.id}`}
+                tabIndex={-1}
               >
 
                 <h3 className="font-semibold">{evidenceDisplayText(publicEvidenceText(record.attribute_label))}</h3>

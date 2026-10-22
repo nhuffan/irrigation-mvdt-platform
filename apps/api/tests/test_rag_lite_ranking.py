@@ -1,5 +1,6 @@
 """Synthetic ranking regressions; these are not domain-relevance measurements."""
 
+import unicodedata
 from types import SimpleNamespace
 
 import pytest
@@ -92,3 +93,65 @@ def test_ties_are_repeatable_and_use_document_page_offset_order():
         ("a", 2, 1400),
         ("b", 1, 0),
     ]
+
+
+@pytest.mark.parametrize(
+    "question, matching, collision",
+    [
+        (
+            "chiều dày tường tâm",
+            "Chiều dày tường tâm: 0.6 m.",
+            "Chiều dài tường, cao trình đáy, tràn tam giác.",
+        ),
+        ("dày", "dày", "đáy"),
+        ("dày", "dày", "đây"),
+        ("thử", "thử", "thứ"),
+        ("áp", "áp", "ấp"),
+        ("bàn", "bàn", "bán"),
+        ("café", "café", "cafe"),
+        ("đập", "đập", "dập"),
+    ],
+)
+def test_explicit_diacritics_exclude_distinct_folded_words(
+    question, matching, collision
+):
+    assert [row[3]["page"] for row in rank(question, [matching, collision])] == [1]
+
+
+@pytest.mark.parametrize(
+    "question, passages",
+    [
+        ("day", ["dày", "đáy", "đây"]),
+        ("thu", ["thử", "thứ"]),
+        ("ap", ["áp", "ấp"]),
+        ("ban", ["bàn", "bán"]),
+        ("cafe", ["café", "cafe"]),
+        ("dap", ["đập", "dập"]),
+    ],
+)
+def test_unaccented_queries_retain_accent_insensitive_matches(question, passages):
+    assert [row[3]["page"] for row in rank(question, passages)] == list(
+        range(1, len(passages) + 1)
+    )
+
+
+@pytest.mark.parametrize(
+    "question, passage",
+    [
+        ("THỦY LỰC", "Thuỷ lực"),
+        ("thuỷ lực", "thủy lực"),
+        (unicodedata.normalize("NFD", "thủy lực"), "thuỷ lực"),
+        ("thủy lực", unicodedata.normalize("NFD", "thuỷ lực")),
+    ],
+)
+def test_diacritics_preserve_unicode_and_tone_position_variants(question, passage):
+    assert [row[3]["page"] for row in rank(question, [passage])] == [1]
+
+
+def test_mixed_query_only_constrains_explicit_meaningful_diacritics():
+    passages = [
+        "Chiều dày tường tâm.",
+        "Chiều dài tường, cao trình đáy, tràn tam giác.",
+    ]
+    assert [row[3]["page"] for row in rank("chieu dày tuong tam", passages)] == [1]
+    assert len(rank("Find thông số thủy lực", ["Thuỷ lực"])) == 1

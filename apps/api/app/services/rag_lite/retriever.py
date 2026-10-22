@@ -103,7 +103,25 @@ def tokens(value: str) -> set[str]:
     return set(re.findall(r"[a-z0-9]+", fold(value))) - STOP
 
 
+def word_signatures(value):
+    # Keep letters such as đ and the word's diacritic inventory. Mark placement
+    # is ignored so tone-placement spellings such as thủy/thuỷ remain compatible.
+    result = {}
+    for word in re.findall(r"[^\W_]+", unicodedata.normalize("NFC", value.lower())):
+        decomposed = unicodedata.normalize("NFKD", word)
+        result[word] = (
+            "".join(c for c in decomposed if not unicodedata.combining(c)),
+            "".join(sorted(c for c in decomposed if unicodedata.combining(c))),
+        )
+    return result
+
+
 def rank_document_chunks(candidates, question, query_tokens):
+    explicit_diacritics = {
+        signature
+        for word, signature in word_signatures(question).items()
+        if word != fold(word) and fold(word) in query_tokens
+    }
     # Preserve original word order inside the meaningful part of the question.
     # Only trim leading/trailing scaffolding or the selected asset's name/code;
     # removing interior stop words would invent adjacency that is not in the text.
@@ -119,6 +137,12 @@ def rank_document_chunks(candidates, question, query_tokens):
         # e.g. "thứ" supplies "thu" but is not evidence for "thử nghiệm".
         # Require every meaningful keyword instead of accepting three of four.
         if not query_tokens or not query_tokens <= terms:
+            continue
+        # Accented query words constrain candidates; unaccented words retain the
+        # original accent-insensitive search. This only narrows folded matches.
+        if explicit_diacritics and not explicit_diacritics <= set(
+            word_signatures(chunk["text"]).values()
+        ):
             continue
         # Small reproducible keyword index. IDF limits dominance of common words.
         score = sum(
@@ -304,7 +328,8 @@ def retrieve(db, storage, settings, request):
     ranked = rank_document_chunks(candidates, request.question, query_tokens)
     limitations.append(
         "PDF search requires all search keywords; exact normalized phrases rank first. "
-        "Accent folding can still conflate words and paraphrases may be missed"
+        "Explicit query diacritics constrain matches; unaccented words remain "
+        "accent-insensitive. Paraphrases or imperfect source text may be missed"
     )
     citations = []
     for _, _, doc, chunk in ranked[: request.top_k]:

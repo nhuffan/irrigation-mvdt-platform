@@ -76,12 +76,14 @@ test('document grouping preserves all ranked passages, original objects and firs
 });
 
 test('technical evidence and source actions retain the exact asset rather than its parent or another asset', () => {
-  assert.equal(citationHref(attribute(), 'evidence'), `/assets/${ASSET}`);
+  assert.equal(citationHref(attribute(), 'evidence'), `/assets/${ASSET}#record-${RECORD}`);
   assert.equal(citationHref(attribute(), 'source'), `/data-sources/${SOURCE}/documents`);
   assert.equal(citationHref(attribute(), 'original'), null);
   assert.equal(citationHref(attribute(), 'download'), null);
   for (const patch of [
     { url: `/assets/${OTHER}` }, { asset_id: null }, { record_id: null },
+    { record_id: '../outside' }, { record_id: `${RECORD}#other` },
+    { url: `/assets/${ASSET}#record-${RECORD}` },
     { asset_id: '../outside' }, { document_id: DOCUMENT },
   ]) for (const kind of ['evidence', 'source', 'original', 'download']) {
     assert.equal(citationHref(attribute(patch), kind), null, JSON.stringify({ patch, kind }));
@@ -162,4 +164,44 @@ test('standard research caveats and unavailable generation do not overwhelm succ
     'Generation unavailable or invalid; original retrieval evidence retained',
   ];
   assert.equal(needsOpenLimitations(result({ status: 'GENERATION_UNAVAILABLE', limitations })), false);
+});
+
+
+test('empty results distinguish unavailable or stale evidence from a completed search with no match', () => {
+  for (const limitation of [
+    'An authorized document is missing, stale or invalid; rebuild its local index',
+    'PDF checksum mismatch detected',
+    'Document integrity validation failed',
+    'Authorization revoked',
+  ]) {
+    const unavailable = result({ status: 'NOT_ENOUGH_EVIDENCE', citations: [], limitations: [limitation] });
+    assert.equal(resultHeading(unavailable), 'Evidence retrieval unavailable', limitation);
+    assert.equal(needsOpenLimitations(unavailable), true, limitation);
+  }
+  const noMatch = result({
+    status: 'NOT_ENOUGH_EVIDENCE', citations: [],
+    limitations: ['No matching reviewed direct attribute; no parent/child inheritance'],
+  });
+  assert.equal(resultHeading(noMatch), 'No supporting evidence found');
+});
+
+test('partial retrieval keeps every valid passage while clearly disclosing an incomplete search', () => {
+  const citations = [document({ citation_id: 'page-10' }), document({ citation_id: 'page-9', page: 9 })];
+  const partial = result({ citations, limitations: ['An authorized document is missing, stale or invalid; rebuild its local index'] });
+  assert.equal(resultHeading(partial), 'Supporting evidence found · search incomplete');
+  assert.equal(needsOpenLimitations(partial), true);
+  assert.deepEqual(groupDocuments(partial.citations)[0].citations, citations);
+  assert.equal(resultHeading({ ...partial, status: 'ANSWERED', answer: 'Source-backed text' }), 'Evidence-backed answer');
+});
+
+test('provider failure and limited text coverage are distinct from document integrity failure', () => {
+  const limitations = [
+    'Generation unavailable or invalid; original retrieval evidence retained',
+    'An authorized PDF has no usable extracted text; OCR is outside scope',
+    'Keyword retrieval; extraction may damage tables. Check the original PDF and locator',
+  ];
+  const retained = result({ status: 'GENERATION_UNAVAILABLE', limitations });
+  assert.equal(resultHeading(retained), 'Evidence found · AI summary unavailable');
+  assert.equal(needsOpenLimitations(retained), false);
+  assert.equal(resultHeading({ ...retained, citations: [] }), 'No supporting evidence found');
 });

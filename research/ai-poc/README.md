@@ -16,11 +16,10 @@ The allowlist format is `{"version":1,"authorization":"actual permission referen
 
 Use the existing configured database and authorization file; no migration or development seeding is required.
 
-From `apps/api`:
+From `apps/api`, keep an existing valid checksum-pinned index. If the authorized index is absent or stale, explicitly rebuild it first with `uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3`. Do not reseed or reset the database. Then start the API:
 
 ```sh
 export RAG_LITE_ALLOWLIST_PATH="$PWD/../../storage/rag-lite/allowlist.json"
-uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3
 RAG_LITE_ENABLED=true uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 --no-access-log
 ```
 
@@ -50,18 +49,20 @@ node --test apps/web/tests/*.test.mjs
 
 The evaluator requires running enabled local services and the pinned corpus. Its default output is a new timestamped CSV; explicit output paths must not already exist. Existing measurements are never overwritten. Additional hit@1/hit@3 and returned-page columns preserve the original result columns. [Cases](rag_lite_eval_cases.csv) contain source-checked expected record/page IDs; [results](rag_lite_eval_results.csv) are written only by actual executions. They remain separate from the historical participant-study protocol.
 
-Limits: 1,000-character questions, top-k 1–8, 25 MiB PDFs, 300 pages per PDF, 8 KiB web requests and 30 queries/minute per client host/process. This is a local retrieval-only prototype: no OCR, translation/embedding model, current-condition inference or operational advice. PDF searches require all meaningful keywords and prefer exact normalized phrases. Accent folding can still confuse words (for example, dày/đây), and paraphrases may be missed. Check original PDF pages; keyword hits and citation validity do not prove engineering correctness. Public deployment needs access controls and shared rate limits.
+Limits: 1,000-character questions, top-k 1–8, 25 MiB PDFs, 300 pages per PDF, 8 KiB web requests and 30 queries/minute per client host/process. This is a local retrieval-only prototype: no OCR, translation/embedding model, current-condition inference or operational advice. PDF searches require all meaningful keywords and prefer exact normalized phrases. Explicitly accented query keywords constrain matches by base letters and diacritic inventory; unaccented keywords remain accent-insensitive. This removes the source-checked dày/đáy and tâm/tam collision in the fixed wall-thickness case. Missing source accents, identical diacritic inventories in different positions, and paraphrases can still cause misses or collisions. Check original PDF pages; keyword hits and citation validity do not prove engineering correctness. Public deployment needs access controls and shared rate limits.
 
 
 ## 90–120 second evidence-search demonstration
 
 Use the enabled local services and authorized corpus above; open [Evidence Search](http://localhost:3000/ai-research-preview). The interface provides retrieval evidence. `UnavailableProvider` is intentional: no external model is connected, and any provider/data-transfer approval belongs to a separate stage.
 
-1. **0:00–0:25** Choose Spillway and click the suggested design-pressure field. Inspect the exact historical **200 bar** value. Expand **Evidence details** to distinguish the reviewed record from its UNVERIFIED source and UNKNOWN authority, then follow [source details](http://localhost:3000/data-sources/fa8c5d20-e1b9-52c3-94ca-2644ef56ac82/documents).
-2. **0:25–0:55** Return to search, select Spillway, and open **More search options → Show document passages only**. Search `hành trình 4650`. Open the [original manual at physical PDF page 9](http://localhost:3000/api/media/documents/6c2975db-da89-546c-b1c7-f421827c1fc2#page=9), printed page 7. The original reports 4,650 mm stroke. For `áp suất thử nghiệm`, inspect both page-10 latch and page-9 main-cylinder passages; neither should be silently discarded. Use the **Expand excerpt** and **More passages** disclosures.
+1. **0:00–0:25** Choose Spillway and click the suggested design-pressure field. Inspect the exact historical **200 bar** value. Expand **Evidence details** to distinguish the reviewed record from its UNVERIFIED source and UNKNOWN authority, then follow **View asset evidence** to the exact record (including focus after streamed loading), or [source details](http://localhost:3000/data-sources/fa8c5d20-e1b9-52c3-94ca-2644ef56ac82/documents).
+2. **0:25–0:55** Return to search, select Spillway, and open **More search options → Show document passages only**. Search `hành trình 4650`. Open the [original manual at physical PDF page 9](http://localhost:3000/api/media/documents/6c2975db-da89-546c-b1c7-f421827c1fc2#page=9), printed page 7. The original reports 4,650 mm stroke. For `áp suất thử nghiệm`, inspect both page-10 latch and page-9 main-cylinder passages: both report **270 bar for different cylinders**. The generic query does not identify one cylinder or establish that page 9 must rank first; neither passage should be silently discarded. Use the **Expand excerpt** and **More passages** disclosures.
 3. **0:55–1:20** Choose Intake No. 1, East Canal and its suggested canal-route field. The canonical text is **Kênh Đông** (displayed with its English label). Switch to the Intake Structure parent and search `reported_canal_route`: no inherited child evidence should appear.
 4. **1:20–1:40** Ask `What is the current condition?` and inspect the explicit no-evidence state with open limitations. A historical record cannot validate current condition or justify operating advice.
 5. **1:40–2:00** Open **Search coverage** and explain text-searchable versus image-only originals. **All authorized PDFs** is an explicit scope change and never attributes a corpus passage to an asset. Provenance remains inspectable; no model response or engineering confidence score is fabricated.
+
+A completed search with no match shows **No supporting evidence found**. An invalid/stale index shows **Evidence retrieval unavailable**, with recovery guidance; valid citations from a partial search stay visible under **Search incomplete**. HTTP429 and API/network failures show **Search unavailable** with distinct limit/connection copy and Retry; feature OFF disables the preview. These are different states, not interchangeable evidence conclusions.
 
 Chrome can open the physical-page original link. The preexisting in-app PDF iframe may remain blank; use the original link or download instead of promising an embedded preview. Stop the API/frontend processes you started after the demonstration; preserve preexisting PostGIS and its volumes.
 

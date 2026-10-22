@@ -1,0 +1,17 @@
+case_id,original_passed,original_returned_pdf_pages,original_hit_at_1,original_hit_at_3,original_hit_at_5,original_citation_count,original_resolvable_citations,original_latency_ms,original_known_irrelevant_count,refinement_passed,refinement_returned_pdf_pages,refinement_hit_at_1,refinement_hit_at_3,refinement_hit_at_5,refinement_citation_count,refinement_resolvable_citations,refinement_latency_ms,refinement_known_irrelevant_count,final_passed,final_returned_pdf_pages,final_hit_at_1,final_hit_at_3,final_hit_at_5,final_citation_count,final_resolvable_citations,final_latency_ms,final_known_irrelevant_count,source_judgment_basis
+A1,True,,True,True,True,1,1,182.054,,True,,True,True,True,1,1,62.36,,True,,True,True,True,1,1,36.796,,
+A2,True,,True,True,True,1,1,14.183,,True,,True,True,True,1,1,10.211,,True,,True,True,True,1,1,11.432,,
+A3,True,,True,True,True,1,1,14.502,,True,,True,True,True,1,1,9.417,,True,,True,True,True,1,1,53.668,,
+A4,True,,True,True,True,1,1,11.326,,True,,True,True,True,1,1,9.07,,True,,True,True,True,1,1,53.27,,
+D1,True,10|9|11|25|46,False,True,True,5,5,36.601,3,True,10|9,False,True,True,2,2,35.228,0,True,10|9,False,True,True,2,2,38.698,0,Original known-irrelevant counts preserved from prior comparison; refinement/final source-text audit by implementing AI; not independent domain validation
+D2,True,2|3|4,True,True,True,3,3,21.649,2,True,2|3,True,True,True,2,2,19.475,1,True,2,True,True,True,1,1,30.169,0,Original known-irrelevant counts preserved from prior comparison; refinement/final source-text audit by implementing AI; not independent domain validation
+D3,True,4,True,True,True,1,1,36.656,0,True,4,True,True,True,1,1,31.161,0,True,4,True,True,True,1,1,34.949,0,Original known-irrelevant counts preserved from prior comparison; refinement/final source-text audit by implementing AI; not independent domain validation
+B1,True,,,,,0,0,8.256,,True,,,,,0,0,7.641,,True,,,,,0,0,7.103,,
+B2,True,,,,,0,0,5.62,,True,,,,,0,0,5.67,,True,,,,,0,0,5.919,,
+N1,True,,,,,0,0,3.877,,True,,,,,0,0,3.101,,True,,,,,0,0,3.261,,
+N2,True,,,,,0,0,31.839,,True,,,,,0,0,33.192,,True,,,,,0,0,40.998,,
+N3,True,,,,,0,0,3.591,,True,,,,,0,0,3.373,,True,,,,,0,0,3.631,,
+N4,True,,,,,0,0,4.603,,True,,,,,0,0,3.921,,True,,,,,0,0,4.346,,
+N5,True,,,,,0,0,10.526,,True,,,,,0,0,9.934,,True,,,,,0,0,11.671,,
+C1,True,10|9|11|25|46,False,True,True,5,5,58.83,3,True,10|9,False,True,True,2,2,49.141,0,True,10|9,False,True,True,2,2,55.037,0,Original known-irrelevant counts preserved from prior comparison; refinement/final source-text audit by implementing AI; not independent domain validation
+G1,True,,True,True,True,1,1,14.136,,True,,True,True,True,1,1,11.087,,True,,True,True,True,1,1,13.367,,

@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import { citationHref, displayValue, groupDocuments, needsOpenLimitations, resultHeading, type RagCitation, type RagResult } from "@/lib/rag-lite";
+import { citationHref, criticalRetrievalIssue, displayValue, groupDocuments, needsOpenLimitations, resultHeading, type RagCitation, type RagResult } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
 
 function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
@@ -86,11 +86,16 @@ export function EvidenceResults({ result, scopeName, query, headingRef }: {
 }) {
   const attributes = result.citations.filter(c => c.kind === "technical_attribute");
   const documents = groupDocuments(result.citations);
+  const retrievalIssue = criticalRetrievalIssue(result);
   return <section className={styles.results} aria-label="Search results">
     <header className={styles.resultHeading}>
       <div><p className="eyebrow">Search results for {scopeName}</p><h2 ref={headingRef} tabIndex={-1}>{resultHeading(result)}</h2><p className={styles.query}>“{query}”</p></div>
       {result.citations.length > 0 && <span className={styles.count}>{result.citations.length} {result.citations.length === 1 ? "reference" : "references"}</span>}
     </header>
+    {retrievalIssue && result.citations.length > 0 && <div className={`panel ${styles.error}`} role="note">
+      <h3>Search incomplete</h3>
+      <p>Some authorized evidence could not be verified or searched. Verify the original PDFs, checksums, and local index, then retry. The returned references remain available for review.</p>
+    </div>}
     {result.status === "ANSWERED" && result.answer && <div className={`panel ${styles.answer}`}>
       {result.answer.split(/(\[[^\]]+\])/g).map((part, i) => {
         const c = result.citations.find(citation => part === `[${citation.citation_id}]`);
@@ -98,8 +103,8 @@ export function EvidenceResults({ result, scopeName, query, headingRef }: {
       })}
     </div>}
     {!result.citations.length && <div className={`panel ${styles.empty}`}>
-      <h3>No evidence supports this request in the selected scope.</h3>
-      <p>Choose the exact asset or component and try keywords used in the original document. You can explicitly select all authorized PDFs to broaden the search.</p>
+      <h3>{retrievalIssue ? "The authorized document search could not be completed." : "No evidence supports this request in the selected scope."}</h3>
+      <p>{retrievalIssue ? "Verify the original PDFs, their checksums, and the local search index, then retry. No conclusion about the availability of supporting evidence can be drawn from this failed search." : "Choose the exact asset or component and try keywords used in the original document. You can explicitly select all authorized PDFs to broaden the search."}</p>
     </div>}
     {attributes.length > 0 && <div className={styles.attributeGrid}>{attributes.map(c => <AttributeCard key={c.citation_id} citation={c} />)}</div>}
     {documents.map(group => <DocumentCard key={group.documentId} citations={group.citations} />)}

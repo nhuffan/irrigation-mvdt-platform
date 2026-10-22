@@ -890,3 +890,109 @@ All 14 PostgreSQL table fingerprints and six original PDF metadata/checksum/extr
 Operational/demo instructions are refreshed in the existing [feature README](research/ai-poc/README.md); no separate runbook, slide or nested stage report was created. Residual issues: accent-folded word collisions (D2 page 3), strict-keyword/paraphrase misses, ambiguous cylinder queries, table-extraction fidelity, unknown source dates/authority, and preexisting whole-backend lint warnings. Generation remains deliberately unavailable and requires a separately authorized future stage.
 
 Task-owned API/frontend stopped through their original sessions; ports8000/3000 verified free. Both temporary browser tabs closed, Chrome viewport override reset. Preexisting healthy `mvdt-postgis`, database volumes and unrelated services remain running; no container started by this task.
+
+## Stage RAG Lite POC Finalization — 2026-10-22
+
+**Final status: RAG_LITE_RETRIEVAL_DEMO_READY.** The initial partial checkpoint below is retained; the Chrome verification closure at the end of this section resolves its outstanding browser gates.
+
+**Initial checkpoint: PARTIAL / NOT_READY.** Implementation, production build, automated checks and fixed-case evaluation pass. Fresh Chrome checks verified the document, attribution, refusal and failure flows below, but final post-fix record navigation and 375/768/1440 px checks remain unverified: browser automation became disabled in Work settings. Do not apply `RAG_LITE_RETRIEVAL_DEMO_READY` until these checks and the remaining browser retry/OFF checks pass.
+
+### Bounded changes and baseline
+
+- Branch `feat/rag-lite-poc`; HEAD before/after `adfe929a38b5f7fa4c8681d70a8f56a3cf662ace`. The implementation is an uncommitted working-tree change on that reviewed baseline. Original Level-1 acceptance, Stage5B NOT_READY, source authority/verification, approved historical values/units, geometry, O&M and paper outputs remain unchanged.
+- `apps/api/app/services/rag_lite/retriever.py` and `apps/api/tests/test_rag_lite_ranking.py`: one deterministic, tests-first correction. Meaningful explicitly accented query words must match the base letters and sorted diacritic inventory of a source word, after the existing all-keyword gate. NFC/NFD and thủy/thuỷ spellings remain compatible; unaccented queries preserve folded behavior. No case/page/title/answer constants, embeddings, OCR, translation, schema or index changes.
+- `apps/web/src/lib/rag-lite.ts`, `components/rag-lite/evidence-results.tsx` and `tests/rag-lite.test.mjs`: distinguish failed/incomplete retrieval from completed empty search; preserve every valid citation. Technical evidence links include the exact existing record fragment after canonical URL validation. Provider unavailability is excluded from integrity failures.
+- A fresh Chrome click exposed a further blocker: the correct record fragment was present, but streamed asset content arrived after native hash scrolling; the record remained below the viewport (observed top 2071 px). `components/asset/technical-info.tsx`, new `components/asset/record-fragment-focus.tsx`, `src/lib/record-fragment-focus.ts` and `tests/record-fragment-focus.test.mjs` now reveal/focus only an actually rendered matching record on mount/hashchange, with observer cleanup. Regression tests and build pass; final Chrome confirmation is pending.
+- Only the existing feature [README](research/ai-poc/README.md) is updated with compact startup/demo instructions and current limitations. Two new measured CSVs are added below. No duplicate runbook, slides, nested stage output or new RAG product scope.
+- Fresh input-baseline HTTP rerun: **16/16 PASS, 12/12 citations resolvable**, latency 4.784–220.606 ms. This temporary rerun and the source/error ledger were recorded before ranking edits; historical evaluation files were not overwritten.
+
+### Source-checked retrieval comparison
+
+Actual new [16-case results](research/ai-poc/rag_lite_eval_results_final_2026-10-22.csv) and [original/refinement/final comparison](research/ai-poc/rag_lite_eval_comparison_final_2026-10-22.csv) were created exclusively. Original cases/results and refinement outputs remain byte-identical to input HEAD. The original cohort and expected answers are unchanged.
+
+| Fixed case | Original physical pages | Refinement / fresh input rerun | Final physical pages | Source/error ledger |
+|---|---|---|---|---|
+| D1, asset-scoped pressure | 10, 9, 11, 25, 46 | 10, 9 | 10, 9 | Page 10 latch cylinder and page 9 main gate cylinder both report 270 bar. The generic query identifies neither cylinder exclusively; page 9 is not forced first. |
+| D2, core-wall thickness | 2, 3, 4 | 2, 3 | 2 | Page 2 supports 0.6 m thickness. Original page 3 says “Cao trình đáy” and “tràn tam giác”; it does not support the thickness query. The actual folded collisions are dày/đáy and tâm/tam. The preceding stage's dày/đây description is corrected here without rewriting that historical section. |
+| D3, spillway system count | 4 | 4 | 4 | Supported original page retained. |
+| C1, explicit corpus pressure | 10, 9, 11, 25, 46 | 10, 9 | 10, 9 | Both supported cylinder passages retained; corpus citations have null asset attribution. |
+
+- Final actual HTTP run completed **2026-10-22 23:11:47 +07:00**: **16/16 PASS**, **11/11 returned citations resolvable**; all document excerpts and original checksums checked against their physical pages. Four exact attribute cases remain 4/4; seven boundary/negative cases retain safe refusal. The generation-unavailable case retains retrieval evidence.
+- Across the same four document/corpus cases, hit@1 **2/4**, hit@3 **4/4**, hit@5 **4/4**, unchanged from refinement. Source-checked irrelevant returned entries decrease **1→0** (original stage: 8). This is implementing-AI judgement on a small fixed cohort, not independent domain validation, general retrieval accuracy or academic benchmark evidence.
+- Recorded query latency **3.261–55.037 ms** in the committed-result-format new CSV; a second temporary 16-case replay after the anchor build also passed with identical non-latency outputs and 11/11 citations (2.974–200.443 ms). Timings do not establish speed or scale improvements.
+- Remaining limitations: damaged/missing source accents can cause misses; words with the same letters and diacritic inventory may still collide when mark positions differ. Unaccented queries intentionally remain accent-insensitive. Strict keywords miss paraphrases; imperfect table extraction, image-only PDFs, ambiguous cylinder queries and unknown source dates/authority remain disclosed.
+
+### Actual verification and application/browser evidence
+
+| Check / command | Actual result |
+|---|---|
+| `cd apps/api && .venv/bin/python -m pytest -q` | **479 PASS**, 4.36 s, one existing Starlette/httpx deprecation warning; 74 focused RAG tests including 19 added ranking cases |
+| `.venv/bin/ruff check app/api/routes/rag_lite.py app/schemas/rag_lite.py app/services/rag_lite tests/test_rag_lite*.py` | **PASS**; scoped format and evaluator Ruff/format also PASS |
+| Whole-backend `.venv/bin/ruff check .` | Same 3 preexisting I001 findings at unchanged `tests/test_empirical.py:3`, `tests/test_methodology_review.py:3,501`; no unrelated formatting changes |
+| `pnpm --dir apps/web lint` | **PASS** after final anchor change |
+| `node --test apps/web/tests/*.test.mjs` | **136/136 PASS**, 380.211 ms final suite; three integrity/link tests and three record-fragment behavior tests added |
+| Production build | **PASS**, installed Next 16.3.6 CLI `build --webpack`, build ID `H2umP7Z9YMSm1QuJqWlRr`, then `start --hostname 127.0.0.1 --port 3101` |
+| `apps/api/.venv/bin/python scripts/evaluate_rag_lite.py --web-base http://localhost:3101 --output research/ai-poc/rag_lite_eval_results_final_2026-10-22.csv` | **16/16 PASS**, new result file only; temporary post-anchor confirmation also 16/16 |
+| `git diff --check` | **PASS** |
+| Chrome SPILLWAY SQL → record/source | **200 bar** shown, record VERIFIED distinct from source UNVERIFIED / authority UNKNOWN; source RS-SRC-018 opens correctly. Exact fragment resolved to the preserved record; async scroll bug reproduced and patched. Final post-patch Chrome scroll/focus: **NOT_TESTED** due browser disabled. |
+| Chrome D1 grouped document passages | **PASS** on current retrieval/UI changes before anchor-only build: one original, all two passages available, physical pages **10,9**; original physical page **9/51** rendered in Chrome and showed 270 bar / 4650 mm main-cylinder text. In-app iframe limitation remains. |
+| Chrome child/parent | **PASS**: C01 shows East Canal — Kênh Đông on the C01 record link; switching to INTAKE clears results and `reported_canal_route` returns no inherited evidence. |
+| Chrome current condition and scope | **PASS**: current-condition question produces explicit no-evidence/refusal with open scope limitations; switching to all authorized PDFs clears old results; corpus result explicitly says no asset attribution. Fixed HTTP cases also verify operational/bypass refusals. |
+| Chrome empty versus stale-index | **PASS**: healthy no-match differs from a controlled stale copied index. Before fix the latter misleadingly said No supporting evidence found; after fix it says **Evidence retrieval unavailable**, explains failed verification and opens limitations. Canonical index was never changed. Partial-result warning tested by helper fixtures. |
+| Chrome HTTP429 and API-down | **PASS**: actual local process limiter reached with read-only refusal requests, then Chrome showed **Search unavailable**, limit/wait copy and Retry. Stopping only the task API and retrying changed to connection-failure copy, not empty evidence. Successful post-restart Retry: **NOT_TESTED** after browser access was disabled. |
+| Chrome Enter / focus / cancel / stale response | Enter submission and result-heading focus **PASS**; a temporary API wrapper delayed the real D1 response 4 s, Chrome showed pending/Cancel, cancellation restored controls and allowed a new scope. Final delayed-response/non-overwrite observation: **NOT_TESTED** after browser disabled; no production timing claim from this harness. |
+| Feature OFF | **HTTP PASS**: status enabled=false, query404, correct disabled server-rendered copy, health and asset/reservoir/map/3D/methodology routes HTTP200. Fresh Chrome OFF view: **NOT_TESTED** due browser disabled. |
+| 375/768/1440 px responsive screenshots | **NOT_TESTED** on the final build. Viewport capability attempts did not affect the observed 1745 px Chrome tab; this is not counted as responsive PASS. No mobile screenshot is fabricated or reused from the preceding stage. |
+
+Existing user services were present on 8000/3000, so the task used separate API8100/frontend3101. To preserve the running frontend's `.next`, production builds used `/tmp/rag-lite-finalization/web`, with the original installed dependencies and copy-worker/copy-Cesium scripts. All **140 current frontend source files** (tracked plus three new files) were byte-verified against the snapshot; source manifest fingerprint `6398ada2fc125e15959c1c442725403247c7d6961c3ae7136f6435d58f33fc18`. Exact build command: `API_BASE_URL=http://localhost:8100/api/v1 NEXT_PUBLIC_API_BASE_URL=http://localhost:8100/api/v1 node <repo>/apps/web/node_modules/next/dist/bin/next build --webpack`. `pnpm --dir apps/web build` was not run against the live checkout; an initial snapshot pnpm attempt aborted dependency setup without a TTY, and the installed CLI build succeeded without altering dependencies.
+
+Screenshots are actual Chrome captures outside the repository, with their real observed 1745 px width. The capture API returned JPEG bytes, so file extensions were corrected to `.jpg` without changing bytes. All are from the retrieval/integrity build before the final anchor-only change, not proof of that later patch. Base directory: `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`.
+
+| Screenshot | Dimensions | SHA256 |
+|---|---|---|
+| `rag-final-desktop.jpg` | 1745×1798 | `d8b14bd7d8b59e4378fcccc0dde39a5b2baf72f7ad9a107d98b4f69b92a6f098` |
+| `rag-final-pdf-page9.jpg` | 1745×952 | `8f92a7b798ae0214916bf056f8b2494b00b2e9fe65f5ba9568cff90772972ca0` |
+| `rag-final-stale.jpg` | 1745×1378 | `d5aae51de8ec608671880135b3d79d4ff0afc3dc824953764f3cf9eb19ac3188` |
+| `rag-final-rate-limit.jpg` | 1745×952 | `66033ffc93394630b79c5a3dbd15d05e22dabf7b60438bfd964fa4b7d3aa5c6d` |
+
+### Preservation, disclosure and remaining gate
+
+Actual final coverage: **6 checksum-authorized PDFs / 2 text-searchable / 4 image-only / 0 unavailable**, 56 searchable physical pages, 70 chunks. Four image-only PDFs remain retained but unsearchable without OCR. All six original-byte SHA256 values equal their pinned authorization checksums. All 14 database table fingerprints and six original metadata/checksum/extraction readbacks match the fresh input baseline; database fingerprint remains `b35970f54e4c56652a1fbf401c91f980b1859e01ba90aca2949fe364b8c47494`. All eight runtime allowlist/index/manifest JSON files are unchanged; index fingerprint remains `59af2b9f1d7f06cb44246df908d367bd4773a46cae2f687972bc59fdf71a5f8c`. Earlier stage output is preserved as an exact byte prefix. No source inventory, approved attribute, snapshot, protocol, paper/figure or Stage5B edits.
+
+`UnavailableProvider` remains intentional; live status reports generation_available=false, mode=retrieval_only. No proprietary excerpt was sent to an external LLM, and no transport, credentials or generated-answer service was enabled.
+
+“An experimental asset-aware evidence retrieval preview was demonstrated over bounded historical documents; AI-generated answers, operational intelligence and independent domain validation were not established.”
+
+The remaining gate is actual Chrome confirmation of final streamed record focus/scroll, successful retry after restart, OFF view and a completed late-response check, plus real 375/768/1440 px captures. Local browser automation was disabled despite the user's intent to re-enable it; this environment limitation is recorded as NOT_TESTED, not a product PASS or an inferred approval to bypass browser settings. No further ranking/product work is required for this bounded stage.
+
+Task-owned API8100 (including stale/timing/OFF variants) and production frontend3101 were stopped gracefully through their original sessions; both ports verified free. Preexisting FastAPI parent16918 (reload child21967), frontend17105 on8000/3000 and healthy `mvdt-postgis` remain running. No container or volume was created/deleted. Browser-tab close/viewport-reset attempts were also blocked by the disabled browser setting, so explicit browser cleanup could not be confirmed; no user tab was intentionally closed.
+
+
+### Chrome verification closure — final gate passed
+
+After local browser access became available, the outstanding checks were completed in actual Chrome against the **same production build `H2umP7Z9YMSm1QuJqWlRr`**. All 140 frontend source files still match the build snapshot. No implementation change or new ranking correction was needed during this resumed verification. This closure supersedes the initial NOT_TESTED/NOT_READY browser checkpoint above.
+
+- **Exact record navigation PASS:** SPILLWAY search returns **200 bar**; View asset evidence loads the preserved record `ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9`, then scrolls it into view and focuses it after streamed content renders. Observed record top **293 px** in a 1008 px viewport, versus the reproduced pre-fix 2071 px offset. Source verification/authority remain separately visible and unchanged.
+- **Document flow PASS:** D1 retains both physical pages **10,9** in one group, with the second passage accessible. The original PDF rendered at **9/51** in Chrome, showing the main-cylinder 270 bar and 4650 mm passage. Page 10 concerns the latch cylinder; the generic query still does not establish which cylinder the user intended. Chrome PDF navigation did not emit the usual load-complete signal, so rendering was verified by the actual viewer screenshot after it painted, not by navigation timeout alone.
+- **Attribution/refusal/scope PASS:** C01 returns its own East Canal — Kênh Đông record; INTAKE parent `reported_canal_route` returns zero references. The current-condition question produces a refusal with open limitations. Switching to All authorized PDFs visibly clears previous results, and a new pressure search returns two passages with the explicit no-asset-attribution label.
+- **Retry/OFF PASS:** stopping only the task API produces Search unavailable with connection copy. After restart, Retry returns the same D1 question/scope and two references. With the API flag OFF, Chrome reload shows the disabled-preview notice and no search form. The earlier actual stale-index and HTTP429 observations remain valid; neither failure is presented as a completed empty search.
+- **Keyboard/responsive PASS:** Enter submits, the result heading receives focus, Tab moves to Expand excerpt and Enter expands/collapses it. Actual viewport/document scroll widths are **375/375**, **768/768**, **1440/1440 px**, including the grouped two-passage result and wrapping long document title; no horizontal overflow observed. These are fresh captures, not the earlier ineffective viewport attempts.
+- **Cancel/late-response PASS:** a disposable test-only middleware delayed the real pressure query by 12 seconds. Cancel restored controls and permitted a new scope/query. A second controlled race recorded the newer C01 result visible at **2026-10-22T16:58:16.378Z**, before the cancelled old response became ready at **16:58:27.887Z**. A subsequent Chrome readback still showed the C01 question, record and asset UUID, with zero document passages. The middleware and event ledger exist only under temporary storage; no production delay, provider behavior or performance improvement is claimed.
+
+Actual additional Chrome screenshots below use the existing visualization directory above. Every screenshot is from the final production build; dimensions are the captured image sizes (full-page images may be taller than the viewport).
+
+| Screenshot | Dimensions | SHA256 |
+|---|---|---|
+| `rag-ready-record.jpg` | 1×1 | `0a7bde096c16a32e072e9f139f51e0a0f379ec00aa087f88f3de6ca0063aaeb0` |
+| `rag-ready-desktop.jpg` | 1×1 | `706ffd1c47dd421d7f3178d30f5373016d9e9e1f94047fb4c9b5fcc673008a84` |
+| `rag-ready-tablet.jpg` | 1×1 | `ee10915909a724907a4267b8f5cec9f466d9a905afe91a9e6067b4036c17dcd8` |
+| `rag-ready-mobile.jpg` | 1×1 | `36f9e420d6b9f677bfddfd19e893d594425ab157b20b6a91b641d56a5e4f21e0` |
+| `rag-ready-pdf-page9.jpg` | 1×1 | `91f366998a135edd4abd8b4a4acee90f92b7e5d5e79065abd5ffa0c90a90686e` |
+| `rag-ready-off.jpg` | 1×1 | `7bba6da02ec2665454d6669cfc0a3e1b002aa534c4719fd73fb4c24b979570c8` |
+| `rag-ready-race-verified.jpg` | 1×1 | `fbd2d7134ab0a908911283ddc95435aa87f2f322ac0ba24fd16c92d09081199e` |
+
+**Preservation rechecked:** all 14 table fingerprints and six original PDF checksum/extraction readbacks still exactly match the input baseline; canonical allowlist/index/manifest and historical evaluation CSV bytes are unchanged. The previously recorded 479 API tests, final 136 frontend tests, lint/build and 16/16 HTTP results with 11/11 citations apply to the unchanged implementation. Generation remains unavailable; this is retrieval-only historical evidence, with the original extraction, domain-validation and source-authority limits retained.
+
+All resumed task-owned API variants and frontend were stopped gracefully; ports8100/3101 are free. Preexisting API8000, frontend3000 and healthy `mvdt-postgis` remain running. The two current verification tabs were closed and the temporary viewport override reset. The three older task tabs from the interrupted session were already debugger-detached and could not be closed through their old handles; they were left untouched rather than treating a failed close as success. This does not block the verified demo flows.
+
+**Final tag: `RAG_LITE_RETRIEVAL_DEMO_READY`.** All five P0 flows and the outstanding browser gates now pass. The initial access blocker is resolved; no additional RAG scope, external LLM, OCR, dataset or paper work was introduced.
