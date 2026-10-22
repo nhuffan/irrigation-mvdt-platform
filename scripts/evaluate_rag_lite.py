@@ -5,10 +5,12 @@ import csv
 import hashlib
 import io
 import json
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from time import perf_counter
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 from pypdf import PdfReader
 
@@ -34,9 +36,16 @@ def main():
     parser.add_argument(
         "--output",
         type=Path,
-        default=ROOT / "research/ai-poc/rag_lite_eval_results.csv",
+        default=None,
     )
     args = parser.parse_args()
+    if args.output is None:
+        stamp = datetime.now(ZoneInfo("Asia/Ho_Chi_Minh")).strftime("%Y%m%dT%H%M%S%f")
+        args.output = ROOT / f"research/ai-poc/rag_lite_eval_results_{stamp}.csv"
+    if args.output.exists():
+        parser.error(
+            "Results already exist; choose a new --output path to preserve measurements"
+        )
     rows = list(csv.DictReader(args.cases.open()))
     results, pdfs, pages = [], {}, {}
     for row in rows:
@@ -67,6 +76,29 @@ def main():
             for c in citations
         )
         expected_hit = bool(row["expected_record_id"] or row["expected_document_id"])
+        expected_rank = (
+            next(
+                (
+                    rank
+                    for rank, c in enumerate(citations, 1)
+                    if (
+                        not row["expected_record_id"]
+                        or c["record_id"] == row["expected_record_id"]
+                    )
+                    and (
+                        not row["expected_document_id"]
+                        or c["document_id"] == row["expected_document_id"]
+                    )
+                    and (
+                        not row["expected_page"]
+                        or str(c["page"]) == row["expected_page"]
+                    )
+                ),
+                None,
+            )
+            if expected_hit
+            else None
+        )
         exact = None
         if row["expected_value"]:
             exact = any(
@@ -121,9 +153,16 @@ def main():
                 "citation_count": len(citations),
                 "resolvable_citations": valid,
                 "citation_ids": "|".join(c["citation_id"] for c in citations),
+                "hit_at_1": expected_rank == 1 if expected_hit else "",
+                "hit_at_3": expected_rank is not None and expected_rank <= 3
+                if expected_hit
+                else "",
+                "returned_pdf_pages": "|".join(
+                    str(c["page"]) for c in citations if c["document_id"]
+                ),
             }
         )
-    with args.output.open("w") as output:
+    with args.output.open("x") as output:
         writer = csv.DictWriter(
             output, fieldnames=list(results[0]), lineterminator="\n"
         )

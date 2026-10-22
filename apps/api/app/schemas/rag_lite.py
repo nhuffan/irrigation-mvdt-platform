@@ -62,3 +62,12 @@ class RagResponse(BaseModel):
     asset_id: UUID | None = None
     citations: list[Citation] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
+
+
+class RagCoverage(BaseModel):
+    authorized_documents: int = 0
+    searchable_documents: int = 0
+    image_only_documents: int = 0
+    unavailable_documents: int = 0
+    searchable_pages: int = 0
+    indexed_chunks: int = 0

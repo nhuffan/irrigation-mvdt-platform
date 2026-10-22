@@ -4,10 +4,13 @@ const base = () => process.env.API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_
 const headers = { "Cache-Control": "no-store" };
 
 export async function GET(request: Request) {
-  const asset = new URL(request.url).searchParams.get("asset_id");
+  const params = new URL(request.url).searchParams;
+  const asset = params.get("asset_id");
   if (asset && !/^[0-9a-f-]{36}$/i.test(asset))
     return Response.json({ error: "Invalid asset" }, { status: 400, headers });
-  const path = asset
+  const path = params.get("coverage") === "true"
+    ? `/coverage?reservoir_id=${MANAGED_RESERVOIR_ID}`
+    : asset
     ? `/demo-questions?asset_id=${encodeURIComponent(asset)}&reservoir_id=${MANAGED_RESERVOIR_ID}`
     : "/status";
   try {

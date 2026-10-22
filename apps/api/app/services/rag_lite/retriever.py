@@ -103,6 +103,43 @@ def tokens(value: str) -> set[str]:
     return set(re.findall(r"[a-z0-9]+", fold(value))) - STOP
 
 
+def rank_document_chunks(candidates, question, query_tokens):
+    # Preserve original word order inside the meaningful part of the question.
+    # Only trim leading/trailing scaffolding or the selected asset's name/code;
+    # removing interior stop words would invent adjacency that is not in the text.
+    query_words = re.findall(r"[a-z0-9]+", fold(question))
+    while query_words and query_words[0] not in query_tokens:
+        query_words.pop(0)
+    while query_words and query_words[-1] not in query_tokens:
+        query_words.pop()
+    query_phrase = " ".join(query_words)
+    ranked = []
+    for doc, chunk, terms in candidates:
+        # A partial overlap can confuse Vietnamese syllables after accent folding:
+        # e.g. "thứ" supplies "thu" but is not evidence for "thử nghiệm".
+        # Require every meaningful keyword instead of accepting three of four.
+        if not query_tokens or not query_tokens <= terms:
+            continue
+        # Small reproducible keyword index. IDF limits dominance of common words.
+        score = sum(
+            math.log(1 + len(candidates) / (1 + sum(t in c[2] for c in candidates)))
+            for t in sorted(query_tokens)
+        ) / math.sqrt(max(len(terms), 1))
+        words = " ".join(re.findall(r"[a-z0-9]+", fold(chunk["text"])))
+        phrase_match = f" {query_phrase} " in f" {words} "
+        ranked.append((phrase_match, score, doc, chunk))
+    ranked.sort(
+        key=lambda row: (
+            -row[0],
+            -row[1],
+            str(row[2].id),
+            row[3]["page"],
+            row[3]["offset"],
+        )
+    )
+    return ranked
+
+
 def reviewed_records(db, asset_id):
     return [
         r
@@ -264,22 +301,13 @@ def retrieve(db, storage, settings, request):
             limitations.append(
                 "An authorized document is missing, stale or invalid; rebuild its local index"
             )
-    ranked = []
-    for doc, chunk, terms in candidates:
-        matched = query_tokens & terms
-        if not matched or len(matched) / max(len(query_tokens), 1) < 0.75:
-            continue
-        # Small reproducible keyword index. IDF limits dominance of common words.
-        score = sum(
-            math.log(1 + len(candidates) / (1 + sum(t in c[2] for c in candidates)))
-            for t in matched
-        ) / math.sqrt(max(len(terms), 1))
-        ranked.append((score, doc, chunk))
-    ranked.sort(
-        key=lambda row: (-row[0], str(row[1].id), row[2]["page"], row[2]["offset"])
+    ranked = rank_document_chunks(candidates, request.question, query_tokens)
+    limitations.append(
+        "PDF search requires all search keywords; exact normalized phrases rank first. "
+        "Accent folding can still conflate words and paraphrases may be missed"
     )
     citations = []
-    for _, doc, chunk in ranked[: request.top_k]:
+    for _, _, doc, chunk in ranked[: request.top_k]:
         citations.append(
             Citation(
                 citation_id=f"doc-{chunk['chunk_id']}",

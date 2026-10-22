@@ -271,3 +271,17 @@ def test_component_code_does_not_match_parent_code_prefix(rag):
         URL, json={**body, "question": "T-SCOPE-C01 test pressure"}
     ).json()
     assert result["citations"] and result["citations"][0]["value_number"] == 270.0
+
+
+def test_document_search_does_not_accept_partial_keyword_overlap(rag):
+    client, body, *_ = rag
+    result = client.post(
+        URL,
+        json={
+            **body,
+            "question": "synthetic inspection software quantum",
+            "query_type": "document",
+        },
+    ).json()
+    assert result["status"] == "NOT_ENOUGH_EVIDENCE" and not result["citations"]
+    assert any("all search keywords" in item for item in result["limitations"])

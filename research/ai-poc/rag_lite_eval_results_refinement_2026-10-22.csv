@@ -1,0 +1,17 @@
+case_id,status,passed,latency_ms,hit_at_5,exact_value_unit_asset,citation_count,resolvable_citations,citation_ids,hit_at_1,hit_at_3,returned_pdf_pages
+A1,RETRIEVAL_ONLY,True,62.36,True,True,1,1,attr-ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9-39e522c7fd8d5aac,True,True,
+A2,RETRIEVAL_ONLY,True,10.211,True,True,1,1,attr-1bb6ca28-134c-5edc-add5-63ed0a90052f-dc5174a6a64e79de,True,True,
+A3,RETRIEVAL_ONLY,True,9.417,True,True,1,1,attr-d1281d47-f144-5c32-9444-44f60fb85b23-a0eeb5a2b4c5773a,True,True,
+A4,RETRIEVAL_ONLY,True,9.07,True,True,1,1,attr-4f47208f-2c20-50f6-84ec-eca83f9a111a-2157201e226d5f13,True,True,
+D1,RETRIEVAL_ONLY,True,35.228,True,,2,2,doc-ab34321b3f2fe343db157dfcede7a4931a15e89c8283c034c30ca803df855f61|doc-0dcf2e723fe4f9a17331d2d6e74970b85037317bb16cc52397221774e4647b58,False,True,10|9
+D2,RETRIEVAL_ONLY,True,19.475,True,,2,2,doc-6e329eb90e6521499cc2b981b217ceb01bc6727e784199c7071a5b09c70eacdf|doc-c59e7bfa0205f684595abe84bf415d93f23d9a8d4131aab98fac02fa7452a96c,True,True,2|3
+D3,RETRIEVAL_ONLY,True,31.161,True,,1,1,doc-1d0145f8a2afa5c013dac674c19a11bd1d2175b6862f6b21378811a9c5cec547,True,True,4
+B1,NOT_ENOUGH_EVIDENCE,True,7.641,,,0,0,,,,
+B2,NOT_ENOUGH_EVIDENCE,True,5.67,,,0,0,,,,
+N1,NOT_ENOUGH_EVIDENCE,True,3.101,,,0,0,,,,
+N2,NOT_ENOUGH_EVIDENCE,True,33.192,,,0,0,,,,
+N3,NOT_ENOUGH_EVIDENCE,True,3.373,,,0,0,,,,
+N4,NOT_ENOUGH_EVIDENCE,True,3.921,,,0,0,,,,
+N5,NOT_ENOUGH_EVIDENCE,True,9.934,,,0,0,,,,
+C1,RETRIEVAL_ONLY,True,49.141,True,,2,2,doc-ab34321b3f2fe343db157dfcede7a4931a15e89c8283c034c30ca803df855f61|doc-0dcf2e723fe4f9a17331d2d6e74970b85037317bb16cc52397221774e4647b58,False,True,10|9
+G1,GENERATION_UNAVAILABLE,True,11.087,True,True,1,1,attr-ebe67ac6-c0d7-5aea-a3e4-ae4cd268ffe9-39e522c7fd8d5aac,True,True,

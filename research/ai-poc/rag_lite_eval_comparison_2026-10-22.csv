@@ -1,0 +1,17 @@
+case_id,before_passed,before_returned_pages,before_hit_at_1,before_hit_at_3,before_hit_at_5,before_known_irrelevant_count,before_citation_count,before_resolvable_citations,before_latency_ms,after_passed,after_returned_pages,after_hit_at_1,after_hit_at_3,after_hit_at_5,after_known_irrelevant_count,after_citation_count,after_resolvable_citations,after_latency_ms
+A1,True,,True,True,True,,1,1,200.918,True,,True,True,True,,1,1,62.36
+A2,True,,True,True,True,,1,1,12.486,True,,True,True,True,,1,1,10.211
+A3,True,,True,True,True,,1,1,11.664,True,,True,True,True,,1,1,9.417
+A4,True,,True,True,True,,1,1,8.816,True,,True,True,True,,1,1,9.07
+D1,True,10|9|11|25|46,False,True,True,3,5,5,34.531,True,10|9,False,True,True,0,2,2,35.228
+D2,True,2|3|4,True,True,True,2,3,3,19.433,True,2|3,True,True,True,1,2,2,19.475
+D3,True,4,True,True,True,0,1,1,33.948,True,4,True,True,True,0,1,1,31.161
+B1,True,,,,,,0,0,7.468,True,,,,,,0,0,7.641
+B2,True,,,,,,0,0,5.386,True,,,,,,0,0,5.67
+N1,True,,,,,,0,0,2.916,True,,,,,,0,0,3.101
+N2,True,,,,,,0,0,31.65,True,,,,,,0,0,33.192
+N3,True,,,,,,0,0,3.329,True,,,,,,0,0,3.373
+N4,True,,,,,,0,0,4.25,True,,,,,,0,0,3.921
+N5,True,,,,,,0,0,9.819,True,,,,,,0,0,9.934
+C1,True,10|9|11|25|46,False,True,True,3,5,5,47.023,True,10|9,False,True,True,0,2,2,49.141
+G1,True,,True,True,True,,1,1,15.04,True,,True,True,True,,1,1,11.087
