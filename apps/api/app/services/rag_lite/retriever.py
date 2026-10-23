@@ -1,6 +1,7 @@
 import math
 import re
 import unicodedata
+from decimal import Decimal
 
 from sqlalchemy import select
 
@@ -10,7 +11,7 @@ from app.models.media import Document
 from app.schemas.rag_lite import Citation
 from app.services.om_service import list_records
 from app.services.rag_lite.answer import respond
-from app.services.rag_lite.indexer import digest, load_allowlist, load_index, read_pdf
+from app.services.rag_lite.indexer import digest, inspect_document, load_allowlist
 
 STOP = {
     "a",
@@ -164,6 +165,34 @@ def rank_document_chunks(candidates, question, query_tokens):
     return ranked
 
 
+def attribute_matches(record, question, query_tokens):
+    # Field meaning must match every meaningful keyword. Half-overlap confused
+    # test/design pressure. Values can refine a field query, never select it alone.
+    field = record.attribute_key + " " + record.attribute_label
+    value = " ".join(
+        str(v)
+        for v in (record.value_number, record.value_text, record.unit)
+        if v is not None
+    )
+    if not query_tokens or not query_tokens & tokens(field):
+        return False
+    if not query_tokens <= tokens(field + " " + value):
+        return False
+    # Compare whole numeric literals, not token fragments such as the zero in
+    # 4650.0. No unit conversion or comma/decimal convention is inferred.
+    numeric = r"(?<![\w.])[+-]?\d+(?:\.\d+)?(?![\w.])"
+    question_numbers = {Decimal(v) for v in re.findall(numeric, question)}
+    field_numbers = {Decimal(v) for v in re.findall(numeric, field + " " + value)}
+    if not question_numbers <= field_numbers:
+        return False
+    explicit = {
+        signature
+        for word, signature in word_signatures(question).items()
+        if word != fold(word) and fold(word) in query_tokens
+    }
+    return explicit <= set(word_signatures(field + " " + value).values())
+
+
 def reviewed_records(db, asset_id):
     return [
         r
@@ -238,6 +267,7 @@ def retrieve(db, storage, settings, request):
             [
                 "Request exceeds historical retrieval scope or asks to bypass evidence rules"
             ],
+            reason_codes=["OUT_OF_SCOPE"],
         )
     records = []
     if request.asset_id:
@@ -247,6 +277,7 @@ def retrieve(db, storage, settings, request):
                 request,
                 [],
                 ["Unknown asset in the selected reservoir; choose its exact UUID"],
+                reason_codes=["SCOPE_MISMATCH"],
             )
         # Never resolve aliases or inherit evidence across parent/child boundaries.
         for other in db.scalars(
@@ -262,6 +293,7 @@ def retrieve(db, storage, settings, request):
                     [
                         "Question names another asset; select exactly one asset/component"
                     ],
+                    reason_codes=["SCOPE_MISMATCH"],
                 )
         records = [
             r
@@ -279,8 +311,7 @@ def retrieve(db, storage, settings, request):
             exact = request.attribute_key == record.attribute_key
             if (request.attribute_key and exact) or (
                 not request.attribute_key
-                and score
-                and score / max(len(query_tokens), 1) >= 0.5
+                and attribute_matches(record, request.question, query_tokens)
             ):
                 ranked.append((score, str(record.id), record))
         ranked.sort(key=lambda row: (-row[0], row[1]))
@@ -297,34 +328,42 @@ def retrieve(db, storage, settings, request):
                 request,
                 [],
                 ["No matching reviewed direct attribute; no parent/child inheritance"],
+                reason_codes=["NO_MATCH" if records else "NO_REVIEWED_ATTRIBUTE"],
             )
     allowlist = load_allowlist(settings.rag_lite_allowlist_path)
     source_ids = {r.source_id for r in records}
     candidates = []
-    for doc in documents_for_reservoir(db, request.reservoir_id):
-        if allowlist.get(str(doc.id)) != doc.checksum_sha256:
-            continue
-        if request.asset_id and doc.source_id not in source_ids:
-            continue
-        try:
-            # Re-check current bytes on EVERY query, not just at index time.
-            read_pdf(storage, doc)
-            index = load_index(settings.rag_lite_index_dir / f"{doc.id}.json", doc)
-            if not index["chunks"]:
-                limitations.append(
-                    "An authorized PDF has no usable extracted text; OCR is outside scope"
-                )
-            for chunk in index["chunks"]:
-                if any(phrase in fold(chunk["text"]) for phrase in UNSUPPORTED[15:]):
-                    limitations.append(
-                        "A potentially instructional passage was excluded"
-                    )
-                    continue
-                candidates.append((doc, chunk, tokens(chunk["text"])))
-        except (OSError, ValueError, KeyError, TypeError):
+    documents = [
+        doc
+        for doc in documents_for_reservoir(db, request.reservoir_id)
+        if not request.asset_id or doc.source_id in source_ids
+    ]
+    reasons = []
+    if request.asset_id and not records:
+        reasons.append("NO_REVIEWED_ATTRIBUTE")
+    if not documents:
+        reasons.append("NO_DIRECT_DOCUMENT")
+    for doc in documents:
+        index, issues = inspect_document(storage, settings, doc, allowlist)
+        reasons.extend(issues)
+        if any(
+            code in issues
+            for code in ("INDEX_INVALID", "DOCUMENT_MISSING", "DOCUMENT_INVALID")
+        ):
             limitations.append(
-                "An authorized document is missing, stale or invalid; rebuild its local index"
+                "An authorized document is missing, stale or invalid; verify the original and local index"
             )
+        if "IMAGE_ONLY" in issues or "EXTRACTION_LIMITED" in issues:
+            limitations.append(
+                "An authorized PDF has limited or no usable extracted text; OCR is outside scope"
+            )
+        if not index:
+            continue
+        for chunk in index["chunks"]:
+            if any(phrase in fold(chunk["text"]) for phrase in UNSUPPORTED[15:]):
+                limitations.append("A potentially instructional passage was excluded")
+                continue
+            candidates.append((doc, chunk, tokens(chunk["text"])))
     ranked = rank_document_chunks(candidates, request.question, query_tokens)
     limitations.append(
         "PDF search requires all search keywords; exact normalized phrases rank first. "
@@ -363,9 +402,12 @@ def retrieve(db, storage, settings, request):
         limitations.append(
             "No relevant authorized passage with a reviewed direct asset link; try explicit corpus-wide search"
         )
+    if not citations and (candidates or not reasons):
+        reasons.append("NO_MATCH")
     return respond(
         request,
         citations,
         list(dict.fromkeys(limitations)),
         max_context_chars=settings.rag_lite_max_context_chars,
+        reason_codes=list(dict.fromkeys(reasons)),
     )

@@ -66,13 +66,7 @@ nav a {
   padding: 10px 16px;
   border-radius: 8px;
 }
-.app-header .nav-qualifier {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  font-weight: 400;
-  color: #698078;
-}
+
 nav a[aria-current] {
   background: #e9f2ec;
   color: #18563f;

@@ -12,12 +12,20 @@ LIMITATIONS = [
 ]
 
 
-def respond(request, evidence, limitations, provider=None, max_context_chars=12000):
+def respond(
+    request,
+    evidence,
+    limitations,
+    provider=None,
+    max_context_chars=12000,
+    reason_codes=None,
+):
     result = RagResponse(
         status="RETRIEVAL_ONLY" if evidence else "NOT_ENOUGH_EVIDENCE",
         asset_id=request.asset_id,
         citations=evidence,
         limitations=LIMITATIONS + limitations,
+        reason_codes=reason_codes or [],
     )
     if not evidence or request.mode == "evidence_only":
         return result

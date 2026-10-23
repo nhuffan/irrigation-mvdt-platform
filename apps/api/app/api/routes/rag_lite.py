@@ -94,39 +94,37 @@ def demo_questions(
             "attribute_key": r.attribute_key,
             "attribute_label": r.attribute_label,
         }
-        for r in reviewed_records(db, asset_id)[:4]
+        for r in [
+            r
+            for r in reviewed_records(db, asset_id)
+            if r.source.reservoir_id == reservoir_id
+            and (
+                r.value_number is not None
+                or (r.value_text is not None and r.value_text.strip())
+            )
+        ][:4]
     ]
 
 
-@router.get("/coverage", response_model=RagCoverage, dependencies=[Depends(enabled)])
+@router.get(
+    "/coverage",
+    response_model=RagCoverage,
+    response_model_exclude_none=True,
+    dependencies=[Depends(enabled)],
+)
 def search_coverage(
     reservoir_id: UUID,
     response: Response,
     db: Annotated[Session, Depends(get_rag_db)],
     storage: Annotated[Storage, Depends(get_storage)],
+    asset_id: UUID | None = None,
 ):
-    from app.services.rag_lite.indexer import load_allowlist, load_index, read_pdf
-    from app.services.rag_lite.retriever import documents_for_reservoir
+    from app.models.asset import Asset
+    from app.services.rag_lite.coverage import search_coverage as live_coverage
 
+    if asset_id:
+        asset = db.get(Asset, asset_id)
+        if not asset or asset.reservoir_id != reservoir_id:
+            raise HTTPException(404, "Asset not found")
     response.headers["Cache-Control"] = "no-store"
-    coverage = RagCoverage()
-    allowlist = load_allowlist(settings.rag_lite_allowlist_path)
-    for doc in documents_for_reservoir(db, reservoir_id):
-        if allowlist.get(str(doc.id)) != doc.checksum_sha256:
-            continue
-        coverage.authorized_documents += 1
-        try:
-            read_pdf(storage, doc)
-            index = load_index(settings.rag_lite_index_dir / f"{doc.id}.json", doc)
-            if index["chunks"]:
-                coverage.searchable_documents += 1
-                coverage.searchable_pages += len({c["page"] for c in index["chunks"]})
-                coverage.indexed_chunks += len(index["chunks"])
-            elif all(page["characters"] == 0 for page in index["coverage"]):
-                coverage.image_only_documents += 1
-            else:
-                # Very little extractable text is not proof that a PDF is image-only.
-                coverage.unavailable_documents += 1
-        except (OSError, ValueError, KeyError, TypeError):
-            coverage.unavailable_documents += 1
-    return coverage
+    return live_coverage(db, storage, settings, reservoir_id, asset_id)

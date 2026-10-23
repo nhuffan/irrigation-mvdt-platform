@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import { citationHref, criticalRetrievalIssue, displayValue, groupDocuments, needsOpenLimitations, resultHeading, type RagCitation, type RagResult } from "@/lib/rag-lite";
+import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, needsOpenLimitations, resultHeading, type RagCitation, type RagResult } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
 
 function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
@@ -10,7 +10,7 @@ function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
     ["Source", `${c.source_code} · ${c.source_id}`], ["Asset ID", c.asset_id ?? "Corpus-wide; no asset attribution"],
     ["Record ID", c.record_id], ["Attribute key", c.attribute_key], ["Evidence ID", c.evidence_id],
     ["Original locator", c.locator], ["Source date", c.source_date ?? "Unknown"],
-    ["Record status", c.record_status], ["Source status", c.source_status], ["Source authority", c.authority ?? "Unknown"],
+    ["Record status", c.record_status], ["Source status", metadataLabel(c.source_status)], ["Source authority", metadataLabel(c.authority)],
     ["Original SHA-256", c.checksum_sha256], ["Citation ID", c.citation_id],
   ];
   return <details className={styles.details}>
@@ -26,10 +26,15 @@ function EvidenceLink({ citation, kind, children, primary = false }: {
   return href ? <a className={primary ? styles.primaryLink : "text-link"} href={href}>{children}</a> : null;
 }
 
+function SourceSummary({ citation: c }: { citation: RagCitation }) {
+  return <p className={styles.provenance}>Source {c.source_code} · Status: {metadataLabel(c.source_status)} · Authority: {metadataLabel(c.authority)} · Date: {metadataLabel(c.source_date)}</p>;
+}
+
 function AttributeCard({ citation: c }: { citation: RagCitation }) {
   return <article id={c.citation_id} tabIndex={-1} className={`panel ${styles.attributeCard}`}>
     <div className={styles.tags}><span>Historical / Reference</span><span>{c.source_code}</span>{c.record_status && <span>Record: {c.record_status}</span>}</div>
     <h3>{evidenceDisplayText(c.title)}</h3>
+    <SourceSummary citation={c} />
     <p className={styles.value}>{(c.value_number === null && c.value_text !== null && c.value_text !== ""
       ? evidenceDisplayText(displayValue(c)) : displayValue(c)) || <span className={styles.muted}>Empty text recorded</span>}</p>
     <div className={styles.actions}>
@@ -44,6 +49,7 @@ function Passage({ citation: c }: { citation: RagCitation }) {
   const original = citationHref(c, "original");
   return <section id={c.citation_id} tabIndex={-1} className={styles.passage} aria-label={`Physical PDF page ${c.page ?? "unknown"}`}>
     <p className={styles.pageLabel}>Physical PDF page {c.page ?? "Unknown"}</p>
+    <SourceSummary citation={c} />
     <div className={styles.excerpt}><p className={styles.clamp}>{c.excerpt}</p><details>
       <summary><span className={styles.expandText}>Expand excerpt</span><span className={styles.collapseText}>Collapse excerpt</span></summary>
       <p className={styles.fullExcerpt}>{c.excerpt}</p>
@@ -52,6 +58,7 @@ function Passage({ citation: c }: { citation: RagCitation }) {
       {original ? <EvidenceLink citation={c} kind="original" primary>Open original PDF (page {c.page}) <span aria-hidden="true">↗</span></EvidenceLink> : <EvidenceLink citation={c} kind="evidence" primary>Open document</EvidenceLink>}
       {original && <EvidenceLink citation={c} kind="evidence">Document details</EvidenceLink>}
       <EvidenceLink citation={c} kind="download">Download</EvidenceLink>
+      <EvidenceLink citation={c} kind="source">Source details</EvidenceLink>
     </div>
     <EvidenceDetails citation={c} />
   </section>;
@@ -105,6 +112,7 @@ export function EvidenceResults({ result, scopeName, query, headingRef }: {
     {!result.citations.length && <div className={`panel ${styles.empty}`}>
       <h3>{retrievalIssue ? "The authorized document search could not be completed." : "No evidence supports this request in the selected scope."}</h3>
       <p>{retrievalIssue ? "Verify the original PDFs, their checksums, and the local search index, then retry. No conclusion about the availability of supporting evidence can be drawn from this failed search." : "Choose the exact asset or component and try keywords used in the original document. You can explicitly select all authorized PDFs to broaden the search."}</p>
+      {!!result.reason_codes?.length && <ul className={styles.reasons}>{result.reason_codes.map(evidenceReasonText).filter(Boolean).map(message => <li key={message}>{message}</li>)}</ul>}
     </div>}
     {attributes.length > 0 && <div className={styles.attributeGrid}>{attributes.map(c => <AttributeCard key={c.citation_id} citation={c} />)}</div>}
     {documents.map(group => <DocumentCard key={group.documentId} citations={group.citations} />)}

@@ -54,6 +54,22 @@ class Citation(BaseModel):
     authority: str | None = None
 
 
+EvidenceReason = Literal[
+    "NO_DIRECT_DOCUMENT",
+    "NO_REVIEWED_ATTRIBUTE",
+    "NOT_AUTHORIZED",
+    "IMAGE_ONLY",
+    "INDEX_INVALID",
+    "DOCUMENT_MISSING",
+    "DOCUMENT_INVALID",
+    "EXTRACTION_LIMITED",
+    "NO_MATCH",
+    "SOURCE_METADATA_UNKNOWN",
+    "OUT_OF_SCOPE",
+    "SCOPE_MISMATCH",
+]
+
+
 class RagResponse(BaseModel):
     status: Literal[
         "ANSWERED", "RETRIEVAL_ONLY", "NOT_ENOUGH_EVIDENCE", "GENERATION_UNAVAILABLE"
@@ -62,6 +78,20 @@ class RagResponse(BaseModel):
     asset_id: UUID | None = None
     citations: list[Citation] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
+    reason_codes: list[EvidenceReason] = Field(default_factory=list)
+
+
+class RagCoverageDiagnostics(BaseModel):
+    asset_id: UUID
+    reviewed_attributes: int = 0
+    direct_documents: int = 0
+    not_authorized_documents: int = 0
+    missing_documents: int = 0
+    invalid_documents: int = 0
+    invalid_indexes: int = 0
+    extraction_limited_documents: int = 0
+    unknown_metadata_sources: int = 0
+    reason_codes: list[EvidenceReason] = Field(default_factory=list)
 
 
 class RagCoverage(BaseModel):
@@ -71,3 +101,4 @@ class RagCoverage(BaseModel):
     unavailable_documents: int = 0
     searchable_pages: int = 0
     indexed_chunks: int = 0
+    diagnostics: RagCoverageDiagnostics | None = None

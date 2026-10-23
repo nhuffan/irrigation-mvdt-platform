@@ -8,23 +8,23 @@ Experimental future work: [historical evidence search preview](research/ai-poc/R
 
 ## Chạy local
 
-Từ root, với Docker Desktop đang chạy, dependencies/env và database/storage hiện có đã được cấu hình:
+Từ **repository root**, với Docker Desktop đang chạy, dependencies/env và database/storage hiện có đã được cấu hình, mở đúng hai terminal:
 
-```sh
-pnpm db:up   # nếu database local chưa chạy
-pnpm dev:api # terminal 1 — http://localhost:8000
-pnpm dev:web # terminal 2 — http://localhost:3000
-```
-
-Web: http://localhost:3000 · Swagger: http://localhost:8000/docs. Kiểm tra instance đang dùng cổng 3000/8000 trước khi khởi chạy; dùng lại đúng instance của project, không mở stack thứ hai.
-
-**AI Research Preview — Experimental / Future Work** dùng chung web/API trên. Mặc định `RAG_LITE_ENABLED=false`. Để bật, thay lệnh trong terminal API bằng:
-
-```sh
+```bash
+# Terminal 1
 RAG_LITE_ENABLED=true RAG_LITE_ALLOWLIST_PATH="$PWD/storage/rag-lite/allowlist.json" pnpm dev:api
+
+# Terminal 2
+pnpm dev:web
 ```
 
-Mở [AI Research Preview](http://localhost:3000/ai-research-preview) từ navigation. Cần allowlist đã được cấp quyền, checksum hợp lệ và index local hiện có; xem [cấu hình và demo](research/ai-poc/README.md). Đây là tìm kiếm bằng chứng lịch sử, chỉ đọc; chưa kết nối LLM bên ngoài, sinh câu trả lời, OCR, dự đoán hiện trạng, tư vấn vận hành hay xác nhận chuyên môn độc lập. Đặt `RAG_LITE_ENABLED=false` và khởi động lại API để tắt preview.
+MVDT và **AI Research** dùng chung web [localhost:3000](http://localhost:3000) và API [localhost:8000](http://localhost:8000/docs). Mở [AI Research](http://localhost:3000/ai-research-preview) từ tab navigation. Dùng lại đúng instance của project nếu cổng3000/8000 đã được sử dụng; không mở stack thứ hai.
+
+Kiểm tra trạng thái: `curl http://localhost:8000/api/v1/experimental/rag-lite/status`. `enabled=true` cho phép tìm bằng chứng; `generation_available=false` là chủ đích retrieval-only, không phải lỗi. Allowlist được cấp quyền, PDF gốc đúng checksum và index local phải có sẵn; các tài liệu riêng và file runtime này không được commit. Xem [cấu hình và giới hạn](research/ai-poc/README.md).
+
+Mặc định cấu hình `RAG_LITE_ENABLED=false`. Để tắt sau khi opt-in, dừng API bằng Ctrl+C rồi chạy `RAG_LITE_ENABLED=false pnpm dev:api`; hoặc `pnpm dev:api` nếu `.env` không bật cờ. Chưa kết nối LLM bên ngoài, sinh câu trả lời, OCR, dự đoán hiện trạng, tư vấn vận hành hay xác nhận chuyên môn độc lập.
+
+Nếu database local chưa chạy, khởi động một lần bằng `pnpm db:up` trước hai terminal trên.
 
 Không migrate, seed lại hoặc reset database nghiên cứu hiện có để chạy preview. Chỉ khi khởi tạo database development mới: `pnpm db:migrate`, `pnpm db:seed`, `pnpm db:seed:assets`, rồi `pnpm db:seed:media`; seed không phải dữ liệu nghiên cứu đã xác minh.
 

@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { AskPanel } from "@/components/rag-lite/ask-panel";
 import { getReservoirAssets } from "@/lib/api";
-import { MANAGED_RESERVOIR_ID, RESERVOIR_HREF } from "@/lib/site-scope";
+import { MANAGED_RESERVOIR_ID } from "@/lib/site-scope";
 import styles from "@/components/rag-lite/rag-lite.module.css";
 
 export const dynamic = "force-dynamic";
@@ -23,9 +22,8 @@ export default async function AiResearchPreview() {
     } catch { return null; }
   })) : [];
   return <main className={`page-shell ${styles.page}`}>
-    <div className={styles.topline}><Link className="text-link" href={RESERVOIR_HREF}>← Back to reservoir</Link></div>
-    <header className={styles.intro}><p className="eyebrow">RAG Lite — Experimental Evidence Search</p><h1>Find the evidence behind a value.</h1><p>Search historical technical fields and original document passages linked to your asset.</p></header>
-    <p role="note" className={styles.notice}>Experimental historical documentary retrieval. Not current condition or operational advice. Human verification required.</p>
+    <header className={styles.intro}><h1>AI Research</h1></header>
+    <p role="note" className={styles.notice}>Experimental historical evidence · Human verification required. Not current condition or operational advice.</p>
     {enabled ? <AskPanel initialAssetId={demos.find(id => id !== null) ?? undefined} assets={assets.map(({ id, asset_code, name, parent_asset_id }) => ({ id, asset_code, name, parent_asset_id }))} /> : <p role="status" className="panel">
       {available ? "Experimental evidence search is disabled. The core application remains available." : "Evidence search is unavailable. Retry when the local services are running."}
     </p>}

@@ -5,6 +5,7 @@ import type { Asset } from "@/types/asset";
 import { assetDisplayName } from "@/lib/asset-display";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import type { RagCoverage, RagDemo, RagResult } from "@/lib/rag-lite";
+import { SearchCoverage } from "./search-coverage";
 import { EvidenceResults } from "./evidence-results";
 import styles from "./rag-lite.module.css";
 
@@ -18,6 +19,8 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   const [queryType, setQueryType] = useState("auto");
   const [demos, setDemos] = useState<RagDemo[]>([]);
   const [coverage, setCoverage] = useState<RagCoverage | null>(null);
+  const [coverageError, setCoverageError] = useState(false);
+  const [coverageAttempt, setCoverageAttempt] = useState(0);
   const [run, setRun] = useState<SearchRun | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -32,11 +35,16 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   useEffect(() => { if (error) errorHeading.current?.focus(); }, [error]);
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/rag-lite?coverage=true", { signal: controller.signal, cache: "no-store" })
-      .then(r => r.ok ? r.json() : null).then(value => { if (!controller.signal.aborted) setCoverage(value); })
-      .catch(() => {});
+    if (!allDocs && !assetId) return;
+    const url = `/api/rag-lite?coverage=true${allDocs ? "" : `&asset_id=${encodeURIComponent(assetId)}`}`;
+    fetch(url, { signal: controller.signal, cache: "no-store" })
+      .then(async r => {
+        if (!r.ok) throw new Error("Coverage unavailable");
+        const value: RagCoverage = await r.json();
+        if (!controller.signal.aborted) { setCoverage(value); setCoverageError(false); }
+      }).catch(() => { if (!controller.signal.aborted) { setCoverage(null); setCoverageError(true); } });
     return () => controller.abort();
-  }, []);
+  }, [assetId, allDocs, coverageAttempt]);
   useEffect(() => {
     if (!assetId || allDocs) return;
     const controller = new AbortController();
@@ -48,7 +56,7 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
 
   function reset(clearDemos = false) {
     active.current?.abort(); setBusy(false); setRun(null); setError(""); lastRequest.current = null;
-    if (clearDemos) setDemos([]);
+    if (clearDemos) { setDemos([]); setCoverage(null); setCoverageError(false); }
   }
   function clear() { reset(); setQuestion(""); input.current?.focus(); }
   function cancel() { active.current?.abort(); setBusy(false); input.current?.focus(); }
@@ -98,9 +106,13 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
           <button className={`button ${styles.submit}`} type="submit" disabled={busy || question.trim().length < 2 || (!allDocs && !assetId)}>{busy ? "Searching…" : "Search evidence"}<span aria-hidden="true">↗</span></button>
         </div>
         <div className={styles.searchNotes}>
-          <p>{allDocs ? "Searches only authorized PDFs in this reservoir. Passages are not attributed to an asset." : "Search technical fields and PDF passages linked directly to this asset. Parent and component records stay separate."}</p>
+          <p>{allDocs ? "Corpus-wide · not attributed to this asset. Searches only authorized PDFs in this reservoir." : "Search technical fields and PDF passages linked directly to this asset. Parent and component records stay separate."}</p>
           {busy ? <button type="button" className="text-link" onClick={cancel}>Cancel</button> : question && <button type="button" className="text-link" onClick={clear}>Clear search</button>}
         </div>
+        <SearchCoverage coverage={coverage && (allDocs ? !coverage.diagnostics : coverage.diagnostics?.asset_id === assetId) ? coverage : null}
+          allDocs={allDocs} unavailable={coverageError || (!allDocs && !assetId)} busy={busy}
+          onRetry={() => { setCoverageError(false); setCoverageAttempt(value => value + 1); }}
+          onCorpus={() => { reset(true); setAllDocs(true); input.current?.focus(); }} />
         {demos.length > 0 && !allDocs && <div className={styles.suggestions}><span>Suggested</span>{demos.slice(0, 3).map(demo => <button type="button" key={demo.attribute_key} disabled={busy} onClick={() => void ask(demo.question, demo.attribute_key)}>{evidenceDisplayText(demo.attribute_label ?? demo.attribute_key.replaceAll("_", " "))}</button>)}</div>}
         <div className={styles.secondaryControls}>
           {!allDocs && <details className={styles.options}>
@@ -111,12 +123,6 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
               </select>
             </label>
           </details>}
-          <details className={styles.options}>
-            <summary>Search coverage</summary>
-            {coverage ? <><p>{coverage.authorized_documents} authorized originals · {coverage.searchable_documents} text-searchable PDFs · {coverage.image_only_documents} image-only PDFs</p>
-              <p>{coverage.searchable_pages} searchable physical pages. Image-only PDFs are retained but cannot be searched as text. No OCR is used. Missing hits do not prove a document is absent.</p>
-              {coverage.unavailable_documents > 0 && <p role="note">{coverage.unavailable_documents} authorized {coverage.unavailable_documents === 1 ? "document is" : "documents are"} unavailable, stale, or lack usable text. Verify the originals and local index.</p>}</> : <p>Coverage is currently unavailable. A missing result does not mean that an original document is absent.</p>}
-          </details>
         </div>
       </form>
     </section>
@@ -124,6 +130,6 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
     {busy && <div className={styles.progress} role="status">Searching historical records and authorized documents…</div>}
     {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={`panel ${styles.error}`}><h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey)}>Retry search</button></div>}
     {run && <EvidenceResults key={`${run.scopeName}:${run.question}`} result={run.result} scopeName={run.scopeName} query={run.question} headingRef={heading} />}
-    {!busy && !run && !error && <section className={styles.startState}><p className="eyebrow">From record to original source</p><h2>Find a value. Follow its evidence.</h2><p>Choose an asset, enter keywords, or try a suggested field. Exact recorded values and original PDF pages appear here with links for your review.</p></section>}
+    {!busy && !run && !error && <section className={styles.startState}><h2>Evidence results appear here</h2><p>Choose an asset, enter keywords, or try a suggested field. Exact recorded values and original PDF pages appear here with links for your review.</p></section>}
   </>;
 }

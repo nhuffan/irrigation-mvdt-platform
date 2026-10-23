@@ -166,3 +166,31 @@ def build_index(documents, storage, directory: Path, allowlist: dict[str, str], 
             entry["status"] = "UNAVAILABLE_OR_INVALID_PDF"
     atomic_json(directory / "rag_corpus_manifest.json", manifest)
     return manifest
+
+
+def inspect_document(storage, settings, doc, allowlist):
+    """Read-only diagnostics; authorization precedes every filesystem access."""
+    if allowlist.get(str(doc.id)) != doc.checksum_sha256:
+        return None, ["NOT_AUTHORIZED"]
+    try:
+        read_pdf(storage, doc)
+    except FileNotFoundError:
+        return None, ["DOCUMENT_MISSING"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None, ["DOCUMENT_INVALID"]
+    try:
+        index = load_index(settings.rag_lite_index_dir / f"{doc.id}.json", doc)
+        pages = index["coverage"]
+        if not pages or any(not isinstance(p["characters"], int) for p in pages):
+            raise ValueError("INVALID_COVERAGE")
+        if not index["chunks"]:
+            return index, [
+                "IMAGE_ONLY"
+                if all(p["characters"] == 0 for p in pages)
+                else "EXTRACTION_LIMITED"
+            ]
+        return index, ["EXTRACTION_LIMITED"] if any(
+            not p["indexed"] for p in pages
+        ) else []
+    except (OSError, ValueError, KeyError, TypeError):
+        return None, ["INDEX_INVALID"]

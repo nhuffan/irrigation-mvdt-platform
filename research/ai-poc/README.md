@@ -14,7 +14,7 @@ The allowlist format is `{"version":1,"authorization":"actual permission referen
 
 ## Run locally
 
-Follow the single [root local startup workflow](../../README.md#chạy-local), including its API opt-in command. The existing Next.js app on port 3000 and FastAPI app on port 8000 serve both the platform and this preview. Use the existing configured database, storage and authorization file; no migration or development seeding is required.
+Follow the single [root local startup workflow](../../README.md#chạy-local), with its exact two-terminal RAG-enabled commands. The existing Next.js app on port 3000 and FastAPI app on port 8000 serve both the platform and this preview. Use the existing configured database, storage and authorization file; no migration or development seeding is required.
 
 Keep an existing valid checksum-pinned index. Only if the authorized index is absent or stale, explicitly rebuild it from `apps/api` with `uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3` before enabling the preview. Do not reseed or reset the database.
 
@@ -49,6 +49,8 @@ Use the enabled local services and authorized corpus above; open [Evidence Searc
 3. **0:55–1:20** Choose Intake No. 1, East Canal and its suggested canal-route field. The canonical text is **Kênh Đông** (displayed with its English label). Switch to the Intake Structure parent and search `reported_canal_route`: no inherited child evidence should appear.
 4. **1:20–1:40** Ask `What is the current condition?` and inspect the explicit no-evidence state with open limitations. A historical record cannot validate current condition or justify operating advice.
 5. **1:40–2:00** Open **Search coverage** and explain text-searchable versus image-only originals. **All authorized PDFs** is an explicit scope change and never attributes a corpus passage to an asset. Provenance remains inspectable; no model response or engineering confidence score is fabricated.
+
+Selected-asset coverage now counts reviewed SQL fields and directly linked searchable/image-only PDFs, with distinct authorization, original/index integrity, extraction and unknown-metadata explanations. A corpus-wide offer changes scope only when explicitly selected; it does not submit automatically or attribute passages to the previous asset. Auto SQL matching requires every meaningful keyword in the field and recorded value/unit before returning it; otherwise it falls through to authorized PDF search. Explicit attribute keys keep exact lookup.
 
 A completed search with no match shows **No supporting evidence found**. An invalid/stale index shows **Evidence retrieval unavailable**, with recovery guidance; valid citations from a partial search stay visible under **Search incomplete**. HTTP429 and API/network failures show **Search unavailable** with distinct limit/connection copy and Retry; feature OFF disables the preview. These are different states, not interchangeable evidence conclusions.
 

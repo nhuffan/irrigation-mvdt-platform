@@ -1059,3 +1059,108 @@ Post-browser read-only audit matches the fresh baseline across all14 database ta
 Live enabled coverage was6 checksum-authorized PDFs /2 searchable /4 image-only /0 unavailable,56 searchable physical pages and70 chunks. No OCR, embeddings, external LLM, generated answer, current-condition prediction, operational advice or independent validation. Strict keywords/paraphrase misses, ambiguous cylinder queries, extraction quality, unknown source dates/authority and the preexisting in-app PDF iframe limitation remain; the original link rendered in Chrome.
 
 The preexisting frontend3000 (PID17105) and healthy `mvdt-postgis` were retained. The preexisting API8000 was deliberately restarted for opt-in/fault checks, then restored via `pnpm dev:api` to its original default-OFF configuration (reloader33831/worker33833, one API instance). Final health/status/preview returnHTTP200; `enabled=false`, `generation_available=false`, `mode=retrieval_only`; actual Chrome confirms the disabled notice and no search form. All temporary enabled/stale/timing API variants were stopped gracefully and their PIDs exited. No diagnostic server remains; no second web/API port, container or volume was created. The restored API remains to preserve the workload that was running before this task. Both current verification tabs were closed and the viewport override reset; unrelated services and user tabs were left intact.
+
+
+## Stage 7 output — 2026-10-23
+
+**Status: `LEVEL1_RAG_LITE_EVIDENCE_UI_READY`.** Source-backed UI/diagnostics and bounded retrieval refinement pass fresh local acceptance. Input `main` and fetched `origin/main` were both `2848f2265d9c5e964e95b427ffa68ba786e75323`; initial tree was clean. This is experimental historical retrieval, not a validated academic AI contribution or operational/current-condition system. Level-1 evidence, Stage5B NOT_READY and paper/research results remain unchanged.
+
+### Focused implementation
+
+- Root README prominently contains the exact requested two-terminal RAG-enabled startup block, run from repository root. Normal MVDT and AI Research share web3000/API8000. The status command, intentionally false generation availability, private uncommitted authorization/original/index prerequisites and explicit OFF restart are documented. Feature README references this single workflow. Default configuration remains OFF; no `.env` edit.
+- Existing main navigation now has the ordinary, one-line **AI Research** tab, preserving its route and exact active state. Removed the navigation qualifier, redundant Back to reservoir row and unused classes/imports. One concise page heading and subtle historical/experimental/human-verification note remain; the disclosure is not an error banner. Other tab layouts are unchanged.
+- Extended the existing read-only coverage endpoint with optional `asset_id`, validated against the reservoir. Existing corpus response fields remain compatible. Selected-asset diagnostics count reviewed SQL fields, direct PDFs, authorized/searchable/image-only originals, missing/invalid originals, invalid indexes, limited extraction and unknown source metadata. Shared `inspect_document` checks authorization before file access and rechecks original bytes; coverage and retrieval use the same integrity/scope checks. No canonical DB schema/migration or cache rebuild.
+- Added structured query reason codes and visible coverage/recovery explanations, retaining existing statuses and limitations. No direct searchable PDF triggers an **explicit** All authorized PDFs offer; it clears results and changes scope only when selected, without automatic submission, inheritance or asset attribution. Coverage requests are cancelled on scope changes and stale asset coverage is not displayed. Coverage service failure has a separate unavailable state and retry.
+- Exact SQL auto matching now requires every meaningful query keyword in the reviewed field label/key plus recorded value/unit, with existing explicit-diacritic constraints. A field keyword is required; numeric literals are compared whole to avoid matching the zero fragment in4650.0. No unit conversion, uncontrolled synonyms, loose OR, hardcoded production answers/pages, provider, embeddings or OCR. Explicit attribute-key lookup remains exact. Document ranking/chunks/physical pages are unchanged.
+- Result cards expose source label, source status, authority/date (Unknown when absent), record status, original physical page and tested record/source/original actions. Grouped passages, all citations, canonical same-origin URL validation, exact record fragment and failure/generation distinctions remain. Suggestions require a reviewed, nonempty recorded value.
+
+Changed implementation groups: `apps/api/app/api/routes/rag_lite.py`, `schemas/rag_lite.py`, `services/rag_lite/{answer,indexer,retriever,coverage}.py`; `apps/api/tests/test_rag_lite_diagnostics.py`; web preview page/API adapter/global qualifier style/header, RAG ask/results/coverage/styles/helper and helper tests; root README, feature README and this single root Stage7 section. No extra stage report, slide, runbook or repository screenshot directory.
+
+### Investigation: why evidence can be empty
+
+Fresh read-only per-asset probes checked an actual reviewed SQL field where available, PDF no-match and scoped coverage for all10 research assets. Development fixtures were not exposed as UI choices. Temporary investigation/evaluation logs are under `/tmp/rag-lite-stage7-2026-10-23/`.
+
+| Asset/group | Reviewed SQL fields | Direct / searchable PDFs | Actual finding |
+|---|---:|---:|---|
+| DAM | 7 | 1 / 1 | Exact reviewed SQL works; original RS-SRC-007 is searchable. Source metadata remains partly unknown. |
+| SPILLWAY | 10 | 1 / 1 | Exact SQL and RS-SRC-018 passages work; SQL-first half-overlap could return wrong field meanings, fixed below. |
+| INTAKE parent / MGMT parent | 0 / 0 | 0 / 0 each | `NO_REVIEWED_ATTRIBUTE` + `NO_DIRECT_DOCUMENT`; no child evidence inherited. |
+| INTAKE C01 / C02 / C03 | 6 / 6 / 6 | 0 / 0 each | SQL exists, but `NO_DIRECT_DOCUMENT`; an empty PDF list does not negate the reviewed fields. |
+| MGMT DINING / OFFICE / SAIL | 3 / 5 / 1 | 0 / 0 each | Same direct-PDF gap; their actual reviewed SQL probes return scoped records. |
+
+| Cause/state | Evidence observed and verified handling |
+|---|---|
+| No direct PDF / no reviewed field | Eight of10 research assets have no directly linked PDF in this retrieval scope; two parent assets also have no reviewed direct fields. UI names these separately and offers explicit corpus scope. |
+| Missing source metadata | Live source dates/authority include genuine unknowns; selected-asset coverage explains these and result cards preserve Unknown. No owner/date/verification is invented. |
+| PDF not authorized | All6 retained research PDFs remain authorized. Existing documents outside the checksum allowlist are skipped without byte access; revocation fixture produces `NOT_AUTHORIZED`, no citations and no scope expansion. |
+| Missing/modified original | Zero among the6 live authorized originals. Synthetic missing/changed-byte tests distinguish `DOCUMENT_MISSING` / `DOCUMENT_INVALID`; stale indexed text is not returned. |
+| Stale/invalid index | Zero live at baseline/final. A disposable copied index with a changed version on8000 produces `INDEX_INVALID`, zero references and Evidence retrieval unavailable; canonical index untouched. |
+| Image-only / extraction limited | Live corpus has4 originals with no extracted text and2 searchable PDFs. Synthetic low-text pages distinguish `EXTRACTION_LIMITED` from `IMAGE_ONLY`; partially indexed documents disclose incomplete page coverage. No OCR claim. |
+| Keyword/phrase mismatch | Real SQL pressure mismatch reproduced and fixed below. Healthy unrelated keyword probes produce `NO_MATCH`; strict keywords, paraphrases, damaged accents and table extraction can still miss evidence. |
+| Scope mismatch | Parent/component and explicit other-asset boundaries retained; corpus searches have null asset attribution. No automatically broadened search or copied citations. |
+| Service/rate-limit error | Actual API-down, HTTP429 and Retry verified on Chrome; they remain Search unavailable with connection/wait copy, distinct from a completed no-hit or invalid index. |
+| UI hiding valid results | No lost citation found in tested flows: both ranked PDF passages remain accessible through More passages, with original links, expansion and keyboard access at all three widths. |
+
+### Source-linked before/after: bounded SQL routing correction
+
+Read-only comparison executed the input-HEAD retriever and final retriever over the same persisted records/originals. Every new document excerpt was checked against its original physical page and checksum. `targeted-comparison.json` SHA256 `c9736a1c724a98a48fa002b6cbcdb7ee89a80f80778ed756d9eaba4139a79722`.
+
+| Actual auto query on SPILLWAY | Before | After / source basis |
+|---|---|---|
+| `áp suất thử nghiệm` | SQL270bar test pressure **plus wrong design200bar**; SQL-first stopped document search | No insufficient SQL field match; returns authorized original PDF pages10,9. Both explicitly report270bar, for latch and main cylinders respectively; no forced page9 preference. |
+| `áp suất thiết kế` | Design200bar plus wrong design-discharge2800m3/s and test270bar | Only the reviewed200bar design-pressure record. Original manual physical p9 and p10 distinguish design200bar from test270bar; exact record/locator remain inspectable. |
+| `hành trình 4650` | Exact4650mm record | Same record/value/unit; numeric filter cannot match0 or4650.1 through decimal token fragments. |
+| `quantum spacecraft banana` | Zero hits | Zero hits with diagnostic reason; no fabricated source. |
+
+These observed wrong-field extras are removed by deterministic narrowing, not by changing source values or broadening evidence. The real design label/value has positive/negative regressions; synthetic service/authorization/scope tests exercise missing evidence. This small source check is implementing-AI judgement, not independent engineering validation or universal accuracy measurement.
+
+### Fresh automated checks and evaluation
+
+| Command/check | Actual result |
+|---|---|
+| `cd apps/api && .venv/bin/python -m pytest -q` | **498/498 PASS**,4.24s;19 added diagnostics/SQL/numeric regressions. Existing Starlette/httpx deprecation warning retained. |
+| `.venv/bin/python -m pytest tests/test_rag_lite*.py -q` | **93/93 PASS**,1.23s. New tests recorded a failing missing helper before implementation and numeric false-match red before its fix. |
+| From `apps/api`: `.venv/bin/ruff check --no-cache app/api/routes/rag_lite.py app/schemas/rag_lite.py app/services/rag_lite tests/test_rag_lite*.py` and corresponding `ruff format --no-cache --check` | **PASS**,15 files already formatted. |
+| Whole-backend Ruff | Same3 preexisting I001 findings in unchanged `tests/test_empirical.py:3` and `tests/test_methodology_review.py:3,501`; not silently fixed. |
+| `pnpm --dir apps/web lint` | **PASS**. |
+| `node --test apps/web/tests/*.test.mjs` | **139/139 PASS**,0 failures;3 new reason/metadata/integrity helper tests. |
+| Production webpack build | **PASS**, buildID **`u14ILFRrsy421J0NMkvka`**. All141 frontend sources, including new coverage component, match the built snapshot. |
+| Actual fixed16-case HTTP baseline/final | **16/16 PASS both**, **11/11 citations resolvable both**, all non-latency output columns identical. |
+| `git diff --check` | **PASS**. |
+
+Production compilation used the installed Next CLI in `/tmp/rag-lite-stage7-2026-10-23/build/web` with byte-copied source, original `node_modules` symlink and existing worker/Cesium copy scripts; no second server or overwrite of the preexisting dev `.next`. Exact build command after copying assets: `API_BASE_URL=http://localhost:8000/api/v1 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1 node <repo>/apps/web/node_modules/next/dist/bin/next build --webpack`. Manifest SHA256 `b31a834935fdd4eb32f08d3ddd89c29e5aa643496aa18bef88e6b0b3003cd1ed`.
+
+Evaluator command: `apps/api/.venv/bin/python scripts/evaluate_rag_lite.py --web-base http://localhost:3000 --output /tmp/rag-lite-stage7-2026-10-23/final-eval.csv`. New temporary baseline/final files were created exclusively; historical CSVs were not overwritten. Before CSV SHA256 `271f4fbe77dd63148792b563dd478f1ff908a6fdc9e7fb5534da76f69d651238`; final `a4ec11f997f000523e85f8337af082e9c7c36890580cdca763e205b8537e1edc`. Final local query latency6.931–189.386ms versus baseline8.227–71.854ms; no speed/scalability claim. An intermediate post-edit run also passed16/16 with11/11 links.
+
+On unchanged fixed document/corpus queries D1/D2/D3/C1, physical pages remain10,9 /2 /4 /10,9. Hit@1 remains2/4, hit@3 remains4/4, with no added incorrect document passage in these source-checked cases. Four exact SQL value/unit/asset cases, seven boundary/negative refusals and provider-unavailable evidence remain unchanged. Fixed-case empty results and source scope are identical; the additional real auto-query comparison above exposes a separate routing gap that the fixed cohort did not measure.
+
+### Actual Chrome acceptance and evidence
+
+- Shared web3000/API8000; all five navigation routes retain the correct active tab. AI is one line with the same tab height as peers; Back to reservoir and qualifier are absent. Overview retains10research assets/44technical/zero verifiedO&M. No unrelated tab redesign.
+- Exact SQL design200bar → original record fragment, loaded/focused after streaming with record top257.98px. Source UNVERIFIED remains distinct from record VERIFIED and unknown authority/date. Original/source/record links resolve in the fixed evaluator; original PDF physically rendered at9/51 in Chrome.
+- Per-asset no-source coverage, SQL-without-PDF C01, parent no-inheritance, explicit corpus offer (clears results, no auto-submit), corpus no-attribution, healthy no-match and current-condition refusal all verified. Date/authority Unknown remain visible.
+- Enter submit, result-heading focus, Tab→excerpt and Enter toggle pass. Long bilingual labels and both physical-page passages remain accessible. Actual viewport/document scrollWidth375/375,768/768,1440/1440px, no horizontal overflow; no exhaustive device/screen-reader claim.
+- FlagOFF shows disabled view/no form while core Overview still loads. Stale copied index shows unavailable retrieval and its diagnostic reason. Actual limiter returned429/Retry-After60 after29 additional successful refusal requests (one previous request already counted); Chrome shows wait/retry. API-down Retry shows connection copy; restored canonical API Retry recovers the same question and two citations.
+- Cancel/new-result race: temporary middleware delayed only the pressure query12s. C01 result visible at `2026-10-23T06:16:40.802Z`, before cancelled old response ready at `06:16:51.907452Z`. Later Chrome read at `06:18:23.800Z` still showed C01's question/record/asset and zero document passages, no alert. Timing harness is outside repo and now stopped; no production timing change claimed.
+
+Actual Chrome captures are outside repo at `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`. Browser checks use the preexisting dev frontend; production compilation is verified separately. Full-page image dimensions can exceed viewport height.
+
+| Screenshot | Actual dimensions | SHA256 |
+|---|---|---|
+| `stage7-1440.jpg` | 1440×1783 | `60b6d3ece731e98da542f60189ed2d8c9b3928652a4a67841352871b6a59176f` |
+| `stage7-375.jpg` | 375×2615 | `72b3af555fe3bc7c1381c995c40a6e2a23396d7cb770ad7c635ddd4b32a060a5` |
+| `stage7-429.jpg` | 1440×1034 | `e0215145e410cf357a17d67a7efdcbdc2f6a7c3c059ff5e3885c1931058e532a` |
+| `stage7-768.jpg` | 768×2041 | `25503e5f0ff2f35ffc9d246d7ce9b2d895093ef00bade9ad690323897194711f` |
+| `stage7-late-response.jpg` | 1440×1452 | `f4c24af2b77446efa96384eb56aa66fd3b1f7e4c2448216bf7de1f431234f87d` |
+| `stage7-no-source.jpg` | 1440×1000 | `e2645b494f5ef754eb8dee4048c8419bbf73dbed6832e3334459a4539f2b35a3` |
+| `stage7-off.jpg` | 1440×1000 | `f2bdcb29673ddf14dbc66137b80334d9ab75d631ca6ce79ff115a6968602da4a` |
+| `stage7-original-p9.jpg` | 1745×952 | `91f366998a135edd4abd8b4a4acee90f92b7e5d5e79065abd5ffa0c90a90686e` |
+| `stage7-stale.jpg` | 1440×1411 | `bab01661cd22c7d840537b052f5840837b2666b8b944a79d9bbb4389b031c43d` |
+
+### Preservation, service cleanup and limits
+
+All14 database table fingerprints and6 original PDF metadata/checksum/extraction readbacks exactly match input baseline. Database aggregate remains `b35970f54e4c56652a1fbf401c91f980b1859e01ba90aca2949fe364b8c47494`. All8 runtime authorization/index/manifest JSON bytes unchanged, aggregate `8d759a8ce6227e810bc4a5d016a97fec9fe36ade3ba81208aac3bd4879a8d6bf`. All115 protected research/docs/database files and44 historical CSVs remain identical. Previous root stage log is preserved as the exact253206-byte prefix. No migration/import/seed/reset, canonical index regeneration, source authority/status edit, original write, data freeze or paper-metric change.
+
+Final enabled coverage remains6 authorized /2 searchable /4 image-only /0 unavailable,56 searchable physical pages and70 chunks. Many asset-specific PDF gaps require additional authorized, directly linked searchable originals; UI cannot create those passages. Strict keyword/paraphrase, imperfect extraction, missing source metadata, cylinder ambiguity and the preexisting in-app PDF iframe limitation remain. External original rendered; no OCR, LLM, generated answers, embeddings, operational advice or independent validation was enabled.
+
+Preexisting web3000 (PID48430) and healthy PostGIS were retained. Preexisting API8000 (supervisor49044) was deliberately restarted for OFF/stale/timing checks, then restored with the exact README opt-in command to its original **ON** state on canonical allowlist/index (supervisor55755/worker55758). Final health/status/coverage HTTP200; enabled=true, generation_available=false, mode=retrieval_only. All task-only OFF/stale/timing variants exited; no additional port/server/container/volume remains. The restored API preserves the workload present before this stage. Both task Chrome tabs closed and viewport reset; user tabs and unrelated services untouched.

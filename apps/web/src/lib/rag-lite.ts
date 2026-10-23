@@ -30,6 +30,7 @@ export type RagResult = {
   asset_id: string | null;
   citations: RagCitation[];
   limitations: string[];
+  reason_codes?: string[];
 };
 
 export type RagDemo = { question: string; attribute_key: string; attribute_label?: string };
@@ -41,10 +42,23 @@ export type RagCoverage = {
   unavailable_documents: number;
   searchable_pages: number;
   indexed_chunks: number;
+  diagnostics?: {
+    asset_id: string;
+    reviewed_attributes: number;
+    direct_documents: number;
+    not_authorized_documents: number;
+    missing_documents: number;
+    invalid_documents: number;
+    invalid_indexes: number;
+    extraction_limited_documents: number;
+    unknown_metadata_sources: number;
+    reason_codes: string[];
+  };
 };
 
 /** Retrieval integrity failures require a different recovery path from a completed search with no match. */
 export function criticalRetrievalIssue(result: RagResult): boolean {
+  if (result.reason_codes?.some(code => ["INDEX_INVALID", "DOCUMENT_MISSING", "DOCUMENT_INVALID"].includes(code))) return true;
   return result.limitations.some(line => {
     // Provider availability is separate from the integrity of retained retrieval evidence.
     if (line === "Generation unavailable or invalid; original retrieval evidence retained") return false;
@@ -113,4 +127,28 @@ export function citationHref(citation: RagCitation, kind: "evidence" | "original
 export function needsOpenLimitations(result: RagResult): boolean {
   if (!result.citations.length || result.status === "NOT_ENOUGH_EVIDENCE") return true;
   return criticalRetrievalIssue(result);
+}
+
+
+/** Codes come from live, scope-bound checks; never infer absent sources from no hits. */
+export function evidenceReasonText(code: string): string | null {
+  const messages: Record<string, string> = {
+    NO_DIRECT_DOCUMENT: "No PDF is directly linked through reviewed evidence in this scope. Technical records may still be available.",
+    NO_REVIEWED_ATTRIBUTE: "No reviewed technical attribute is available for this asset. Parent and component evidence stays separate.",
+    NOT_AUTHORIZED: "Some linked PDFs are not authorized for local search. They have not been searched.",
+    IMAGE_ONLY: "Some authorized PDFs have no extracted text (image-only coverage). Text search cannot read them; no OCR is used.",
+    INDEX_INVALID: "The local index is absent, stale or invalid. Verify it against the authorized original before retrying.",
+    DOCUMENT_MISSING: "An authorized original PDF is missing from local storage. Its indexed text cannot be used.",
+    DOCUMENT_INVALID: "An authorized original could not pass its checksum or file checks. Its indexed text cannot be used.",
+    EXTRACTION_LIMITED: "Some original pages have too little usable extracted text. Search covers only indexed passages, not the entire original.",
+    NO_MATCH: "No passage or reviewed field matched these keywords. Try wording from the original; missing hits do not prove evidence is absent.",
+    SOURCE_METADATA_UNKNOWN: "Some source dates or authorities are not recorded. Unknown metadata is not independent source verification.",
+    OUT_OF_SCOPE: "This request asks beyond historical evidence retrieval or to bypass evidence rules. Current condition and operational advice are outside scope.",
+    SCOPE_MISMATCH: "The asset is outside this reservoir or the question names another asset. Select the exact asset or component.",
+  };
+  return messages[code] ?? null;
+}
+
+export function metadataLabel(value: string | null | undefined): string {
+  return !value?.trim() || value === "UNKNOWN" ? "Unknown" : value;
 }

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { citationHref, displayValue, groupDocuments, needsOpenLimitations, resultHeading } from '../src/lib/rag-lite.ts';
+import { citationHref, displayValue, evidenceReasonText, metadataLabel, groupDocuments, needsOpenLimitations, resultHeading } from '../src/lib/rag-lite.ts';
 
 const ASSET = '11111111-1111-4111-8111-111111111111';
 const OTHER = '22222222-2222-4222-8222-222222222222';
@@ -204,4 +204,32 @@ test('provider failure and limited text coverage are distinct from document inte
   assert.equal(resultHeading(retained), 'Evidence found · AI summary unavailable');
   assert.equal(needsOpenLimitations(retained), false);
   assert.equal(resultHeading({ ...retained, citations: [] }), 'No supporting evidence found');
+});
+
+
+test('structured empty reasons distinguish absent links, limited text, authorization and completed no-match', () => {
+  const codes = ['NO_DIRECT_DOCUMENT', 'NO_REVIEWED_ATTRIBUTE', 'NOT_AUTHORIZED', 'IMAGE_ONLY', 'INDEX_INVALID', 'DOCUMENT_MISSING', 'DOCUMENT_INVALID', 'EXTRACTION_LIMITED', 'NO_MATCH', 'SOURCE_METADATA_UNKNOWN', 'OUT_OF_SCOPE', 'SCOPE_MISMATCH'];
+  const messages = codes.map(evidenceReasonText);
+  assert.equal(new Set(messages).size, codes.length);
+  assert.ok(messages.every(message => typeof message === 'string' && message.length > 0));
+  assert.match(evidenceReasonText('NO_DIRECT_DOCUMENT'), /Technical records may still be available/);
+  assert.match(evidenceReasonText('IMAGE_ONLY'), /no OCR/);
+  assert.match(evidenceReasonText('SOURCE_METADATA_UNKNOWN'), /not independent/);
+  assert.equal(evidenceReasonText('unknown-future-code'), null);
+});
+
+test('structured integrity errors retain all valid citations and differ from authorization or text coverage', () => {
+  for (const code of ['INDEX_INVALID', 'DOCUMENT_MISSING', 'DOCUMENT_INVALID']) {
+    assert.equal(resultHeading(result({ reason_codes: [code] })), 'Supporting evidence found · search incomplete');
+    assert.equal(resultHeading(result({ citations: [], reason_codes: [code], status: 'NOT_ENOUGH_EVIDENCE' })), 'Evidence retrieval unavailable');
+  }
+  for (const code of ['NO_DIRECT_DOCUMENT', 'NOT_AUTHORIZED', 'IMAGE_ONLY', 'EXTRACTION_LIMITED', 'NO_MATCH', 'SOURCE_METADATA_UNKNOWN']) {
+    assert.equal(resultHeading(result({ citations: [], reason_codes: [code], status: 'NOT_ENOUGH_EVIDENCE' })), 'No supporting evidence found');
+  }
+});
+
+test('absent source metadata is visibly Unknown without inventing a source date or authority', () => {
+  for (const value of [null, undefined, '', ' ', 'UNKNOWN']) assert.equal(metadataLabel(value), 'Unknown');
+  assert.equal(metadataLabel('UNVERIFIED'), 'UNVERIFIED');
+  assert.equal(metadataLabel('2026-01-01'), '2026-01-01');
 });

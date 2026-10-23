@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   if (asset && !/^[0-9a-f-]{36}$/i.test(asset))
     return Response.json({ error: "Invalid asset" }, { status: 400, headers });
   const path = params.get("coverage") === "true"
-    ? `/coverage?reservoir_id=${MANAGED_RESERVOIR_ID}`
+    ? `/coverage?reservoir_id=${MANAGED_RESERVOIR_ID}${asset ? `&asset_id=${encodeURIComponent(asset)}` : ""}`
     : asset
     ? `/demo-questions?asset_id=${encodeURIComponent(asset)}&reservoir_id=${MANAGED_RESERVOIR_ID}`
     : "/status";
