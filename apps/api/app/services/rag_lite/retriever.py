@@ -8,7 +8,7 @@ from sqlalchemy import select
 from app.models.asset import Asset
 from app.models.data_source import DataSource
 from app.models.media import Document
-from app.schemas.rag_lite import Citation
+from app.schemas.rag_lite import Citation, RagPagination
 from app.services.om_service import list_records
 from app.services.rag_lite.answer import respond
 from app.services.rag_lite.indexer import digest, inspect_document, load_allowlist
@@ -258,6 +258,22 @@ def attribute_citation(record):
     )
 
 
+def result_window(request, ranked):
+    """Slice the complete deterministic ranking after current scope/integrity checks."""
+    if request.page is None:
+        return ranked[: request.top_k], None
+    total = len(ranked)
+    pages = math.ceil(total / request.page_size)
+    page = min(request.page, max(pages, 1))
+    start = (page - 1) * request.page_size
+    return ranked[start : start + request.page_size], RagPagination(
+        page=page,
+        page_size=request.page_size,
+        total_results=total,
+        total_pages=pages,
+    )
+
+
 def retrieve(db, storage, settings, request):
     limitations = []
     if any(phrase in fold(request.question) for phrase in UNSUPPORTED):
@@ -316,20 +332,25 @@ def retrieve(db, storage, settings, request):
                 ranked.append((score, str(record.id), record))
         ranked.sort(key=lambda row: (-row[0], row[1]))
         if ranked:
-            return respond(
+            window, pagination = result_window(request, ranked)
+            result = respond(
                 request,
-                [attribute_citation(row[2]) for row in ranked[: request.top_k]],
+                [attribute_citation(row[2]) for row in window],
                 [
                     "Exact persisted values; field relevance is keyword-based. No parent/child inheritance"
                 ],
             )
+            result.pagination = pagination
+            return result
         if request.attribute_key or request.query_type == "attribute":
-            return respond(
+            result = respond(
                 request,
                 [],
                 ["No matching reviewed direct attribute; no parent/child inheritance"],
                 reason_codes=["NO_MATCH" if records else "NO_REVIEWED_ATTRIBUTE"],
             )
+            _, result.pagination = result_window(request, [])
+            return result
     allowlist = load_allowlist(settings.rag_lite_allowlist_path)
     source_ids = {r.source_id for r in records}
     candidates = []
@@ -370,8 +391,9 @@ def retrieve(db, storage, settings, request):
         "Explicit query diacritics constrain matches; unaccented words remain "
         "accent-insensitive. Paraphrases or imperfect source text may be missed"
     )
+    window, pagination = result_window(request, ranked)
     citations = []
-    for _, _, doc, chunk in ranked[: request.top_k]:
+    for _, _, doc, chunk in window:
         citations.append(
             Citation(
                 citation_id=f"doc-{chunk['chunk_id']}",
@@ -404,10 +426,13 @@ def retrieve(db, storage, settings, request):
         )
     if not citations and (candidates or not reasons):
         reasons.append("NO_MATCH")
-    return respond(
+    result = respond(
         request,
         citations,
         list(dict.fromkeys(limitations)),
         max_context_chars=settings.rag_lite_max_context_chars,
         reason_codes=list(dict.fromkeys(reasons)),
     )
+
+    result.pagination = pagination
+    return result

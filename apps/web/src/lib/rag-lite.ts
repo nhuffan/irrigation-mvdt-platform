@@ -31,6 +31,7 @@ export type RagResult = {
   citations: RagCitation[];
   limitations: string[];
   reason_codes?: string[];
+  pagination?: { page: number; page_size: number; total_results: number; total_pages: number } | null;
 };
 
 export type RagDemo = { question: string; attribute_key: string; attribute_label?: string };
@@ -137,7 +138,7 @@ export function metadataLabel(value: string | null | undefined): string {
 
 /** One outcome per search; full diagnostics remain available on demand. */
 export function searchFeedback(result: RagResult): { title: string; description: string } {
-  const count = result.citations.length;
+  const count = result.pagination?.total_results ?? result.citations.length;
   if (criticalRetrievalIssue(result)) return {
     title: count ? `${count} ${count === 1 ? "reference" : "references"} · incomplete` : "Documents unavailable",
     description: count ? "Some documents could not be searched. Available references are shown below." : "Verify the original files and local index, then retry.",
@@ -156,4 +157,24 @@ export function searchFeedback(result: RagResult): { title: string; description:
   if (codes.includes("EXTRACTION_LIMITED") && !codes.includes("NO_MATCH")) return { title: "No searchable match", description: "The linked originals have limited extracted text." };
   if (codes.includes("NO_REVIEWED_ATTRIBUTE")) return { title: "No reviewed fields", description: "No reviewed technical fields are available for this asset." };
   return { title: "No matches", description: "Try fewer keywords or wording from the original document." };
+}
+
+
+/** Keep first/last and nearby page numbers, without a long row on small screens. */
+export function paginationItems(page: number, total: number): (number | "…")[] {
+  if (total < 1) return [];
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const nearby = page <= 3 ? [1, 2, 3, 4, 5] : page >= total - 2
+    ? [total - 4, total - 3, total - 2, total - 1, total] : [page - 1, page, page + 1];
+  const visible = [...new Set([1, total, ...nearby])].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+  const items: (number | "…")[] = [];
+  for (const n of visible) {
+    const previous = items.at(-1);
+    if (typeof previous === "number") {
+      if (n - previous === 2) items.push(previous + 1);
+      else if (n - previous > 2) items.push("…");
+    }
+    items.push(n);
+  }
+  return items;
 }

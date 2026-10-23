@@ -2,7 +2,7 @@
 
 import type { RefObject } from "react";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, type RagCitation, type RagResult } from "@/lib/rag-lite";
+import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
 
 function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
@@ -65,11 +65,7 @@ function DocumentCard({ citations }: { citations: RagCitation[] }) {
       <div className={styles.tags}><span>{first.source_code}</span><span>Source: {metadataLabel(first.source_status)}</span></div>
       <h3>{evidenceDisplayText(first.title)}</h3>
     </header>
-    <Passage citation={first} />
-    {citations.length > 1 && <details className={styles.morePassages}>
-      <summary>{citations.length - 1} more {citations.length === 2 ? "passage" : "passages"} from this document</summary>
-      {citations.slice(1).map(c => <Passage key={c.citation_id} citation={c} />)}
-    </details>}
+    {citations.map(c => <Passage key={c.citation_id} citation={c} />)}
   </article>;
 }
 
@@ -82,13 +78,14 @@ function revealCitation(id: string) {
   target?.focus({ preventScroll: true });
 }
 
-export function EvidenceResults({ result, headingRef, onCorpus }: {
-  result: RagResult; headingRef: RefObject<HTMLHeadingElement | null>; onCorpus?: () => void;
+export function EvidenceResults({ result, headingRef, onCorpus, onPage }: {
+  result: RagResult; headingRef: RefObject<HTMLHeadingElement | null>; onCorpus?: () => void; onPage: (page: number) => void;
 }) {
   const attributes = result.citations.filter(c => c.kind === "technical_attribute");
   const documents = groupDocuments(result.citations);
   const retrievalIssue = criticalRetrievalIssue(result);
   const feedback = searchFeedback(result);
+  const paging = result.pagination;
   return <section className={styles.results} aria-label="Search results">
     <header className={styles.resultHeading}>
       <h2 ref={headingRef} tabIndex={-1}>{feedback.title}</h2>
@@ -111,5 +108,16 @@ export function EvidenceResults({ result, headingRef, onCorpus }: {
       {!!result.reason_codes?.length && <ul>{result.reason_codes.map(evidenceReasonText).filter(Boolean).map(message => <li key={message}>{message}</li>)}</ul>}
       <ul>{result.limitations.map((line, i) => <li key={i}>{line}</li>)}</ul>
     </details>
+    {paging && paging.total_pages > 1 && <nav className={styles.pagination} aria-label="Search result pages">
+      <span className={styles.pageRange}>{(paging.page - 1) * paging.page_size + 1}–{Math.min(paging.page * paging.page_size, paging.total_results)} of {paging.total_results}</span>
+      <div className={styles.pageButtons}>
+        <button type="button" disabled={paging.page === 1} onClick={() => onPage(paging.page - 1)} aria-label="Previous page">‹</button>
+        {paginationItems(paging.page, paging.total_pages).map((item, i) => item === "…"
+          ? <span key={`gap-${i}`} aria-hidden="true">…</span>
+          : <button type="button" key={item} aria-label={`Page ${item}`} aria-current={item === paging.page ? "page" : undefined} onClick={() => { if (item !== paging.page) onPage(item); }}>{item}</button>)}
+        <button type="button" disabled={paging.page === paging.total_pages} onClick={() => onPage(paging.page + 1)} aria-label="Next page">›</button>
+      </div>
+    </nav>}
+
   </section>;
 }

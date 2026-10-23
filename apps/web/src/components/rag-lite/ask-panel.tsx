@@ -10,7 +10,7 @@ import { EvidenceResults } from "./evidence-results";
 import styles from "./rag-lite.module.css";
 
 type SearchAsset = Pick<Asset, "id" | "asset_code" | "name" | "parent_asset_id">;
-type SearchRun = { result: RagResult; scopeName: string };
+type SearchRun = { result: RagResult; scopeName: string; pageChange: boolean };
 
 export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; initialAssetId?: string }) {
   const [assetId, setAssetId] = useState(initialAssetId ?? assets[0]?.id ?? "");
@@ -28,10 +28,15 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   const heading = useRef<HTMLHeadingElement | null>(null);
   const errorHeading = useRef<HTMLDivElement | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
-  const lastRequest = useRef<{ question: string; attributeKey?: string } | null>(null);
+  const lastRequest = useRef<{ question: string; attributeKey?: string; page: number } | null>(null);
 
   useEffect(() => () => active.current?.abort(), []);
-  useEffect(() => { if (run) heading.current?.focus({ preventScroll: true }); }, [run]);
+  useEffect(() => {
+    if (run) {
+      heading.current?.focus({ preventScroll: true });
+      if (run.pageChange) heading.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  }, [run]);
   useEffect(() => { if (error) errorHeading.current?.focus(); }, [error]);
   useEffect(() => {
     const controller = new AbortController();
@@ -60,12 +65,12 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   }
   function clear() { reset(); setQuestion(""); input.current?.focus(); }
   function cancel() { active.current?.abort(); setBusy(false); input.current?.focus(); }
-  async function ask(value = question, attributeKey?: string) {
+  async function ask(value = question, attributeKey?: string, page = 1, pageChange = false) {
     const trimmed = value.trim();
     if (trimmed.length < 2 || (!allDocs && !assetId)) return;
     active.current?.abort();
     const controller = new AbortController(); active.current = controller;
-    lastRequest.current = { question: trimmed, attributeKey };
+    lastRequest.current = { question: trimmed, attributeKey, page };
     setQuestion(trimmed); setBusy(true); setError(""); setRun(null);
     const selected = assets.find(a => a.id === assetId);
     const scopeName = allDocs ? "all authorized PDFs · no asset attribution" : selected ? assetDisplayName(selected) : "selected asset";
@@ -74,12 +79,12 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: trimmed, asset_id: allDocs ? null : assetId,
           all_authorized_docs: allDocs, mode: "evidence_only", query_type: attributeKey ? "attribute" : allDocs ? "document" : queryType,
-          ...(attributeKey ? { attribute_key: attributeKey } : {}), top_k: 5 }),
+          ...(attributeKey ? { attribute_key: attributeKey } : {}), page, page_size: 5 }),
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]),
       });
       if (!response.ok) throw new Error(response.status === 429 ? "Search limit reached. Wait a minute, then retry." : response.status === 404 ? "This experimental search is currently disabled." : "Search could not be completed. Check the local connection and retry.");
       const result: RagResult = await response.json();
-      if (!controller.signal.aborted) setRun({ result, scopeName });
+      if (!controller.signal.aborted) setRun({ result, scopeName, pageChange });
     } catch (e) {
       if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Search could not be completed. Please retry.");
     } finally { if (!controller.signal.aborted) setBusy(false); }
@@ -137,9 +142,10 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
     <div className={styles.outcome}>
       {busy && <p className={styles.progress} role="status">Searching…</p>}
       {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={styles.error}>
-        <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey)}>Retry search</button>
+        <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, lastRequest.current?.page ?? 1)}>Retry search</button>
       </div>}
-      {run && <EvidenceResults result={run.result} headingRef={heading} onCorpus={!allDocs ? searchCorpus : undefined} />}
+      {run && <EvidenceResults result={run.result} headingRef={heading} onCorpus={!allDocs ? searchCorpus : undefined}
+        onPage={page => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, page, true)} />}
       {!busy && !run && !error && <p className={styles.startState}>Enter keywords to search historical evidence.</p>}
     </div>
   </section>;

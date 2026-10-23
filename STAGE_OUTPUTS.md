@@ -1192,3 +1192,33 @@ Actual captures outside repo, in `/Users/nhuffan/.codex/visualizations/2026/10/2
 | `ux-empty-768.jpg` | `70469e5754fafe88b91734ea540d58c37f3161a495d5ad537314387b53676a58` |
 
 Only frontend presentation/helper/tests, existing feature README and this root output changed. API/retrieval/authorization/index logic, database/schema/seed, original PDFs and historical research outputs were not edited. No new server/process/container/port was started; preexisting web3000 PID48430 and API8000 supervisor61514/worker61516 were retained without restart. Task browser tab closed and viewport reset. No duplicate runbook, slide or stage output file.
+
+
+### Stage 7 numbered result pagination — 2026-10-23
+
+User-requested follow-up on clean `main` `7a75a11c689c88d1942239b823d40846e312b5bd`, equal to fetched origin at task start. Replaces the collapsed “more passages from this document” presentation with every returned passage visible on its result page and numbered pagination at the bottom of the same search panel.
+
+- UI requests five references per page, shows the full matched count, current range and numbered previous/next controls. All passages on a page render directly, including multiple passages from one document. Full excerpt and provenance disclosures remain available. Small result sets show all page numbers; longer sets retain first/last and nearby numbers with gaps.
+- API adds opt-in paired `page` (1–10000) and `page_size` (1–20) for evidence-only retrieval, with total-result/page metadata. Slices the complete deterministic ranking after existing authorization, asset/reservoir scope, original-byte and index checks. Requests without pagination retain existing `top_k` behavior. Each subsequent page rechecks current evidence; no persisted result cache or ranking change. Out-of-range pages clamp to the last available page.
+- Page changes preserve question, scope and query type, then focus/scroll to the compact result heading. New queries and scope changes start at page 1; retry retains the requested page. Existing abort handling remains. Existing feature README updated; no additional stage/runbook/slide file.
+
+**Fresh checks:** 104/104 focused RAG tests and 509/509 complete API tests PASS, including 11 new pagination cases for 5–5–1 traversal, uniqueness, legacy first-page equality, range clamping, scope/authorization, changed original bytes, bounded input and exact SQL metadata. Existing Starlette/httpx warning retained. Scoped Ruff/format PASS; whole-backend Ruff still reports the same three preexisting I001 findings in unchanged `tests/test_empirical.py:3` and `tests/test_methodology_review.py:3,501`. Web ESLint PASS; 142/142 web tests PASS. `git diff --check` PASS.
+
+Production webpack build PASS, buildID `QZFsO_3nXlK_8I4XvGAPF`. All 141 frontend source files byte-match the isolated build snapshot at `/tmp/rag-lite-pagination-2026-10-23/build/web`; original dev `.next` preserved. Installed Next CLI used with `API_BASE_URL=http://localhost:8000/api/v1 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1`, existing worker/Cesium copy scripts and `build --webpack`. Manifest SHA256 `81f046b9645a137d4abc06eb69b96514ee8912a6c8fc98e50ce564b82cbc738a`.
+
+Fresh unchanged fixed 16-case HTTP evaluation through web3000: **16/16 PASS**, **11/11 citation links resolvable**; local latency 5.438–49.044ms, no performance claim. New temporary CSV `/tmp/rag-lite-pagination-2026-10-23/eval.csv`, SHA256 `649940675edd2fdfd3c975a08c4ee96252e79b8aaff9f42870d2c5c99307c3ab`; historical evaluation files unchanged. Actual corpus query `thủy lực` traverses all six pages: **29 unique passages**, each excerpt checked against its physical original PDF page and original checksum; legacy first five citation IDs match. These source checks are implementing-agent verification, not independent engineering validation or universal retrieval accuracy.
+
+**Actual Chrome:** `áp suất thử nghiệm` shows both original physical-page 10 and 9 passages immediately, with no redundant single-page navigation. Explicit all-authorized-PDF `thủy lực` shows 29 references; pages 1→2→3 show ranges 1–5/6–10/11–15 and 15 distinct citation IDs while preserving question/scope and focusing the heading. Page 6 shows 26–29, four passages and disabled Next. A new pressure query returns to page 1 with both results. Viewport/document scroll widths equal 375/375, 768/768 and 1440/1440; numbered controls remain accessible. Task Chrome tab closed and viewport reset; user tabs preserved.
+
+Actual Chrome screenshots outside repo in `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`:
+
+| Screenshot | SHA256 |
+|---|---|
+| `pagination-1440.jpg` | `a89dd422c84f9b4dc2f6aab7c41b9d3c3a347064f3589e558f43ca6e2527ed45` |
+| `pagination-375.jpg` | `9e9ec46791007a4346ca18108342227eaafe271ba78615a5c87a1c78bbb8a652` |
+| `pagination-768.jpg` | `aa5c3b5322ab88153a7e9101eea5377a0913a968eef6f2c2c245d32b21201f72` |
+| `pagination-pressure-both.jpg` | `a51b55b877e8d69ad5a70e54b904a9d71fd61188b235a1c2f08528b04bef6e7b` |
+
+All 14 database table fingerprints and six original PDF metadata/checksum/extraction readbacks exactly match input baseline; database fingerprint remains `b35970f54e4c56652a1fbf401c91f980b1859e01ba90aca2949fe364b8c47494`. All eight runtime authorization/index/manifest JSON hashes unchanged. All tracked input files outside the explicitly listed feature code/tests, feature README and this appended output remain byte-identical. Previous root stage output preserved as the exact input prefix. No DB migration/reset/seed, original/source-value change or canonical index regeneration. Keyword/extraction/image-only limitations remain unchanged; no OCR, external LLM or generation enabled.
+
+No service, port or container started for this follow-up. Preexisting web3000 PID48430, API8000 supervisor61514 and healthy PostGIS retained; API worker autoreloaded on source edits, without an explicit service restart. Tests, evaluator and browser used existing local services. Temporary tests/build/evaluation artifacts remain outside repo.

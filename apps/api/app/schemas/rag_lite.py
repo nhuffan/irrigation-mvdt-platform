@@ -14,9 +14,15 @@ class RagQuery(BaseModel):
     query_type: Literal["auto", "attribute", "document"] = "auto"
     attribute_key: str | None = Field(default=None, min_length=1, max_length=100)
     top_k: int = Field(default=5, ge=1, le=8)
+    page: int | None = Field(default=None, ge=1, le=10000)
+    page_size: int | None = Field(default=None, ge=1, le=20)
 
     @model_validator(mode="after")
     def explicit_scope(self):
+        if (self.page is None) != (self.page_size is None):
+            raise ValueError("Pagination requires both page and page_size")
+        if self.page is not None and self.mode != "evidence_only":
+            raise ValueError("Pagination is for retrieval evidence only")
         if (self.asset_id is None) == (not self.all_authorized_docs):
             raise ValueError(
                 "Choose one asset UUID or explicitly search all authorized documents"
@@ -70,6 +76,13 @@ EvidenceReason = Literal[
 ]
 
 
+class RagPagination(BaseModel):
+    page: int
+    page_size: int
+    total_results: int
+    total_pages: int
+
+
 class RagResponse(BaseModel):
     status: Literal[
         "ANSWERED", "RETRIEVAL_ONLY", "NOT_ENOUGH_EVIDENCE", "GENERATION_UNAVAILABLE"
@@ -79,6 +92,7 @@ class RagResponse(BaseModel):
     citations: list[Citation] = Field(default_factory=list)
     limitations: list[str] = Field(default_factory=list)
     reason_codes: list[EvidenceReason] = Field(default_factory=list)
+    pagination: RagPagination | None = None
 
 
 class RagCoverageDiagnostics(BaseModel):

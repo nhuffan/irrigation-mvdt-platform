@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { citationHref, displayValue, evidenceReasonText, metadataLabel, groupDocuments, criticalRetrievalIssue, searchFeedback } from '../src/lib/rag-lite.ts';
+import { citationHref, displayValue, evidenceReasonText, metadataLabel, groupDocuments, criticalRetrievalIssue, searchFeedback, paginationItems } from '../src/lib/rag-lite.ts';
 
 const resultHeading = result => searchFeedback(result).title;
 
@@ -244,4 +244,22 @@ test('one short outcome prioritizes scope and unavailable evidence over generic 
   assert.equal(searchFeedback(empty(['IMAGE_ONLY', 'NO_MATCH'])).title, 'No matches');
   assert.equal(searchFeedback(result()).description, '');
   assert.match(searchFeedback(result({ status: 'GENERATION_UNAVAILABLE' })).description, /original evidence/);
+});
+
+
+test('pagination shows every page for small result sets and bounds long page controls', () => {
+  assert.deepEqual(paginationItems(1, 0), []);
+  for (const page of [1, 2, 3]) assert.deepEqual(paginationItems(page, 3), [1, 2, 3]);
+  assert.deepEqual(paginationItems(1, 6), [1, 2, 3, 4, 5, 6]);
+  assert.deepEqual(paginationItems(1, 20), [1, 2, 3, 4, 5, "…", 20]);
+  assert.deepEqual(paginationItems(10, 20), [1, "…", 9, 10, 11, "…", 20]);
+  assert.deepEqual(paginationItems(20, 20), [1, "…", 16, 17, 18, 19, 20]);
+});
+
+test('result heading uses the full count, while current-page grouping retains every returned citation', () => {
+  const current = [document({citation_id:'page6'}), document({citation_id:'page7', page:9})];
+  const paged = result({ citations: current, pagination: {page:2, page_size:5, total_results:12, total_pages:3} });
+  assert.equal(searchFeedback(paged).title, '12 references');
+  assert.deepEqual(groupDocuments(paged.citations)[0].citations, current);
+  assert.equal(searchFeedback({...paged, reason_codes:['INDEX_INVALID']}).title, '12 references · incomplete');
 });
