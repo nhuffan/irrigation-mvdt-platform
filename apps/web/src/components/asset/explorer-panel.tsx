@@ -1,5 +1,6 @@
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import Link from "next/link";
+import { DocumentLink } from "@/components/documents/document-link";
 import { modelHref, reviewedPreview } from "@/lib/explorer-state";
 import { hierarchy } from "@/lib/asset-location";
 import type { Asset } from "@/types/asset";
@@ -24,7 +25,7 @@ export function ExplorerPanel({asset,assets,data,onSelect}:{asset:Asset;assets:A
  <PanelDisclosure title="Location & coverage"><AssetLocationSummary asset={asset}/><AssetInformationCoverage asset={asset} data={data} compact/></PanelDisclosure>
  <PanelDisclosure title="Sources & evidence"><AssetEvidenceSummary asset={asset} data={data}/></PanelDisclosure>
  <PanelSection title="Documents & 3D">
- <div className="resource-group"><h4>Documents</h4>{data.documents===null?<p>Unavailable</p>:data.documents.length?data.documents.map(d=><p key={d.id}><Link className="text-link" href={`/documents/${d.id}`}>{evidenceDisplayText(d.original_file_name)} →</Link></p>):<p className="muted">No linked documents.</p>}</div>
+ <div className="resource-group"><h4>Documents</h4>{data.documents===null?<p>Unavailable</p>:data.documents.length?data.documents.map(d=><p key={d.id}><DocumentLink className="text-link" href={`/documents/${d.id}`}>{evidenceDisplayText(d.original_file_name)} →</DocumentLink></p>):<p className="muted">No linked documents.</p>}</div>
  <div className="resource-group"><h4>3D representation</h4>{data.links===null?<p>Unavailable</p>:data.links.length?data.links.map(l=><div key={l.id}><p className="summary-note">Representative mapping only</p><Link className="text-link" href={modelHref(asset,l)}>View 3D →</Link><TechnicalMetadataPopover fields={{"Model UUID":l.model_id,"Object key":l.object_key,"Mapping status":l.verification_status}}/></div>):<p className="muted">No linked 3D representation.</p>}</div>
  </PanelSection></aside>;
 }

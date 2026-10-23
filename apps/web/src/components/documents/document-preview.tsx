@@ -58,20 +58,13 @@ export function DocumentPreview({
     );
   if (!state.url) return <p role="status">Loading document…</p>;
   return (
-    <div className="mt-6">
+    <div className="document-preview-frame">
       {!preview && (
         <p className="muted">
           Preview is unavailable for this file type. Download and open it
           externally.
         </p>
       )}
-      <a
-        className="text-link"
-        href={`/api/media/documents/${doc.id}?download=true`}
-        download={doc.original_file_name}
-      >
-        Download {doc.original_file_name}
-      </a>
       {doc.mime_type === "application/pdf" && (
         <iframe
           className="document-preview"

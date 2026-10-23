@@ -1,6 +1,6 @@
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
-import Link from "next/link";
+import { DocumentLink } from "./document-link";
 import type { DocumentRecord } from "@/types/media";
 import { VerificationBadge } from "@/components/asset/source-info";
 export function DocumentList({ documents }: { documents: DocumentRecord[] }) {
@@ -22,9 +22,9 @@ export function DocumentList({ documents }: { documents: DocumentRecord[] }) {
             {doc.mime_type ?? "Unknown file type"}
           </p>
           <VerificationBadge status={doc.source.verification_status} /><TechnicalMetadataPopover fields={{"Document UUID":doc.id,"Source UUID":doc.source_id,"Document code":doc.document_code,"SHA-256":doc.checksum_sha256,"Page count":doc.page_count}}/>
-          <Link className="text-link" href={`/documents/${doc.id}`}>
+          <DocumentLink className="text-link" href={`/documents/${doc.id}`}>
             Open document →
-          </Link>
+          </DocumentLink>
         </li>
       ))}
     </ul>

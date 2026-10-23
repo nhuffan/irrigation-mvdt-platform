@@ -1039,12 +1039,15 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
   .panel-section-body, .panel-section-heading, .panel-disclosure > summary { padding: 12px; }
 }
 
-.document-workspace { display: grid; direction: ltr; grid-template-columns: minmax(0,2fr) minmax(0,3fr); grid-template-areas: "panel content"; gap: 18px; margin-top: 16px; align-items: start; }
+.document-workspace { display: grid; direction: ltr; grid-template-columns: minmax(0,7fr) minmax(0,3fr); grid-template-areas: "content panel"; gap: 18px; margin-top: 16px; align-items: start; }
 .document-inspector, .document-content { min-width: 0; }
-.document-inspector { grid-area: panel; position: sticky; top: 12px; }
+.document-inspector { grid-area: panel; }
 .document-content { grid-area: content; }
-.document-content .document-preview { margin-top: 0; }
-@media(max-width:900px) { .document-workspace { grid-template-columns: minmax(0,1fr); } .document-inspector { position: static; } }
+.document-content .document-preview { display: block; margin-top: 0; }
+.document-preview-frame { margin: 0; }
+.document-download { display: inline-block; margin: 12px 0; }
+.document-content > [role="status"] { margin: 0; }
+@media(max-width:900px) { .document-workspace { grid-template-columns: minmax(0,1fr); grid-template-areas: "content" "panel"; } }
 
 .selected-asset-name { font-size: 19px; line-height: 1.45; font-weight: 650; margin-bottom: 6px; }
 /* Keep expanded 3D headers/status within the workspace height. */
@@ -1055,7 +1058,7 @@ h1, h2, dd, .document-list, .model-metadata { overflow-wrap: anywhere; }
 
 /* Explicit placement wins over DOM auto-placement for every sidebar workspace. */
 @media (max-width: 900px) {
-  .workspace-grid, .asset-properties-layout, .document-workspace {
+  .workspace-grid, .asset-properties-layout {
     grid-template-columns: minmax(0,1fr);
     grid-template-areas: "panel" "content";
   }

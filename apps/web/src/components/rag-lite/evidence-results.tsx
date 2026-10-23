@@ -1,6 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
+import { DocumentLink } from "@/components/documents/document-link";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
@@ -27,6 +28,7 @@ function EvidenceLink({ citation, kind, children, primary = false }: {
   citation: RagCitation; kind: "evidence" | "original" | "source" | "download"; children: React.ReactNode; primary?: boolean;
 }) {
   const href = citationHref(citation, kind);
+  if (href && kind === "evidence" && citation.kind === "document_chunk") return <DocumentLink className={primary ? styles.primaryLink : "text-link"} href={href}>{children}</DocumentLink>;
   return href ? <a className={primary ? styles.primaryLink : "text-link"} href={href}>{children}</a> : null;
 }
 
