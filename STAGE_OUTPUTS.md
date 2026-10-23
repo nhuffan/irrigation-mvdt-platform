@@ -1164,3 +1164,31 @@ All14 database table fingerprints and6 original PDF metadata/checksum/extraction
 Final enabled coverage remains6 authorized /2 searchable /4 image-only /0 unavailable,56 searchable physical pages and70 chunks. Many asset-specific PDF gaps require additional authorized, directly linked searchable originals; UI cannot create those passages. Strict keyword/paraphrase, imperfect extraction, missing source metadata, cylinder ambiguity and the preexisting in-app PDF iframe limitation remain. External original rendered; no OCR, LLM, generated answers, embeddings, operational advice or independent validation was enabled.
 
 Preexisting web3000 (PID48430) and healthy PostGIS were retained. Preexisting API8000 (supervisor49044) was deliberately restarted for OFF/stale/timing checks, then restored with the exact README opt-in command to its original **ON** state on canonical allowlist/index (supervisor55755/worker55758). Final health/status/coverage HTTP200; enabled=true, generation_available=false, mode=retrieval_only. All task-only OFF/stale/timing variants exited; no additional port/server/container/volume remains. The restored API preserves the workload present before this stage. Both task Chrome tabs closed and viewport reset; user tabs and unrelated services untouched.
+
+
+### Stage 7 search UX refinement — 2026-10-23
+
+User-requested presentation follow-up on input `main` `4677a9ecc95705cf4b8964d19768898737a65389`, initial tree clean and fetched origin equal. This supersedes the earlier Stage7 presentation of prominent coverage panels, large result headings and automatically expanded empty-state limitations; evidence scope and backend behavior remain unchanged.
+
+- Form, loading/error/empty/success outcome and evidence now share **one search panel**. Removed repeated searched-asset eyebrow, echoed question, large Supporting evidence found heading, separate count pill and idle heading/explanation block. Success uses one compact reference count; empty outcomes use one short, prioritized reason and a relevant next action. Unsupported scope, no linked evidence, authorization/text gaps and index integrity problems retain distinct meanings; partial results retain every valid citation.
+- Search mode and all live coverage diagnostics moved into **Search options**; long reviewed-field suggestions into **Suggested questions**. Full result reasons/limitations are available under a closed-by-default disclosure. One page-level experimental/historical note remains, and explicit corpus mode still shows its no-attribution warning. Switching to corpus via the empty-state action clears results, without submitting or attributing evidence automatically.
+- Each evidence card/passage keeps one main record/original-PDF action. Source/document/download links, dates, authority, locator, checksums and IDs remain accessible in Evidence details. Source status stays visible, distinct from reviewed-record status; grouped passages, all citations and canonical link validation are preserved. Removed retired presentation helpers and updated the existing feature README demo labels.
+
+**Verification:** web ESLint PASS; `node --test apps/web/tests/*.test.mjs` **140/140 PASS**, including outcome prioritization/integrity and existing exact-value/citation/grouping checks. Production webpack build **PASS**, buildID `DcCoF5RSPp80HLZ7z2R-v`; all141 frontend source files byte-match the temporary build snapshot. Build used the installed NextCLI with existing API8000 in `/tmp/rag-lite-ui-2026-10-23/build/web`, preserving the preexisting `.next`. Manifest SHA256 `960f282baaa4a89b037c413fc83e9e625ebc04ac29509e7163a345c5c6a447f2`. `git diff --check` PASS.
+
+Fresh unchanged16-case HTTP evaluation via web3000: **16/16 PASS**, **11/11 citations resolvable**, query latency6.724–52.908ms in this local run, no performance claim. New result only at `/tmp/rag-lite-ui-2026-10-23/eval.csv`, SHA256 `98bd393d6bd7d5f76247735ab7d1d8e73317a68966e017bfca480b7fa0122628`; historical result files unchanged. No backend suite rerun was needed for this frontend-only follow-up; the earlier backend results remain historical evidence.
+
+Actual **in-app browser** checks on shared3000/8000 confirm: found and no-match outcomes are DOM descendants of the same search panel; no legacy result heading or repeated query; Search options/Suggested questions/limitations closed initially; no horizontal overflow at375/768/1440px for both outcomes; Enter submits and focuses the compact result heading; Tab reaches excerpt disclosure and Enter toggles it; both original physical-page links10,9 remain accessible; exact SQL suggestion returns200bar with separate record/source status; no-source parent shows one short No linked evidence outcome; explicit corpus switch clears results; current-condition question shows Outside search scope; coverage, metadata and secondary links remain inspectable. No new claim of Chrome-specific acceptance or a fresh replay of API-down/429/timing tests in this UI-only follow-up.
+
+Actual captures outside repo, in `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`:
+
+| Screenshot | SHA256 |
+|---|---|
+| `ux-found-default.jpg` | `805f96517d1f664214fa3fe039b331113aa6aa7e12f1c897738da964a169e292` |
+| `ux-empty-1440.jpg` | `9788e342ef971146e6fdf581df62e13f46a5a0d61949f16cbcf9f6a441892128` |
+| `ux-found-375.jpg` | `d66ff5d9e2cfa091c8352b53208fae45ca54f07833db59b51e6da99d19aa8a31` |
+| `ux-empty-375.jpg` | `3e1c2ab0494bf5f84f85c3c0570ebe9fe68ff8c212711ef4bc9e38cd1018bfe7` |
+| `ux-found-768.jpg` | `c2522ed4ab7a607ec1caf655a9e2040a724422ed919a1d59c07187fbba676a04` |
+| `ux-empty-768.jpg` | `70469e5754fafe88b91734ea540d58c37f3161a495d5ad537314387b53676a58` |
+
+Only frontend presentation/helper/tests, existing feature README and this root output changed. API/retrieval/authorization/index logic, database/schema/seed, original PDFs and historical research outputs were not edited. No new server/process/container/port was started; preexisting web3000 PID48430 and API8000 supervisor61514/worker61516 were retained without restart. Task browser tab closed and viewport reset. No duplicate runbook, slide or stage output file.

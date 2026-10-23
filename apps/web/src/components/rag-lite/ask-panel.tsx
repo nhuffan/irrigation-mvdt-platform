@@ -10,7 +10,7 @@ import { EvidenceResults } from "./evidence-results";
 import styles from "./rag-lite.module.css";
 
 type SearchAsset = Pick<Asset, "id" | "asset_code" | "name" | "parent_asset_id">;
-type SearchRun = { result: RagResult; scopeName: string; question: string };
+type SearchRun = { result: RagResult; scopeName: string };
 
 export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; initialAssetId?: string }) {
   const [assetId, setAssetId] = useState(initialAssetId ?? assets[0]?.id ?? "");
@@ -79,14 +79,17 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
       });
       if (!response.ok) throw new Error(response.status === 429 ? "Search limit reached. Wait a minute, then retry." : response.status === 404 ? "This experimental search is currently disabled." : "Search could not be completed. Check the local connection and retry.");
       const result: RagResult = await response.json();
-      if (!controller.signal.aborted) setRun({ result, scopeName, question: trimmed });
+      if (!controller.signal.aborted) setRun({ result, scopeName });
     } catch (e) {
       if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Search could not be completed. Please retry.");
     } finally { if (!controller.signal.aborted) setBusy(false); }
   }
 
-  return <>
-    <section className={`panel ${styles.searchPanel}`} aria-label="Evidence search controls">
+  const currentCoverage = coverage && (allDocs ? !coverage.diagnostics : coverage.diagnostics?.asset_id === assetId) ? coverage : null;
+  function searchCorpus() { reset(true); setAllDocs(true); input.current?.focus(); }
+
+  return <section className={`panel ${styles.searchPanel}`} aria-label="Evidence search">
+
       <form onSubmit={e => { e.preventDefault(); void ask(); }}>
         <fieldset className={styles.scope} disabled={busy}>
           <legend>Search in</legend>
@@ -105,31 +108,39 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
           </label>
           <button className={`button ${styles.submit}`} type="submit" disabled={busy || question.trim().length < 2 || (!allDocs && !assetId)}>{busy ? "Searching…" : "Search evidence"}<span aria-hidden="true">↗</span></button>
         </div>
-        <div className={styles.searchNotes}>
-          <p>{allDocs ? "Corpus-wide · not attributed to this asset. Searches only authorized PDFs in this reservoir." : "Search technical fields and PDF passages linked directly to this asset. Parent and component records stay separate."}</p>
-          {busy ? <button type="button" className="text-link" onClick={cancel}>Cancel</button> : question && <button type="button" className="text-link" onClick={clear}>Clear search</button>}
-        </div>
-        <SearchCoverage coverage={coverage && (allDocs ? !coverage.diagnostics : coverage.diagnostics?.asset_id === assetId) ? coverage : null}
-          allDocs={allDocs} unavailable={coverageError || (!allDocs && !assetId)} busy={busy}
-          onRetry={() => { setCoverageError(false); setCoverageAttempt(value => value + 1); }}
-          onCorpus={() => { reset(true); setAllDocs(true); input.current?.focus(); }} />
-        {demos.length > 0 && !allDocs && <div className={styles.suggestions}><span>Suggested</span>{demos.slice(0, 3).map(demo => <button type="button" key={demo.attribute_key} disabled={busy} onClick={() => void ask(demo.question, demo.attribute_key)}>{evidenceDisplayText(demo.attribute_label ?? demo.attribute_key.replaceAll("_", " "))}</button>)}</div>}
-        <div className={styles.secondaryControls}>
-          {!allDocs && <details className={styles.options}>
-            <summary>More search options</summary>
-            <label className={styles.field}>Search technical fields and PDF passages
-              <select disabled={busy} value={queryType} onChange={e => { reset(); setQueryType(e.target.value); }}>
-                <option value="auto">Technical fields, then PDF passages</option><option value="attribute">Technical fields only</option><option value="document">Show document passages only</option>
-              </select>
-            </label>
-          </details>}
+        {allDocs && <p className={styles.scopeNotice}>Corpus-wide · not attributed to any asset.</p>}
+        <div className={styles.searchToolbar}>
+          <div className={styles.tools}>
+            <details className={styles.options}>
+              <summary>Search options</summary>
+              <div className={styles.optionBody}>
+                {!allDocs && <label className={styles.field}>Search mode
+                  <select disabled={busy} value={queryType} onChange={e => { reset(); setQueryType(e.target.value); }}>
+                    <option value="auto">Technical fields, then PDF passages</option><option value="attribute">Technical fields only</option><option value="document">Document passages only</option>
+                  </select>
+                </label>}
+                <SearchCoverage coverage={currentCoverage} allDocs={allDocs} unavailable={coverageError || (!allDocs && !assetId)}
+                  onRetry={() => { setCoverageError(false); setCoverageAttempt(value => value + 1); }} />
+              </div>
+            </details>
+            {demos.length > 0 && !allDocs && <details className={styles.suggestions}>
+              <summary>Suggested questions</summary>
+              <div>{demos.slice(0, 3).map(demo => <button type="button" key={demo.attribute_key} disabled={busy} onClick={() => void ask(demo.question, demo.attribute_key)}>{evidenceDisplayText(demo.attribute_label ?? demo.attribute_key.replaceAll("_", " "))}</button>)}</div>
+            </details>}
+          </div>
+          <div className={styles.searchActions}>
+            {busy ? <button type="button" className="text-link" onClick={cancel}>Cancel</button> : question && <button type="button" className="text-link" onClick={clear}>Clear</button>}
+          </div>
         </div>
       </form>
-    </section>
     <div aria-live="polite" aria-atomic="true" className={styles.srOnly}>{busy ? "Searching historical evidence" : run ? `${run.result.citations.length} ${run.result.citations.length === 1 ? "reference" : "references"} returned for ${run.scopeName}` : ""}</div>
-    {busy && <div className={styles.progress} role="status">Searching historical records and authorized documents…</div>}
-    {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={`panel ${styles.error}`}><h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey)}>Retry search</button></div>}
-    {run && <EvidenceResults key={`${run.scopeName}:${run.question}`} result={run.result} scopeName={run.scopeName} query={run.question} headingRef={heading} />}
-    {!busy && !run && !error && <section className={styles.startState}><h2>Evidence results appear here</h2><p>Choose an asset, enter keywords, or try a suggested field. Exact recorded values and original PDF pages appear here with links for your review.</p></section>}
-  </>;
+    <div className={styles.outcome}>
+      {busy && <p className={styles.progress} role="status">Searching…</p>}
+      {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={styles.error}>
+        <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey)}>Retry search</button>
+      </div>}
+      {run && <EvidenceResults result={run.result} headingRef={heading} onCorpus={!allDocs ? searchCorpus : undefined} />}
+      {!busy && !run && !error && <p className={styles.startState}>Enter keywords to search historical evidence.</p>}
+    </div>
+  </section>;
 }

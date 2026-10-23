@@ -66,19 +66,6 @@ export function criticalRetrievalIssue(result: RagResult): boolean {
   });
 }
 
-export function resultHeading(result: RagResult): string {
-  if (result.status !== "ANSWERED" && criticalRetrievalIssue(result)) {
-    return result.citations.length ? "Supporting evidence found · search incomplete" : "Evidence retrieval unavailable";
-  }
-  switch (result.status) {
-    case "ANSWERED": return "Evidence-backed answer";
-    case "RETRIEVAL_ONLY": return "Supporting evidence found";
-    case "GENERATION_UNAVAILABLE":
-      return result.citations.length ? "Evidence found · AI summary unavailable" : "No supporting evidence found";
-    case "NOT_ENOUGH_EVIDENCE": return "No supporting evidence found";
-  }
-}
-
 /** Keep source values canonical; translation belongs only to descriptive labels. */
 export function displayValue(citation: RagCitation): string {
   const value = typeof citation.value_number === "number" && Number.isFinite(citation.value_number)
@@ -124,12 +111,6 @@ export function citationHref(citation: RagCitation, kind: "evidence" | "original
   return kind === "original" ? `${original}#page=${citation.page}` : `${original}?download=true`;
 }
 
-export function needsOpenLimitations(result: RagResult): boolean {
-  if (!result.citations.length || result.status === "NOT_ENOUGH_EVIDENCE") return true;
-  return criticalRetrievalIssue(result);
-}
-
-
 /** Codes come from live, scope-bound checks; never infer absent sources from no hits. */
 export function evidenceReasonText(code: string): string | null {
   const messages: Record<string, string> = {
@@ -151,4 +132,28 @@ export function evidenceReasonText(code: string): string | null {
 
 export function metadataLabel(value: string | null | undefined): string {
   return !value?.trim() || value === "UNKNOWN" ? "Unknown" : value;
+}
+
+
+/** One outcome per search; full diagnostics remain available on demand. */
+export function searchFeedback(result: RagResult): { title: string; description: string } {
+  const count = result.citations.length;
+  if (criticalRetrievalIssue(result)) return {
+    title: count ? `${count} ${count === 1 ? "reference" : "references"} · incomplete` : "Documents unavailable",
+    description: count ? "Some documents could not be searched. Available references are shown below." : "Verify the original files and local index, then retry.",
+  };
+  if (count) return {
+    title: `${count} ${count === 1 ? "reference" : "references"}`,
+    description: result.status === "GENERATION_UNAVAILABLE" ? "AI summary unavailable; original evidence is shown below." : "",
+  };
+  const codes = result.reason_codes ?? [];
+  if (codes.includes("OUT_OF_SCOPE")) return { title: "Outside search scope", description: "Search covers historical evidence, not current condition or operating advice." };
+  if (codes.includes("SCOPE_MISMATCH")) return { title: "Check the selected asset", description: "Select the exact asset or component named in your question." };
+  if (codes.includes("NO_DIRECT_DOCUMENT") && codes.includes("NO_REVIEWED_ATTRIBUTE")) return { title: "No linked evidence", description: "This asset has no reviewed fields or directly linked PDFs." };
+  if (codes.includes("NO_DIRECT_DOCUMENT")) return { title: "No matching evidence", description: "No directly linked PDF is available for this asset. Try a reviewed field or search all authorized PDFs." };
+  if (codes.includes("NOT_AUTHORIZED") && !codes.includes("NO_MATCH")) return { title: "Search access limited", description: "Linked PDFs are not authorized for local search." };
+  if (codes.includes("IMAGE_ONLY") && !codes.includes("NO_MATCH")) return { title: "No searchable text", description: "The linked PDFs are image-only. Text search cannot read them." };
+  if (codes.includes("EXTRACTION_LIMITED") && !codes.includes("NO_MATCH")) return { title: "No searchable match", description: "The linked originals have limited extracted text." };
+  if (codes.includes("NO_REVIEWED_ATTRIBUTE")) return { title: "No reviewed fields", description: "No reviewed technical fields are available for this asset." };
+  return { title: "No matches", description: "Try fewer keywords or wording from the original document." };
 }
