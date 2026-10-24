@@ -108,6 +108,24 @@ def load_allowlist(path: Path | None) -> dict[str, str]:
         return {}
 
 
+def load_scope_pins(path: Path | None):
+    if path is None:
+        return {}
+    try:
+        from uuid import UUID
+
+        value = json.loads(path.read_text())
+        if value.get("version") != 1 or not value.get("authorization"):
+            return {}
+        return {
+            str(UUID(row["document_id"])): row["scope_sha256"]
+            for row in value["documents"]
+            if "scope_sha256" in row
+        }
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return {}
+
+
 def load_index(path: Path, doc):
     value = json.loads(path.read_text())
     if (
@@ -118,20 +136,37 @@ def load_index(path: Path, doc):
         or not 0 < value["page_count"] <= MAX_PAGES
     ):
         raise ValueError("STALE_INDEX")
+    if "profile" in value:
+        from app.services.rag_lite.sections import validate_sections
+
+        validate_sections(value, doc)
+    elif any("asset_ids" in c for c in value["chunks"]):
+        raise ValueError("MISSING_SCOPE_PROFILE")
     for chunk in value["chunks"]:
         if not 1 <= chunk["page"] <= value["page_count"]:
             raise ValueError("INVALID_PAGE")
         identity = f"{VERSION}:{doc.id}:{doc.checksum_sha256}:{chunk['page']}:{chunk['offset']}:{chunk['sha256']}"
         if (
             digest(chunk["text"].encode()) != chunk["sha256"]
-            or digest(identity.encode()) != chunk["chunk_id"]
+            or (
+                "profile" not in value
+                and digest(identity.encode()) != chunk["chunk_id"]
+            )
             or len(chunk["text"]) > CHUNK_CHARS
         ):
             raise ValueError("INVALID_CHUNK")
     return value
 
 
-def build_index(documents, storage, directory: Path, allowlist: dict[str, str], scopes):
+def build_index(
+    documents,
+    storage,
+    directory: Path,
+    allowlist: dict[str, str],
+    scopes,
+    scope_pins=None,
+):
+    scope_pins = scope_pins or {}
     manifest = {"version": VERSION, "documents": []}
     for doc in documents:
         entry = {
@@ -150,7 +185,15 @@ def build_index(documents, storage, directory: Path, allowlist: dict[str, str], 
             path = directory / f"{doc.id}.json"
             try:
                 index = load_index(path, doc)
+                if (
+                    scope_pins.get(str(doc.id))
+                    and index.get("scope_sha256") != scope_pins[str(doc.id)]
+                ):
+                    raise ValueError("SCOPE_AUTHORIZATION_MISMATCH")
             except (OSError, ValueError, KeyError, TypeError):
+                if scope_pins.get(str(doc.id)):
+                    entry["status"] = "SECTION_REVIEW_REQUIRED"
+                    continue
                 index = extract(doc, data)
                 atomic_json(path, index)
             entry.update(
@@ -180,6 +223,9 @@ def inspect_document(storage, settings, doc, allowlist):
         return None, ["DOCUMENT_INVALID"]
     try:
         index = load_index(settings.rag_lite_index_dir / f"{doc.id}.json", doc)
+        pin = load_scope_pins(settings.rag_lite_allowlist_path).get(str(doc.id))
+        if pin != index.get("scope_sha256"):
+            raise ValueError("SCOPE_AUTHORIZATION_MISMATCH")
         pages = index["coverage"]
         if not pages or any(not isinstance(p["characters"], int) for p in pages):
             raise ValueError("INVALID_COVERAGE")

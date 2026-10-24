@@ -34,7 +34,7 @@ export type RagResult = {
   pagination?: { page: number; page_size: number; total_results: number; total_pages: number } | null;
 };
 
-export type RagDemo = { question: string; attribute_key: string; attribute_label?: string };
+export type RagDemo = { question: string; attribute_key: string | null; attribute_label?: string; query_type?: "document" };
 
 export type RagCoverage = {
   authorized_documents: number;

@@ -1,5 +1,12 @@
 // Display translations only; original values, filenames and provenance remain unchanged.
 const english: Record<string, string> = {
+  "W2-historic-eia.pdf": "Historic environmental impact assessment, 2003",
+  "vật liệu đập": "Dam material",
+  "tường bentonite": "Bentonite core wall",
+  "thoát nước": "Drainage",
+  "quan trắc thấm": "Seepage monitoring",
+  "cao trình đỉnh": "Crest elevation",
+  "chiều dài đỉnh": "Crest length",
   "Tuyến kênh được cấp nước theo SIWRR 2010": "Supplied canal route per SIWRR 2010",
   "Lưu lượng theo SIWRR 2010 (C01/C02 tại MNDBT; C03 thiết kế)": "Discharge per SIWRR 2010 (C01/C02 at normal water level; C03 design)",
   "Số lỗ/cửa theo ký hiệu nguồn SIWRR 2010 (không chứng nhận lá van)": "Number of openings/gates per SIWRR 2010 notation (gate leaves not certified)",

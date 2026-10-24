@@ -3,6 +3,7 @@
 from app.schemas.rag_lite import RagCoverage, RagCoverageDiagnostics
 from app.services.rag_lite.indexer import inspect_document, load_allowlist
 from app.services.rag_lite.retriever import documents_for_reservoir, reviewed_records
+from app.services.rag_lite.sections import scoped_chunks
 
 
 def search_coverage(db, storage, settings, reservoir_id, asset_id=None):
@@ -67,10 +68,11 @@ def search_coverage(db, storage, settings, reservoir_id, asset_id=None):
         if "NOT_AUTHORIZED" in issues:
             continue
         result.authorized_documents += 1
-        if index and index["chunks"]:
+        chunks = scoped_chunks(index, asset_id) if index else []
+        if chunks:
             result.searchable_documents += 1
-            result.searchable_pages += len({c["page"] for c in index["chunks"]})
-            result.indexed_chunks += len(index["chunks"])
+            result.searchable_pages += len({c["page"] for c in chunks})
+            result.indexed_chunks += len(chunks)
         elif "IMAGE_ONLY" in issues:
             result.image_only_documents += 1
         else:

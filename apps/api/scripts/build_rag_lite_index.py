@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.services.rag_lite.indexer import build_index, load_allowlist
+from app.services.rag_lite.indexer import build_index, load_allowlist, load_scope_pins
 from app.services.rag_lite.retriever import documents_for_reservoir, source_scopes
 from app.storage.local import LocalStorage
 
@@ -27,6 +27,7 @@ def main():
             settings.rag_lite_index_dir,
             load_allowlist(settings.rag_lite_allowlist_path),
             source_scopes(db, args.reservoir_id),
+            load_scope_pins(settings.rag_lite_allowlist_path),
         )
     print(
         json.dumps(

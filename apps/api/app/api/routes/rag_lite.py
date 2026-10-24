@@ -80,30 +80,18 @@ def query(
 
 @router.get("/demo-questions", dependencies=[Depends(enabled)])
 def demo_questions(
-    asset_id: UUID, reservoir_id: UUID, db: Annotated[Session, Depends(get_rag_db)]
+    asset_id: UUID,
+    reservoir_id: UUID,
+    db: Annotated[Session, Depends(get_rag_db)],
+    storage: Annotated[Storage, Depends(get_storage)],
 ):
     from app.models.asset import Asset
-    from app.services.rag_lite.retriever import reviewed_records
+    from app.services.rag_lite.suggestions import suggested_questions
 
     asset = db.get(Asset, asset_id)
     if not asset or asset.reservoir_id != reservoir_id:
         raise HTTPException(404, "Asset not found")
-    return [
-        {
-            "question": r.attribute_label,
-            "attribute_key": r.attribute_key,
-            "attribute_label": r.attribute_label,
-        }
-        for r in [
-            r
-            for r in reviewed_records(db, asset_id)
-            if r.source.reservoir_id == reservoir_id
-            and (
-                r.value_number is not None
-                or (r.value_text is not None and r.value_text.strip())
-            )
-        ][:4]
-    ]
+    return suggested_questions(db, storage, settings, asset)
 
 
 @router.get(

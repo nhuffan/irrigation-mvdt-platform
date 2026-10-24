@@ -1235,3 +1235,67 @@ User-requested follow-up on clean `main` `d95167b879ab8f4291d15c35666a705c59fd52
 - Screenshot outside repo: `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/document-detail-70-30.png`, SHA256 `4eadf51267324eadc5ff53cc01c92b1ce10ae022d44b1d909647e5434bf50437`. Temporary browser tab closed and viewport reset.
 
 Only the frontend document/navigation components, helper/tests, document layout CSS and this appended root output changed. No API, database, source PDF, canonical index, runtime environment or historical research output edits. No new service/port/container started. Preexisting web3000 PID48430 and API8000 supervisor61514/worker82159 remain running unchanged; no task service required cleanup. Prior root output is preserved as the exact input prefix; no duplicate stage/runbook file created.
+
+
+## Stage 8 output — 2026-10-24
+
+Implemented on clean `main` `fa0ac76122cc4b8a4e072d6d75d3f288124e6e8a`, initially equal to origin. Uses the existing Next.js/FastAPI/PostGIS preview and the human user's earlier explicit authorization for **all retained research PDFs, local indexing only**. No new source download, service, vector store or external model.
+
+### Actual evidence and coverage
+
+Audited the one existing Main Dam asset (`bd4aff6e-8117-426d-906e-953a2b5a4ae9`), its seven reviewed fields/two source identities, retained originals and existing indexes. No Main Dam child asset was invented. Deduplicated 58 retained local PDF paths into 33 originals and inspected actual extracted content; additional suitable material was found, not merely a missing-input report.
+
+Registered the retained **W2 historic EIA 2003** as `RS-DOC-042`, UUID `62e83ed1-2162-510a-a8ce-344a7320c8d1`, under existing `RS-SRC-019`. Original SHA256 `e4c727a343fee05a17090592344cd0d6bf7dc3ac09d38cdefd596b643cc9ede9`, 140 physical pages. This supplies the actual registered original behind four already-reviewed Main Dam dimension records. Source date remains unknown; source verification/authority remain UNVERIFIED/UNKNOWN. No existing technical record, source status, value or reviewed provenance changed.
+
+The W2 full text has 401 chunks for explicit corpus search; only its Main Dam table header/row on physical page20 and Main Dam proposal sections on21/42 are attributed to Main Dam (3 chunks). The reviewed Spillway section on19 has2 chunks. Adjacent saddle-dam/dike/intake material stays outside those selected-asset passages. Boundary mapping is implementation source review, not domain or independent engineering attestation. Re-indexed only Main Dam's existing input summary `RS-DOC-017`: wall specifications and the historic drainage paragraph now retain their own local sections, while the research-hypothesis passage remains separately contextualized.
+
+| Main Dam live coverage | Before | After |
+|---|---:|---:|
+| Reviewed technical records | 7 | 7 |
+| Existing reviewed fields with a registered searchable original | 3 | 7 |
+| Authorized/searchable directly linked PDFs | 1 | 2 |
+| Scoped searchable physical pages | 5 | 8 |
+| Scoped indexed chunks | 10 | 15 |
+
+Whole corpus after: 7 authorized /3 searchable /4 image-only /0 unavailable,196 searchable physical pages and473 chunks. All pages/chunks are scope-aware counts; Main Dam does not inherit all140 W2 pages. Applied outcome (full JSON outside repo under `/tmp/rag-lite-stage8-2026-10-24/`):
+
+```json
+{"imported":["RS-DOC-042"],"reindexed":["RS-DOC-017"],"repeat_apply_skipped":2,"unavailable_selected":0,"new_technical_records":0,"new_reviewed_fields":0}
+```
+
+### Implemented behavior
+
+- `scripts.onboard_rag_lite` offers dry-run by default, single-file flags or selective batch codes, actual byte/type/size/page/hash inspection, stable identity/deduplication, existing source/reservoir/reviewed asset-link gates and explicit local authorization. Repeated `--section`/`--scope-review` flags require no raw DB/allowlist editing. Only selected caches and manifest entries change; source/field verification is never promoted. Failed apply rolls back DB/cache/authorization and removes only newly created unreferenced originals, preserving preexisting/referenced/changed files. Actual repeat apply reports both documents SKIPPED.
+- Opt-in section extraction retains normalized original substrings, physical pages, offsets and immutable source checksums. Chunk and allowlist scope pins are checked at retrieval; missing/changed/invalid originals or scoped caches fail closed. Generic index rebuild reports `SECTION_REVIEW_REQUIRED` instead of silently replacing a scoped cache with unscoped extraction; use reviewed onboarding boundaries to recover it.
+- Deterministic literal ranking now supplements a small source-attested engineering vocabulary. Full concepts avoid generic material-word overlap; diacritics outside aliases remain constrained. Whole numeric literals support decimal commas with1–2 fractional digits and spaced thousands; ambiguous three-digit comma forms stay literal. No source value reformatting/unit conversion. Original imperfect extraction, including the W2 Earthfilll spelling, is retained.
+- Suggested questions expose up to8 valued reviewed fields and up to3 currently matching scoped PDF topics. Main Dam has its7 field suggestions plus material/core-wall/drainage topics. PDF clicks select document mode; page changes/retries retain it. Existing compact outcomes, numbered pagination, explicit corpus scope, original links and document Back destinations remain.
+
+### Source-checked demonstration and verification
+
+Existing feature README now contains the operator command and a tested3–4 minute multi-asset sequence. New `rag_lite_main_dam_cases.csv` pins source titles/IDs, record/document identity, values/units, physical pages and source keywords, separate from the unchanged original fixed cohort and participant-study outputs.
+
+| Actual passing examples | Evidence |
+|---|---|
+| Crest elevation /crest length /crest width /maximum height | Existing distinct reviewed Main Dam records:28m /1100m /8m /28m; datum caveat retained |
+| `vật liệu đập` | W2 physical20, only Main Dam earthfill row/header; generic drawing-material extras excluded |
+| `tường bentonite` | W2 physical21/42, explicitly historic proposals, not completion/current-condition evidence |
+| `thoát nước` | Summary physical3 historic drainage paragraph ranks first; physical4 research hypothesis stays separate |
+| `chiều dày tường tâm 0,6 m` | Exact existing0.6m record; source value/unit unchanged |
+| Spillway `áp suất thử nghiệm` | Original manual physical10/9,270bar for two different cylinders |
+| Main Dam pressure /Spillway bentonite /unknown keywords /current condition | Scoped no-hit or explicit unsupported request; no cross-asset attribution |
+
+Fresh focused backend **135/135 PASS** (104 existing plus31 onboarding/numeric/scope/recovery regressions), scoped Ruff/format PASS; web **144/144 PASS**, ESLint PASS. Existing Starlette deprecation and the synthetic rollback fixture's transaction-deassociation warning remain. No broad backend suite rerun needed. One production webpack build PASS, ID `a46Jkv0MoxzrOByVFQjtQ`; all144 frontend sources match the isolated temporary build, manifest SHA256 `9fa14395e32fbbb955aed10878182f65a87b35f9ad18f0a8469c64b8eac7fb66`. Existing dev `.next` preserved. `git diff --check` PASS.
+
+Actual fixed16 HTTP regression **16/16 PASS before/after**,11/11 citation links resolvable; all non-latency columns unchanged except D2's derived citation ID after summary boundary re-indexing. Same13-case Main Dam pilot improves11/13→13/13; the final cohort adds four natural Vietnamese auto-field searches and achieves **17/17 PASS**,16/16 citation links/source-original checks, zero returned passages outside its declared relevant document/page/keyword pins. New source-title/ID checks also pass. These controlled source checks are implementing-agent verification, not an independent relevance study or a change to paper findings. Final fixed local latency5.814–240.191ms; Main Dam6.111–267.343ms; no speed/scalability claim. CSVs remain new temporary files: fixed-final SHA256 `bc00f88f677c1ca0e317df5d98fb4a3c129f56f21b1b27564768cc0198e72439`; main-source-pinned SHA256 `cdcaaa951baf5b655bf23e29c9abf2c5d1f4b6c9e8c19b9789761109bebf4cce`.
+
+Practical Chrome smoke completed on shared3000/8000: suggested crest value, free-text1100m/8m, exact focused record deep link/Back, new material PDF, original physically rendered at20/140, core-wall and refined drainage themes, no-match under Main Dam, switch to Spillway clears stale results, two pressure passages, document-only numbered1→2 with10 distinct IDs, shared-report bentonite refusal under Spillway, explicit corpus switch clears results and shows no asset attribution, document details Back to AI Research, unsupported current condition, GIS route and existing3D Ready/O&M missing-data state. Real read-only traversal additionally validates all18 corpus `Main Dam` passages over4 pages (5–5–5–3), stable ordering/no duplicate or missing IDs and every excerpt against original physical-page text; scoped `cao trình` validates5 unique original-backed passages.
+
+Two proof captures outside repo at `/Users/nhuffan/.codex/visualizations/2026/10/22/01a16268-d6f0-7ed3-9220-4f0a8366e931/`: `stage8-main-dam.jpg` SHA256 `394848084a5f8c4b0e4e4d1b86b487a5c08de360c24cdf188fc69466fb01f55f`; `stage8-original-p20.jpg` SHA256 `1a44eaba767471e1900d8832274d9f2714644530d435478fd259ede2a53fd573`. Temporary smoke tabs closed; user tabs preserved.
+
+### Preservation and remaining inputs
+
+All13 non-document table fingerprints match baseline, including all48 technical rows/14 assets/22 sources. Total documents8→9; excluding the new W2 UUID, all8 old document rows exactly match their baseline hash. Six registered originals and all33 retained unique PDFs/58 paths keep exact bytes; five unrelated old indexes are unchanged. Only the selected summary index, allowlist pins and corpus manifest changed among old runtime JSONs. Historical research/evaluation CSVs, paper findings and previous root output remain unchanged. No migration/reset/seed, new asset, review promotion or source-authority assertion.
+
+Three retained dam drawing originals remain image-only; OCR is outside this stage, and no direct child/component mapping was invented. The additional2017 ESIA lacks an admitted Main Dam source/link; SIWRR2010 is currently admitted for intake components, lacks Main Dam association and has355 pages above the300-page limit. Further enrichment requires actual reviewed source/asset associations and supporting originals; new VERIFIED engineering parameters require real review evidence. No new material/O&M/current-condition record was fabricated from proposal or hypothesis text. Known extraction/metadata/keyword limits remain; embedded in-app PDF rendering has its existing limitation, while the actual Chrome original page works.
+
+No task server/container/port was started. Preexisting web3000 PID48430, API8000 supervisor61514 (worker auto-reloaded with source edits) and healthy PostGIS remain; no explicit restart or user-workload stop. Build/tests/rendering processes exited. No duplicate runbook, slide, stage plan or output markdown was created.

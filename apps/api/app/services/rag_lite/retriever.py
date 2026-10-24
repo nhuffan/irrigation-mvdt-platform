@@ -1,7 +1,6 @@
 import math
 import re
 import unicodedata
-from decimal import Decimal
 
 from sqlalchemy import select
 
@@ -12,6 +11,12 @@ from app.schemas.rag_lite import Citation, RagPagination
 from app.services.om_service import list_records
 from app.services.rag_lite.answer import respond
 from app.services.rag_lite.indexer import digest, inspect_document, load_allowlist
+from app.services.rag_lite.sections import scoped_chunks
+from app.services.rag_lite.vocabulary import (
+    ALIASES,
+    normalize_numbers,
+    numeric_literals,
+)
 
 STOP = {
     "a",
@@ -101,7 +106,7 @@ def fold(value: str) -> str:
 
 
 def tokens(value: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9]+", fold(value))) - STOP
+    return set(re.findall(r"[a-z0-9]+", fold(normalize_numbers(value)))) - STOP
 
 
 def word_signatures(value):
@@ -117,7 +122,7 @@ def word_signatures(value):
     return result
 
 
-def rank_document_chunks(candidates, question, query_tokens):
+def rank_literal_chunks(candidates, question, query_tokens):
     explicit_diacritics = {
         signature
         for word, signature in word_signatures(question).items()
@@ -138,6 +143,8 @@ def rank_document_chunks(candidates, question, query_tokens):
         # e.g. "thứ" supplies "thu" but is not evidence for "thử nghiệm".
         # Require every meaningful keyword instead of accepting three of four.
         if not query_tokens or not query_tokens <= terms:
+            continue
+        if not numeric_literals(question) <= numeric_literals(chunk["text"]):
             continue
         # Accented query words constrain candidates; unaccented words retain the
         # original accent-insensitive search. This only narrows folded matches.
@@ -165,6 +172,72 @@ def rank_document_chunks(candidates, question, query_tokens):
     return ranked
 
 
+def rank_document_chunks(candidates, question, query_tokens):
+    question = unicodedata.normalize("NFC", question)
+    folded = fold(question)
+    concepts = [
+        phrases
+        for phrases in ALIASES
+        if any(
+            re.search(rf"(?<![a-z0-9]){re.escape(fold(phrase))}(?![a-z0-9])", folded)
+            for phrase in phrases
+        )
+    ]
+    literal = rank_literal_chunks(candidates, question, query_tokens)
+    # A full controlled concept must survive removal of the selected asset name.
+    # For example, generic 'materials' alone does not establish a dam-body material.
+    literal = [
+        row
+        for row in literal
+        if all(
+            any(
+                re.search(
+                    rf"(?<![a-z0-9]){re.escape(fold(phrase))}(?![a-z0-9])",
+                    fold(row[3]["text"]),
+                )
+                for phrase in phrases
+            )
+            for phrases in concepts
+        )
+    ]
+    ignored = tokens(question) - query_tokens
+    matches = {
+        (str(row[2].id), row[3]["page"], row[3]["offset"]): row for row in literal
+    }
+    # Preserve explicit diacritics outside the translated concept. Folded spans
+    # are used only when their offsets agree with the NFC source question.
+    if len(folded) != len(question):
+        return literal
+    for phrases in concepts:
+        for phrase in phrases:
+            pattern = rf"(?<![a-z0-9]){re.escape(fold(phrase))}(?![a-z0-9])"
+            for occurrence in re.finditer(pattern, folded):
+                for target in phrases:
+                    if target == phrase:
+                        continue
+                    alternative = (
+                        question[: occurrence.start()]
+                        + target
+                        + question[occurrence.end() :]
+                    )
+                    for row in rank_literal_chunks(
+                        candidates, alternative, tokens(alternative) - ignored
+                    ):
+                        matches.setdefault(
+                            (str(row[2].id), row[3]["page"], row[3]["offset"]), row
+                        )
+    return sorted(
+        matches.values(),
+        key=lambda row: (
+            -row[0],
+            -row[1],
+            str(row[2].id),
+            row[3]["page"],
+            row[3]["offset"],
+        ),
+    )
+
+
 def attribute_matches(record, question, query_tokens):
     # Field meaning must match every meaningful keyword. Half-overlap confused
     # test/design pressure. Values can refine a field query, never select it alone.
@@ -180,10 +253,7 @@ def attribute_matches(record, question, query_tokens):
         return False
     # Compare whole numeric literals, not token fragments such as the zero in
     # 4650.0. No unit conversion or comma/decimal convention is inferred.
-    numeric = r"(?<![\w.])[+-]?\d+(?:\.\d+)?(?![\w.])"
-    question_numbers = {Decimal(v) for v in re.findall(numeric, question)}
-    field_numbers = {Decimal(v) for v in re.findall(numeric, field + " " + value)}
-    if not question_numbers <= field_numbers:
+    if not numeric_literals(question) <= numeric_literals(field + " " + value):
         return False
     explicit = {
         signature
@@ -380,7 +450,7 @@ def retrieve(db, storage, settings, request):
             )
         if not index:
             continue
-        for chunk in index["chunks"]:
+        for chunk in scoped_chunks(index, request.asset_id):
             if any(phrase in fold(chunk["text"]) for phrase in UNSUPPORTED[15:]):
                 limitations.append("A potentially instructional passage was excluded")
                 continue

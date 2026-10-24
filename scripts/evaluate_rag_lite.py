@@ -137,10 +137,58 @@ def main():
                 )
                 assert citation["excerpt"] in original
             valid += 1
+        # Optional source-checked cohort pins; legacy cases/results keep their schema.
+        expected_title = row.get("expected_title", "")
+        expected_text = row.get("expected_text", "")
+        allowed_pages = set(row.get("allowed_pages", "").split("|")) - {""}
+        pinned = [
+            c
+            for c in citations
+            if (
+                not row["expected_record_id"]
+                or c["record_id"] == row["expected_record_id"]
+            )
+            and (
+                not row["expected_document_id"]
+                or c["document_id"] == row["expected_document_id"]
+            )
+        ]
+        source_id = row.get("expected_source_id", "")
+        source_title = row.get("expected_source_title", "")
+        source_ok = (
+            not source_id or all(c["source_id"] == source_id for c in pinned)
+        ) and (
+            not source_title
+            or any(
+                source_title
+                in pages[f"/data-sources/{c['source_id']}/documents"].decode("utf-8")
+                for c in pinned
+            )
+        )
+        content_ok = (
+            not expected_title or any(c["title"] == expected_title for c in pinned)
+        ) and (
+            not expected_text
+            or all(
+                expected_text.casefold() in c["excerpt"].casefold() for c in citations
+            )
+        )
+        irrelevant = (
+            sum(
+                c["document_id"] != row["expected_document_id"]
+                or str(c["page"]) not in allowed_pages
+                for c in citations
+            )
+            if allowed_pages
+            else 0
+        )
         passed = (
             value["status"] == row["expected_status"]
             and (hit if expected_hit else not citations)
             and exact is not False
+            and content_ok
+            and source_ok
+            and irrelevant == 0
         )
         results.append(
             {
@@ -162,9 +210,24 @@ def main():
                 ),
             }
         )
+        if any(
+            row.get(k)
+            for k in (
+                "expected_title",
+                "expected_text",
+                "allowed_pages",
+                "expected_source_title",
+            )
+        ):
+            results[-1].update(
+                grounded_content=content_ok and source_ok,
+                irrelevant_passages=irrelevant,
+            )
     with args.output.open("x") as output:
         writer = csv.DictWriter(
-            output, fieldnames=list(results[0]), lineterminator="\n"
+            output,
+            fieldnames=list(dict.fromkeys(k for r in results for k in r)),
+            lineterminator="\n",
         )
         writer.writeheader()
         writer.writerows(results)

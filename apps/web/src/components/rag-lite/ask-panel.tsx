@@ -28,7 +28,7 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   const heading = useRef<HTMLHeadingElement | null>(null);
   const errorHeading = useRef<HTMLDivElement | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
-  const lastRequest = useRef<{ question: string; attributeKey?: string; page: number } | null>(null);
+  const lastRequest = useRef<{ question: string; attributeKey?: string; page: number; queryType: string } | null>(null);
 
   useEffect(() => () => active.current?.abort(), []);
   useEffect(() => {
@@ -65,12 +65,13 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   }
   function clear() { reset(); setQuestion(""); input.current?.focus(); }
   function cancel() { active.current?.abort(); setBusy(false); input.current?.focus(); }
-  async function ask(value = question, attributeKey?: string, page = 1, pageChange = false) {
+  async function ask(value = question, attributeKey?: string, page = 1, pageChange = false, requestedType = queryType) {
     const trimmed = value.trim();
     if (trimmed.length < 2 || (!allDocs && !assetId)) return;
     active.current?.abort();
     const controller = new AbortController(); active.current = controller;
-    lastRequest.current = { question: trimmed, attributeKey, page };
+    const resolvedType = attributeKey ? "attribute" : allDocs ? "document" : requestedType;
+    lastRequest.current = { question: trimmed, attributeKey, page, queryType: resolvedType };
     setQuestion(trimmed); setBusy(true); setError(""); setRun(null);
     const selected = assets.find(a => a.id === assetId);
     const scopeName = allDocs ? "all authorized PDFs · no asset attribution" : selected ? assetDisplayName(selected) : "selected asset";
@@ -78,7 +79,7 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
       const response = await fetch("/api/rag-lite", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: trimmed, asset_id: allDocs ? null : assetId,
-          all_authorized_docs: allDocs, mode: "evidence_only", query_type: attributeKey ? "attribute" : allDocs ? "document" : queryType,
+          all_authorized_docs: allDocs, mode: "evidence_only", query_type: resolvedType,
           ...(attributeKey ? { attribute_key: attributeKey } : {}), page, page_size: 5 }),
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]),
       });
@@ -130,7 +131,7 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
             </details>
             {demos.length > 0 && !allDocs && <details className={styles.suggestions}>
               <summary>Suggested questions</summary>
-              <div>{demos.slice(0, 3).map(demo => <button type="button" key={demo.attribute_key} disabled={busy} onClick={() => void ask(demo.question, demo.attribute_key)}>{evidenceDisplayText(demo.attribute_label ?? demo.attribute_key.replaceAll("_", " "))}</button>)}</div>
+              <div>{demos.map(demo => <button type="button" key={`${demo.query_type ?? "attribute"}:${demo.question}`} disabled={busy} onClick={() => { setQueryType(demo.query_type ?? "attribute"); void ask(demo.question, demo.attribute_key ?? undefined, 1, false, demo.query_type ?? "attribute"); }}>{demo.query_type === "document" ? "PDF · " : ""}{evidenceDisplayText(demo.attribute_label ?? demo.question)}</button>)}</div>
             </details>}
           </div>
           <div className={styles.searchActions}>
@@ -142,10 +143,10 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
     <div className={styles.outcome}>
       {busy && <p className={styles.progress} role="status">Searching…</p>}
       {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={styles.error}>
-        <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, lastRequest.current?.page ?? 1)}>Retry search</button>
+        <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, lastRequest.current?.page ?? 1, false, lastRequest.current?.queryType ?? queryType)}>Retry search</button>
       </div>}
       {run && <EvidenceResults result={run.result} headingRef={heading} onCorpus={!allDocs ? searchCorpus : undefined}
-        onPage={page => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, page, true)} />}
+        onPage={page => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, page, true, lastRequest.current?.queryType ?? queryType)} />}
       {!busy && !run && !error && <p className={styles.startState}>Enter keywords to search historical evidence.</p>}
     </div>
   </section>;
