@@ -1,5 +1,5 @@
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { DocumentLink } from "@/components/documents/document-link";
 import { modelHref, reviewedPreview } from "@/lib/explorer-state";
 import { hierarchy } from "@/lib/asset-location";

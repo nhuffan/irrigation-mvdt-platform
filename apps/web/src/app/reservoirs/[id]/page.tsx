@@ -1,3 +1,4 @@
+import { PanelPending } from "@/components/ui/view-pending";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
 import { Suspense } from "react";
 import { ReservoirAssets } from "@/components/asset/reservoir-assets";
@@ -57,9 +58,7 @@ export default async function ReservoirPage({
       </details>
       <Suspense
         fallback={
-          <section className="panel mt-10" role="status">
-            Loading reservoir assets…
-          </section>
+          <PanelPending label="Loading reservoir assets…"/>
         }
       >
         <ReservoirAssets reservoir={reservoir} />

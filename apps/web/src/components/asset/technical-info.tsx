@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { publicEvidenceText, technicalValueDetails } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover, StatusBadge } from "./presentation";

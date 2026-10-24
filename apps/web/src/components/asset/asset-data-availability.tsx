@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import type { Asset } from "@/types/asset";
 import type { ExplorerData } from "@/lib/explorer-data";
 import { assetLocation } from "@/lib/asset-location";

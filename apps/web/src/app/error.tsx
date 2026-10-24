@@ -1,9 +1,9 @@
 "use client";
 export default function ErrorPage({
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   return (
     <main className="page-shell">
@@ -13,7 +13,7 @@ export default function ErrorPage({
         <p className="muted my-5">
           We could not load the latest information. Please try again shortly.
         </p>
-        <button className="button" onClick={() => reset()}>
+        <button className="button" onClick={() => retry()}>
           Try again
         </button>
       </section>

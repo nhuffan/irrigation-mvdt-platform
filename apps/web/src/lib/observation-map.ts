@@ -17,3 +17,15 @@ export function observationReferences(assets: Asset[]) {
     return Number.isFinite(lon) && Number.isFinite(lat) && Math.abs(lon) <= 180 && Math.abs(lat) <= 85.051129;
   });
 }
+
+/** Regional references can overlap on screen; preserve every exact asset choice. */
+export function referenceNeighbors(assets: Asset[], selectedId: string, project: (point: [number, number]) => { x: number; y: number }, hitSize = 56): Asset[] {
+  const references = observationReferences(assets), selected = references.find(asset => asset.id === selectedId);
+  if (!selected || selected.location?.geometry?.type !== "Point") return [];
+  const origin = project(selected.location.geometry.coordinates);
+  return references.filter(asset => {
+    if (asset.location?.geometry?.type !== "Point") return false;
+    const point = project(asset.location.geometry.coordinates);
+    return Math.abs(point.x - origin.x) <= hitSize && Math.abs(point.y - origin.y) <= hitSize;
+  });
+}

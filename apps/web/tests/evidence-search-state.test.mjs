@@ -36,3 +36,27 @@ test('grouped selection preserves all exact asset UUIDs including parents withou
   assert.deepEqual(groups.flatMap(g => [g.parent.id, ...g.children.map(a => a.id)]).sort(), assets.map(a => a.id).sort());
   assert.equal(groups.find(g => g.parent.id === 'intake').parent, assets[1]);
 });
+
+test('Back restoration parses the actual URL and rejects duplicated hidden scope parameters', async () => {
+  const { evidenceSearchFromUrl, evidenceRequestError } = await import('../src/lib/evidence-search-state.ts');
+  const url = evidenceSearchUrl('/ai-research-preview', parseEvidenceSearch(base,[asset]));
+  assert.equal(evidenceSearchFromUrl(url,[asset]).page,2);
+  assert.equal(evidenceSearchFromUrl(`${url}&scope=corpus`,[asset]),null);
+  assert.equal(evidenceSearchFromUrl(`${url}&asset=unknown`,[asset]),null);
+  assert.equal(evidenceSearchFromUrl('/ai-research-preview',[asset]),null);
+  assert.match(evidenceRequestError(429), /limit reached.*minute/);
+  assert.match(evidenceRequestError(404), /disabled/);
+  assert.match(evidenceRequestError(503), /connection and retry/);
+  assert.doesNotMatch(evidenceRequestError(500), /no evidence|no data/i);
+});
+
+test('draft scope and keywords survive reload without automatically submitting a query', async () => {
+  const { evidenceSearchFromUrl } = await import('../src/lib/evidence-search-state.ts');
+  for (const question of ['', 'x', 'sill elevation']) {
+    const state = { assetId: asset, allDocs: false, question, queryType: 'document', page: 1, draft: true };
+    const url = evidenceSearchUrl('/ai-research-preview', state);
+    assert.deepEqual(evidenceSearchFromUrl(url, [asset]), state);
+  }
+  assert.equal(parseEvidenceSearch({...base,draft:'yes'},[asset]),null);
+  assert.equal(parseEvidenceSearch({...base,draft:['1','0']},[asset]),null);
+});

@@ -1,10 +1,13 @@
 "use client";
+import { documentHref } from "@/lib/document-navigation";
+import { OriginLink } from "@/components/documents/document-link";
+import { mapView, readView, saveView, viewStorage } from "@/lib/workspace-view-state";
 import { useEffect, useRef, useState } from "react";
 import type { Map as LibreMap } from "maplibre-gl";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
 import { assetDisplayName } from "@/lib/asset-display";
-import { observationReferences, OPERATOR_MAP_URL } from "@/lib/observation-map";
+import { observationReferences, referenceNeighbors, OPERATOR_MAP_URL } from "@/lib/observation-map";
 import { loadStreetVectorLayer } from "@/lib/street-vector";
 import { rasterClarityPaint, nativeDetailZoom, closerDetailZoom, streetFailureAction, type PixelRendering } from "@/lib/observation-detail";
 import { PanelSection } from "@/components/ui/panel-section";
@@ -52,6 +55,7 @@ export function ObservationMap({ assets, reservoir }: { assets: Asset[]; reservo
     let disposed = false, failed = false;
     let instance: LibreMap | undefined;
     let resize: ResizeObserver | undefined;
+    let referencePopup: import("maplibre-gl").Popup | undefined;
     const fail = (code: ProviderErrorCode = "PROVIDER_UNAVAILABLE") => {
       if (disposed || failed) return;
       failed = true;
@@ -77,15 +81,21 @@ export function ObservationMap({ assets, reservoir }: { assets: Asset[]; reservo
         const lib = await import("maplibre-gl");
         if (disposed || controller.signal.aborted || !container.current) return;
         lib.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
-        const rememberedZoom = lastView.current?.zoom ?? 10;
+        const remembered = lastView.current ?? readView(viewStorage(), `observation-map:${reservoir.id}`, mapView);
+        const rememberedZoom = remembered?.zoom ?? 10;
         const initialZoom = layer.renderMode === "vector" ? cappedCameraZoom(rememberedZoom, layer) : nativeDetailZoom(rememberedZoom, layer);
         instance = new lib.Map({ container: container.current,
           style: layer.style ?? { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#e7eeeb" } }] },
-          center: lastView.current?.center ?? [reservoir.longitude, reservoir.latitude], zoom: initialZoom,
+          center: remembered?.center ?? [reservoir.longitude, reservoir.latitude], zoom: initialZoom,
           minZoom: Math.min(7, cameraZoomLimit(layer)), maxZoom: cameraZoomLimit(layer),
           cooperativeGestures: true, attributionControl: false,
         });
         map.current = instance;
+        instance.on("moveend", () => {
+          if (disposed || !instance) return;
+          const center = instance.getCenter();
+          saveView(viewStorage(), `observation-map:${reservoir.id}`, { center: [center.lng, center.lat], zoom: instance.getZoom(), bearing: instance.getBearing(), pitch: instance.getPitch() });
+        });
         setActiveLayer(layer); setZoom(initialZoom);
         instance.addControl(new lib.NavigationControl(), "top-right");
         instance.addControl(new lib.FullscreenControl(), "top-right");
@@ -130,13 +140,25 @@ export function ObservationMap({ assets, reservoir }: { assets: Asset[]; reservo
             const label = document.createElement("button"); label.className = "observation-reference"; label.textContent = "R";
             label.setAttribute("aria-label", `REFERENCE · ${assetDisplayName(asset)}`);
             label.title = "Reference only. Open details for the research GIS link.";
-            const popupContent = document.createElement("div");
-            const heading = document.createElement("strong"); heading.textContent = `REFERENCE · ${assetDisplayName(asset)}`;
-            const note = document.createElement("p"); note.textContent = "Navigation reference only. Not surveyed geometry.";
-            const link = document.createElement("a"); link.href = `/reservoirs/${asset.reservoir_id}?asset=${encodeURIComponent(asset.id)}#asset-gis`; link.textContent = "Open in research GIS →";
-            popupContent.append(heading, note, link);
-            new lib.Marker({ element: label }).setLngLat(point.coordinates)
-              .setPopup(new lib.Popup({ maxWidth: "280px" }).setDOMContent(popupContent)).addTo(instance);
+            label.addEventListener("click", event => {
+              event.stopPropagation();
+              if (!instance) return;
+              referencePopup?.remove();
+              const nearby = referenceNeighbors(assets, asset.id, point => instance!.project(point));
+              const popupContent = document.createElement("div");
+              const heading = document.createElement("strong");
+              heading.textContent = nearby.length > 1 ? "Overlapping reference markers" : `REFERENCE · ${assetDisplayName(asset)}`;
+              const note = document.createElement("p"); note.textContent = "Navigation references only. Not surveyed geometry. Select the exact asset below.";
+              popupContent.append(heading, note);
+              for (const item of nearby) {
+                const row = document.createElement("p"), link = document.createElement("a");
+                link.href = documentHref(`/reservoirs/${item.reservoir_id}?asset=${encodeURIComponent(item.id)}#asset-gis`, window.location.pathname + window.location.search + window.location.hash);
+                link.textContent = `Open ${assetDisplayName(item)} in research GIS →`;
+                row.append(link); popupContent.append(row);
+              }
+              referencePopup = new lib.Popup({ maxWidth: "360px" }).setLngLat(point.coordinates).setDOMContent(popupContent).addTo(instance);
+            });
+            new lib.Marker({ element: label }).setLngLat(point.coordinates).addTo(instance);
           }
         });
         resize = new ResizeObserver(() => instance?.resize()); resize.observe(container.current);
@@ -146,11 +168,11 @@ export function ObservationMap({ assets, reservoir }: { assets: Asset[]; reservo
     }
     void start();
     return () => {
-      disposed = true; controller.abort(); clearTimeout(timer); resize?.disconnect();
+      disposed = true; controller.abort(); clearTimeout(timer); resize?.disconnect(); referencePopup?.remove();
       if (instance) { const center = instance.getCenter(); lastView.current = { center: [center.lng, center.lat], zoom: nextZoom.current ?? instance.getZoom() }; nextZoom.current = null; instance.remove(); }
       map.current = null;
     };
-  }, [mounted, layerId, streetFallback, vectorStreet, attempt, assets, reservoir.longitude, reservoir.latitude]);
+  }, [mounted, layerId, streetFallback, vectorStreet, attempt, assets, reservoir.id, reservoir.longitude, reservoir.latitude]);
 
   useEffect(() => {
     const instance = map.current;
@@ -198,7 +220,7 @@ export function ObservationMap({ assets, reservoir }: { assets: Asset[]; reservo
           {status === "waiting" ? "Observation map loads when this section enters the viewport." : status === "loading" ? "Loading observation map…" : <><strong>Observation map unavailable</strong><p>Coverage, WebGL or the remote service could not be loaded. No substitute geography is inferred.</p><button className="button button-secondary" onClick={() => setAttempt(a => a + 1)}>Retry map</button><a href={OPERATOR_MAP_URL} target="_blank" rel="noreferrer">Open operator map source ↗</a></>}
         </div>}
       </div>
-      <p className="observation-layer-note">Reviewed references: {observationReferences(assets).length ? observationReferences(assets).map(a => <a className="text-link" key={a.id} href={`/reservoirs/${a.reservoir_id}?asset=${encodeURIComponent(a.id)}#asset-gis`}>REFERENCE · {assetDisplayName(a)} </a>) : "None available"}</p>
+      <p className="observation-layer-note">Reviewed references: {observationReferences(assets).length ? observationReferences(assets).map(a => <OriginLink className="text-link" key={a.id} href={`/reservoirs/${a.reservoir_id}?asset=${encodeURIComponent(a.id)}#asset-gis`}>REFERENCE · {assetDisplayName(a)} </OriginLink>) : "None available"}</p>
       <p className="observation-attribution">{displayLayer?.provider === "osm" ? <><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a> · Street map, not satellite imagery.</> : displayLayer?.provider === "nasa" ? <>Historical imagery: <a href="https://nasa-gibs.github.io/gibs-api-docs/" target="_blank" rel="noreferrer">NASA GIBS / ESDIS</a> · Landsat / USGS, Terra / MODIS.</> : displayLayer?.provider === "maptiler" ? <><a href="https://www.maptiler.com/copyright/" target="_blank" rel="noreferrer">© MapTiler</a> · Dataset contributor credits are retained on the map.</> : displayLayer?.provider === "esri" ? <><a href="https://www.esri.com/" target="_blank" rel="noreferrer">Powered by Esri</a> · Service contributor credits are retained on the map.</> : null} {displayLayer && <a href={displayLayer.sourceUrl} target="_blank" rel="noreferrer">Provider documentation ↗</a>}</p>
       <details className="observation-notes"><summary>Scope, sources and navigation</summary><p>Drag to pan; use +/− or keyboard arrows to navigate. Hold Ctrl/⌘ while scrolling to zoom; use two fingers on mobile. Fullscreen applies to this map only. Open Overview for the asset GIS and evidence inspector.</p><p>NASA layers are low-resolution historical overviews, with zoom capped at their source limit. The street layer uses vector lines/text when MapTiler is available, with OpenStreetMap raster fallback. Raster zoom rests on native integer levels and tile transitions do not blend lower-detail parents. Original-pixel rendering makes historical pixels distinct, not higher resolution. Satellite service levels do not guarantee building detail or surveyed accuracy. Acquisition dates and local high-zoom detail require separate evidence.</p><p>Only reviewed REFERENCE points from the API are displayed. No INTAKE/MGMT coordinates, canonical geometry, local GLB-to-WGS84 transform, canal lines or inferred asset positions are added. The initial camera uses registry context metadata and is not a surveyed reservoir extent.</p><p>The operator map is linked for consultation; no right to copy or rehost it was established. <a href={OPERATOR_MAP_URL} target="_blank" rel="noreferrer">Operator map source ↗</a> · <a href="https://siwrp.org.vn/news/ban-do_520.html" target="_blank" rel="noreferrer">SIWRP map catalogue ↗</a>. Their publications are not layers in this map.</p></details>
     </PanelSection>

@@ -1,3 +1,4 @@
+import { RetryView } from "@/components/ui/retry-view";
 import { parseEvidenceSearch } from "@/lib/evidence-search-state";
 import { AskPanel } from "@/components/rag-lite/ask-panel";
 import { getReservoirAssets } from "@/lib/api";
@@ -15,19 +16,15 @@ export default async function AiResearchPreview({ searchParams }: { searchParams
     if (!response.ok) throw new Error("Unavailable");
     enabled = (await response.json()).enabled === true;
   } catch { available = false; }
-  const assets = enabled ? await getReservoirAssets(MANAGED_RESERVOIR_ID).catch(() => []) : [];
-  const demos = enabled ? await Promise.all(assets.map(async asset => {
-    try {
-      const response = await fetch(`${base}/experimental/rag-lite/demo-questions?asset_id=${asset.id}&reservoir_id=${MANAGED_RESERVOIR_ID}`, { cache: "no-store", signal: AbortSignal.timeout(5000) });
-      return response.ok && (await response.json()).length > 0 ? asset.id : null;
-    } catch { return null; }
-  })) : [];
+  let assetsUnavailable = false;
+  const assets = enabled ? await getReservoirAssets(MANAGED_RESERVOIR_ID).catch(() => { assetsUnavailable = true; return []; }) : [];
   const initialSearch = parseEvidenceSearch(await searchParams, assets.map(asset => asset.id));
   return <main className={`page-shell ${styles.page}`}>
     <header className={styles.intro}><h1>AI Research</h1></header>
     <p role="note" className={styles.notice}>Experimental historical evidence · Human verification required. Not current condition or operational advice.</p>
-    {enabled ? <AskPanel initialSearch={initialSearch} initialAssetId={demos.find(id => id !== null) ?? undefined} assets={assets.map(({ id, asset_code, name, parent_asset_id }) => ({ id, asset_code, name, parent_asset_id }))} /> : <p role="status" className="panel">
-      {available ? "Experimental evidence search is disabled. The core application remains available." : "Evidence search is unavailable. Retry when the local services are running."}
-    </p>}
+    {enabled && !assetsUnavailable && assets.length > 0 ? <AskPanel key={initialSearch ? JSON.stringify(initialSearch) : "clean"} initialSearch={initialSearch} initialAssetId={assets.find(asset => !asset.parent_asset_id)?.id} assets={assets.map(({ id, asset_code, name, parent_asset_id }) => ({ id, asset_code, name, parent_asset_id }))} /> : <section role="status" className="panel">
+      {enabled && !assetsUnavailable && !assets.length ? "No research assets are registered for this reservoir." : assetsUnavailable ? "The asset list could not be loaded. Availability has not been replaced with zero." : available ? "Experimental evidence search is disabled. The core application remains available." : "Evidence search is unavailable. Retry when the local services are running."}
+      {(!available || assetsUnavailable) && <RetryView/>}
+    </section>}
   </main>;
 }

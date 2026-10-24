@@ -1,6 +1,6 @@
 import { publicEvidenceText } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import type { DataSource, VerificationStatus } from "@/types/data-source";
 export function VerificationBadge({ status }: { status: VerificationStatus }) {
   return (

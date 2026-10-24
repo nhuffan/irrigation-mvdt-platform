@@ -1,5 +1,5 @@
 import { MetricCard } from "@/components/ui/panel-section";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { dataset } from "@/lib/explorer-state";
 import { descendantIds, hierarchyCoverage, l2Count, type TechnicalRecords } from "@/lib/asset-hierarchy";
 import type { Asset } from "@/types/asset";

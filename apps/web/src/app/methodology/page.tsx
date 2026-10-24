@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { DocumentLink } from "@/components/documents/document-link";
 import { PageHeader } from "@/components/ui/page-header";
 import { getResearchSummary } from "@/lib/research-summary";

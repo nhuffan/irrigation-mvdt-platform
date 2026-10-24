@@ -1,7 +1,7 @@
 "use client";
 
 import type { RefObject } from "react";
-import { DocumentLink } from "@/components/documents/document-link";
+import { OriginLink } from "@/components/documents/document-link";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
@@ -28,7 +28,10 @@ function EvidenceLink({ citation, kind, children, primary = false }: {
   citation: RagCitation; kind: "evidence" | "original" | "source" | "download"; children: React.ReactNode; primary?: boolean;
 }) {
   const href = citationHref(citation, kind);
-  if (href && kind === "evidence" && citation.kind === "document_chunk") return <DocumentLink className={primary ? styles.primaryLink : "text-link"} href={href}>{children}</DocumentLink>;
+  if (href && (kind === "evidence" || kind === "source")) {
+    const target = kind === "evidence" && citation.kind === "document_chunk" ? `${href}?page=${citation.page ?? 1}` : href;
+    return <OriginLink className={primary ? styles.primaryLink : "text-link"} href={target} returnAnchor={citation.citation_id}>{children}</OriginLink>;
+  }
   return href ? <a className={primary ? styles.primaryLink : "text-link"} href={href}>{children}</a> : null;
 }
 
@@ -88,7 +91,9 @@ export function EvidenceResults({ result, headingRef, onCorpus, onPage }: {
   const retrievalIssue = criticalRetrievalIssue(result);
   const feedback = searchFeedback(result);
   const paging = result.pagination;
-  return <section className={styles.results} aria-label="Search results">
+  const reasonText = result.reason_codes?.map(evidenceReasonText).filter(Boolean).join(" ");
+  return <section className={styles.results} aria-label="Search results" aria-describedby={reasonText ? "search-reason-details" : undefined}>
+    {reasonText && <p id="search-reason-details" className={styles.srOnly}>{reasonText}</p>}
     <header className={styles.resultHeading}>
       <h2 ref={headingRef} tabIndex={-1}>{feedback.title}</h2>
       {feedback.description && <p>{feedback.description}</p>}

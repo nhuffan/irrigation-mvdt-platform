@@ -5,13 +5,14 @@ import { evidenceDisplayText } from "@/lib/evidence-display";
 import { Workspace } from "@/components/workspace";
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { TechnicalMetadataPopover } from "@/components/asset/presentation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import type { Viewer, Model, ScreenSpaceEventHandler } from "cesium";
 import type { ModelRecord, ModelAssetLink } from "@/types/media";
 import { loadCesium } from "./cesium-loader";
 import { modelSelectionUrl, uniqueObjectLink } from "@/lib/model-deep-link";
 import { selectedPrimitives } from "@/lib/model-selection";
 import { pickedObjectKey } from "@/lib/model-picking";
+import { cameraView, readView, saveView, viewStorage } from "@/lib/workspace-view-state";
 import { AssetSidePanel } from "./asset-side-panel";
 export default function CesiumViewer({
   model,
@@ -24,7 +25,8 @@ export default function CesiumViewer({
   modelControls?: ReactNode;
   modelDetails?: ReactNode;
 }) {
-  const defaultObject = initialCameraObject(initialObject, model.coordinate_mode, links);
+  const [defaultObject] = useState(() => initialCameraObject(initialObject, model.coordinate_mode, links));
+  const lastObject = useRef(initialObject);
   const container = useRef<HTMLDivElement>(null);
   const selectionEffect = useRef<((key: string | null, focus?: boolean) => void) | null>(null);
   const selectedRef = useRef<string | null>(defaultObject);
@@ -39,6 +41,11 @@ export default function CesiumViewer({
     defaultObject,
   );
   const [attempt, setAttempt] = useState(0);
+  const restoreObject = useEffectEvent((object?: string) => setSelected(object ?? null));
+  useEffect(() => {
+    if (lastObject.current !== initialObject) { lastObject.current = initialObject; restoreObject(initialObject); }
+  }, [initialObject]);
+
   useEffect(() => {
     window.history.replaceState(null, "", modelSelectionUrl(window.location.href, model.id, selected));
     selectedRef.current = selected;
@@ -48,6 +55,8 @@ export default function CesiumViewer({
     let disposed = false;
     let viewer: Viewer | undefined;
     let stopCameraEvents: (() => void) | undefined;
+    let saveCamera: (() => void) | undefined;
+    let stopRemembering: (() => void) | undefined;
     let stopResize: (() => void) | undefined;
     let primitive: Model | undefined;
     let handler: ScreenSpaceEventHandler | undefined;
@@ -239,12 +248,26 @@ export default function CesiumViewer({
           initialFocusFrames = 0;
           if (!focusObject(selectedRef.current ?? defaultObject)) frame();
         };
+        const cameraKey = () => `3d:${JSON.stringify([model.id, model.coordinate_mode, model.longitude, model.latitude, model.height, model.heading, model.pitch, model.roll, model.scale, selectedRef.current])}`;
+        saveCamera = () => {
+          if (disposed || !loaded.ready || v.isDestroyed()) return;
+          const array = (vector: import("cesium").Cartesian3) => [vector.x, vector.y, vector.z];
+          saveView(viewStorage(), cameraKey(), { position: array(v.camera.positionWC), direction: array(v.camera.directionWC), up: array(v.camera.upWC) });
+        };
+        stopRemembering = v.camera.moveEnd.addEventListener(saveCamera);
         const ready = () => {
           if (!disposed) {
             clearTimeout(timer);
             setStatus("ready");
+            const remembered = readView(viewStorage(), cameraKey(), cameraView);
             frame();
             applySelection(selectedRef.current, true);
+            if (remembered) {
+              initialFocusFrames = 0;
+              v.camera.lookAtTransform(C.Matrix4.IDENTITY);
+              v.camera.setView({ destination: C.Cartesian3.fromArray(remembered.position), orientation: { direction: C.Cartesian3.fromArray(remembered.direction), up: C.Cartesian3.fromArray(remembered.up) } });
+              v.scene.requestRender();
+            }
           }
         };
         if (loaded.ready) ready();
@@ -278,6 +301,8 @@ export default function CesiumViewer({
     }
     void start();
     return () => {
+      saveCamera?.();
+      stopRemembering?.();
       disposed = true;
       clearTimeout(timer);
       reset.current = null;

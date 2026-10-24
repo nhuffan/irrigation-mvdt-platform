@@ -1,6 +1,8 @@
+import { PanelPending } from "@/components/ui/view-pending";
 import { AssetDisplayName } from "@/components/asset/presentation";
 import { Suspense } from "react";
 import Link from "next/link";
+import { documentReturnTo, documentBackLabel } from "@/lib/document-navigation";
 import { notFound } from "next/navigation";
 import { ApiError, getAsset } from "@/lib/api";
 import { AssetDetail } from "@/components/asset/asset-detail";
@@ -9,10 +11,11 @@ export default async function AssetPage({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{paper?:string}>;
+  searchParams: Promise<{paper?:string; returnTo?: string | string[]}>;
 }) {
   const { id } = await params;
-  const paper=(await searchParams).paper==="1";
+  const query = await searchParams;
+  const paper=query.paper==="1";
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
   )
@@ -22,13 +25,14 @@ export default async function AssetPage({
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;
   });
+  const returnTo = documentReturnTo(query.returnTo) ?? `/reservoirs/${asset.reservoir_id}#assets`;
   return (
     <main className={paper?"page-shell clean-paper":"page-shell"}>
       <Link
         className="text-link"
-        href={`/reservoirs/${asset.reservoir_id}#assets`}
+        href={returnTo}
       >
-        ← Back to reservoir assets
+        ← {documentBackLabel(returnTo)}
       </Link>
       <div className="page-heading mt-8">
         <div>
@@ -38,9 +42,7 @@ export default async function AssetPage({
       </div>
       <Suspense
         fallback={
-          <section className="panel" role="status">
-            Loading asset information…
-          </section>
+          <PanelPending label="Loading asset information…"/>
         }
       >
         <AssetDetail asset={asset} />

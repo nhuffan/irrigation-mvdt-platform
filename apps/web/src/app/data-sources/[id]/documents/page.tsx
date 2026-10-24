@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { documentReturnTo, documentBackLabel } from "@/lib/document-navigation";
 import { notFound } from "next/navigation";
 import { ApiError, getResearchSource, getSourceDocuments } from "@/lib/api";
 import { DocumentList } from "@/components/documents/document-list";
@@ -7,9 +9,10 @@ import { linkedDocumentCounts, publicEvidenceText } from "@/lib/asset-informatio
 import { evidenceDisplayText } from "@/lib/evidence-display";
 
 export default async function SourceDocuments({
-  params,
+  params, searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ returnTo?: string | string[] }>;
 }) {
   const { id } = await params;
   const [source, documents] = await Promise.all([
@@ -21,8 +24,10 @@ export default async function SourceDocuments({
     throw error;
   });
   const counts = linkedDocumentCounts(documents);
+  const returnTo = documentReturnTo((await searchParams).returnTo) ?? `/reservoirs/${source.reservoir_id}#assets`;
   return (
     <main className="page-shell">
+      <Link className="text-link" href={returnTo}>← {documentBackLabel(returnTo)}</Link>
       <PageHeader eyebrow="Source inventory" title="Source documents"
         description="Source identity and available document metadata. A source entry does not establish retained file bytes or an asset–document association." />
       <section className="panel" aria-label="Source inventory identity">

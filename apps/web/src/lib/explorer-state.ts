@@ -18,3 +18,16 @@ export function reviewedPreview(data: ExplorerData) {
 export function modelHref(asset: Asset, link: NonNullable<ExplorerData["links"]>[number]) {
   return `/reservoirs/${asset.reservoir_id}/3d?model=${encodeURIComponent(link.model_id)}&object=${encodeURIComponent(link.object_key)}`;
 }
+
+export function explorerFilters(params: Pick<URLSearchParams, "get">) {
+  const location = params.get("location");
+  return { query: (params.get("q") ?? "").slice(0, 200), type: params.get("type") ?? "",
+    location: ["VERIFIED_GEOMETRY", "REFERENCE_LOCATION", "NO_LOCATION"].includes(location ?? "") ? location! : "all",
+    contextVisible: params.get("context") !== "0", modelOnly: params.get("modelOnly") === "1" };
+}
+export function explorerFilterUrl(href: string, key: "q" | "type" | "location" | "context" | "modelOnly", value: string) {
+  const url = new URL(href);
+  if (!value || (key === "location" && value === "all") || (key === "context" && value === "1") || (key === "modelOnly" && value === "0")) url.searchParams.delete(key);
+  else url.searchParams.set(key, key === "q" ? value.slice(0, 200) : value);
+  return url.pathname + url.search + url.hash;
+}

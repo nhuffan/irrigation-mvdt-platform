@@ -1,84 +1,51 @@
-/* Native img intentionally displays a local Blob URL without Next image optimization. */
+/* Local image Blob URLs intentionally bypass Next image optimization. */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import { useEffect, useState } from "react";
 import type { DocumentRecord } from "@/types/media";
-export function DocumentPreview({
-  document: doc,
-}: {
-  document: DocumentRecord;
-}) {
-  const [state, setState] = useState<{ url?: string; error?: string }>({});
+import { documentMediaError, originalDocumentUrl } from "@/lib/document-preview";
+
+export function DocumentPreview({ document: doc, initialPage = 1 }: { document: DocumentRecord; initialPage?: number }) {
+  const [state, setState] = useState<{ id?: string; url?: string; error?: string }>({});
   const [attempt, setAttempt] = useState(0);
-  const preview =
-    doc.mime_type === "application/pdf" ||
-    ["image/png", "image/jpeg", "image/webp", "image/gif"].includes(
-      doc.mime_type ?? "",
-    );
+  const [embeddedError, setEmbeddedError] = useState(false);
+  const pdf = doc.mime_type === "application/pdf";
+  const image = ["image/png", "image/jpeg", "image/webp", "image/gif"].includes(doc.mime_type ?? "");
+  const current = state.id === doc.id ? state : {};
   useEffect(() => {
+    if (!pdf && !image) return;
     const abort = new AbortController();
     let url: string | undefined;
     async function load() {
-      setState({});
+      setState({ id: doc.id }); setEmbeddedError(false);
       try {
         const response = await fetch(`/api/media/documents/${doc.id}`, {
-          signal: AbortSignal.any([abort.signal, AbortSignal.timeout(30000)]),
+          cache: "no-store", signal: AbortSignal.any([abort.signal, AbortSignal.timeout(30000)]),
         });
-        if (!response.ok)
-          throw new Error(
-            response.status === 410
-              ? "Document metadata exists, but the file is unavailable."
-              : "Unable to load document.",
-          );
-        url = URL.createObjectURL(await response.blob());
-        if (!abort.signal.aborted) setState({ url });
-        else URL.revokeObjectURL(url);
+        if (!response.ok) throw new Error(documentMediaError(response.status));
+        const blob = await response.blob();
+        if (abort.signal.aborted) return;
+        url = URL.createObjectURL(blob); setState({ id: doc.id, url });
       } catch (error) {
-        if (!abort.signal.aborted)
-          setState({
-            error:
-              error instanceof Error
-                ? error.message
-                : "Unable to load document.",
-          });
+        if (!abort.signal.aborted) setState({ id: doc.id, error: error instanceof Error ? error.message : documentMediaError(500) });
       }
     }
     void load();
-    return () => {
-      abort.abort();
-      if (url) URL.revokeObjectURL(url);
-    };
-  }, [doc.id, attempt]);
-  if (state.error)
-    return (
-      <div role="alert" className="panel">
-        <p>{state.error}</p>
-        <button onClick={() => setAttempt((n) => n + 1)}>Try again</button>
-      </div>
-    );
-  if (!state.url) return <p role="status">Loading document…</p>;
-  return (
-    <div className="document-preview-frame">
-      {!preview && (
-        <p className="muted">
-          Preview is unavailable for this file type. Download and open it
-          externally.
-        </p>
-      )}
-      {doc.mime_type === "application/pdf" && (
-        <iframe
-          className="document-preview"
-          title={doc.original_file_name}
-          src={state.url}
-        />
-      )}
-      {preview && doc.mime_type !== "application/pdf" && (
-        <img
-          className="document-image"
-          src={state.url}
-          alt={doc.source.title}
-        />
-      )}
+    return () => { abort.abort(); if (url) URL.revokeObjectURL(url); };
+  }, [doc.id, attempt, pdf, image]);
+  return <div className="document-preview-frame">
+    <div className="document-preview-toolbar">
+      <a className="button button-secondary" href={originalDocumentUrl(doc.id, initialPage)} target="_blank" rel="noopener noreferrer">{pdf ? `Open original PDF (page ${initialPage})` : "Open original file"} ↗</a>
+      <a className="text-link" href={`/api/media/documents/${doc.id}?download=true`} download={doc.original_file_name}>Download original</a>
     </div>
-  );
+    {pdf && <p className="preview-fallback">If the embedded preview is blank, open the original above. Preview support does not determine evidence availability.</p>}
+    <div className="document-preview-shell" aria-busy={(pdf || image) && !current.url && !current.error}>
+      {current.error ? <div className="preview-status" role="alert"><h2>Original unavailable</h2><p>{current.error}</p><button className="button button-secondary" onClick={() => setAttempt(n => n + 1)}>Retry original</button></div>
+        : !pdf && !image ? <p className="preview-status">This file type has no embedded preview. Open or download the original above.</p>
+        : !current.url ? <div className="preview-status" role="status"><div className="skeleton-card" aria-hidden="true"/><p>Loading original…</p></div>
+        : embeddedError ? <div className="preview-status" role="alert"><h2>Preview unavailable</h2><p>The original link remains available above.</p><button className="button button-secondary" onClick={() => setAttempt(n => n + 1)}>Retry preview</button></div>
+        : pdf ? <iframe className="document-preview" title={doc.original_file_name} src={`${current.url}#page=${initialPage}`} onError={() => setEmbeddedError(true)}/>
+        : <img className="document-image" src={current.url} alt={doc.source.title} onError={() => setEmbeddedError(true)}/>}
+    </div>
+  </div>;
 }

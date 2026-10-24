@@ -1,4 +1,6 @@
 "use client";
+import { documentHref } from "@/lib/document-navigation";
+import { mapView, readView, saveView, viewStorage } from "@/lib/workspace-view-state";
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { AssetSymbol } from "@/components/asset/asset-symbol";
 import { assetSymbolSvg, assetSymbols } from "@/lib/asset-symbol";
@@ -40,6 +42,7 @@ export function AssetMap({
   const container = useRef<HTMLDivElement>(null);
   const resetView = useRef<(() => void) | null>(null);
   const selectAsset = useRef<((asset: Asset) => void) | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const [basemapUnavailable, setBasemapUnavailable] = useState(false);
   const [locationUnavailable, setLocationUnavailable] = useState(false);
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">(
@@ -56,6 +59,12 @@ export function AssetMap({
     const symbolButtons = new Map<string, HTMLButtonElement>();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let basemapTimer: ReturnType<typeof setTimeout> | undefined;
+    const viewKey = () => `asset-map:${reservoir.id}:${selection.current.selectedId ?? "overview"}`;
+    const remember = () => {
+      if (!map) return;
+      const center = map.getCenter();
+      saveView(viewStorage(), viewKey(), { center: [center.lng, center.lat], zoom: map.getZoom(), bearing: map.getBearing(), pitch: map.getPitch() });
+    };
     void import("maplibre-gl")
       .then(({ Map, Popup, NavigationControl, AttributionControl, ScaleControl, Marker, LngLatBounds, setWorkerUrl }) => {
         if (disposed || !container.current) return;
@@ -71,6 +80,7 @@ export function AssetMap({
           zoom: 10,
         });
         map = instance;
+        instance.on("moveend", remember);
         stopResize = observeCanvasResize(container.current, () => instance.resize());
         resetView.current = () => instance.flyTo({ center: [reservoir.longitude, reservoir.latitude], zoom: 10 });
         instance.addControl(new NavigationControl(), "top-right");
@@ -137,7 +147,7 @@ export function AssetMap({
           content.append(metadata);
           const link = document.createElement("a");
           link.textContent = "View Asset →";
-          link.href = `/assets/${encodeURIComponent(asset.id)}`;
+          link.href = documentHref(`/assets/${encodeURIComponent(asset.id)}`, window.location.pathname + window.location.search + window.location.hash);
           content.append(link);
           if (selection.current.onSelect !== ignoreSelection) {
             const openPanel = document.createElement("button");
@@ -154,7 +164,7 @@ export function AssetMap({
             line.textContent = `${record.attribute_label}: ${record.value_number ?? record.value_text ?? "Unavailable"} ${record.unit ?? ""} · ${record.reviewed_provenance?.verification_level ?? record.verification_status}`;
             content.append(line);
           }
-          popup = new Popup({ maxWidth: "320px", offset: 20, anchor: "left", focusAfterOpen: false })
+          popup = new Popup({ maxWidth: "min(380px, calc(100vw - 60px))", offset: 20, anchor: "left", focusAfterOpen: false })
             .setLngLat(coordinate)
             .setDOMContent(content)
             .addTo(instance);
@@ -278,7 +288,9 @@ export function AssetMap({
             if (asset) selectAsset.current?.(asset);
             else { setLocationUnavailable(false); fitContext(); }
           };
+          const remembered = readView(viewStorage(), viewKey(), mapView);
           highlight.current(selection.current.selectedId);
+          if (remembered) instance.jumpTo(remembered);
           if (timer) clearTimeout(timer);
           setMapState("ready");
         });
@@ -287,6 +299,7 @@ export function AssetMap({
         if (!disposed) setMapState("error");
       });
     return () => {
+      remember();
       disposed = true;
       selectAsset.current = null;
       highlight.current = null;
@@ -297,7 +310,7 @@ export function AssetMap({
       resetView.current = null;
       map?.remove();
     };
-  }, [reservoir, assetsJson, records, contextVisible]);
+  }, [reservoir, assetsJson, records, contextVisible, attempt]);
   useEffect(() => { highlight.current?.(selectedId); }, [selectedId]);
   return (
     <div>
@@ -316,10 +329,10 @@ export function AssetMap({
           </p>
         )}
         {mapState === "error" && (
-          <p className="map-notice" role="alert">
-            The map could not load completely. Check your connection and WebGL
-            support, then reload. Asset records remain available below.
-          </p>
+          <div className="map-notice" role="alert">
+            <p>The map could not load completely. Check the connection and WebGL support. Asset records remain available in the panel.</p>
+            <button className="text-link" onClick={() => setAttempt(value => value + 1)}>Retry map</button>
+          </div>
         )}
         <details
           className="map-legend asset-legend"

@@ -5,7 +5,7 @@ import type { Asset } from "@/types/asset";
 import { assetDisplayName } from "@/lib/asset-display";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import type { RagCoverage, RagDemo, RagResult } from "@/lib/rag-lite";
-import { evidenceAssetGroups, evidenceSearchUrl, type EvidenceSearchState } from "@/lib/evidence-search-state";
+import { evidenceAssetGroups, evidenceSearchUrl, evidenceSearchFromUrl, evidenceRequestError, type EvidenceSearchState } from "@/lib/evidence-search-state";
 import { SearchCoverage } from "./search-coverage";
 import { EvidenceResults } from "./evidence-results";
 import styles from "./rag-lite.module.css";
@@ -25,6 +25,8 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
   const [run, setRun] = useState<SearchRun | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
+  const completedRequest = useRef<EvidenceSearchState | null>(null);
   const active = useRef<AbortController | null>(null);
   const heading = useRef<HTMLHeadingElement | null>(null);
   const errorHeading = useRef<HTMLDivElement | null>(null);
@@ -32,13 +34,27 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
   const lastRequest = useRef<{ question: string; attributeKey?: string; page: number; queryType: string } | null>(null);
 
   const restoreSearch = useEffectEvent(() => {
-    if (initialSearch) void ask(initialSearch.question, initialSearch.attributeKey, initialSearch.page, false, initialSearch.queryType);
+    const stored = evidenceSearchFromUrl(window.location.href, assets.map(asset => asset.id));
+    active.current?.abort(); setRun(null); if (!stored || stored.assetId !== assetId || stored.allDocs !== allDocs) { setDemos([]); setCoverage(null); setCoverageError(false); } setError(""); setCancelled(false); completedRequest.current = null;
+    if (!stored) { setBusy(false); setAssetId(initialAssetId || assets[0]?.id || ""); setAllDocs(false); setQuestion(""); setQueryType("auto"); lastRequest.current = null; return; }
+    setAssetId(stored.assetId || initialAssetId || assets[0]?.id || ""); setAllDocs(stored.allDocs);
+    setQuestion(stored.question); setQueryType(stored.queryType);
+    if (stored.draft) { setBusy(false); return; }
+    void ask(stored.question, stored.attributeKey, stored.page, false, stored.queryType, stored);
   });
-  useEffect(() => { restoreSearch(); return () => active.current?.abort(); }, []);
+  useEffect(() => {
+    const gate = new AbortController();
+    // StrictMode's first effect is cleaned before this microtask can submit.
+    queueMicrotask(() => { if (!gate.signal.aborted) restoreSearch(); });
+    const onPop = () => restoreSearch(); window.addEventListener("popstate", onPop);
+    return () => { gate.abort(); active.current?.abort(); window.removeEventListener("popstate", onPop); };
+  }, []);
   useEffect(() => {
     if (run) {
-      heading.current?.focus({ preventScroll: true });
-      if (run.pageChange) heading.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+      const anchor = window.location.hash.slice(1);
+      const target = run.result.citations.some(c => c.citation_id === anchor) ? document.getElementById(anchor) : null;
+      (target ?? heading.current)?.focus({ preventScroll: true });
+      if (target || run.pageChange) (target ?? heading.current)?.scrollIntoView({ block: "center", behavior: "smooth" });
     }
   }, [run]);
   useEffect(() => { if (error) errorHeading.current?.focus(); }, [error]);
@@ -68,55 +84,64 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
   }
   function reset(clearDemos = false) {
     remember(null);
-    active.current?.abort(); setBusy(false); setRun(null); setError(""); lastRequest.current = null;
+    active.current?.abort(); setBusy(false); setRun(null); setError(""); setCancelled(false); lastRequest.current = null; completedRequest.current = null;
     if (clearDemos) { setDemos([]); setCoverage(null); setCoverageError(false); }
   }
-  function clear() { reset(); setQuestion(""); input.current?.focus(); }
-  function cancel() { active.current?.abort(); remember(null); setBusy(false); input.current?.focus(); }
-  async function ask(value = question, attributeKey?: string, page = 1, pageChange = false, requestedType = queryType) {
-    const trimmed = value.trim();
-    if (trimmed.length < 2 || (!allDocs && !assetId)) return;
+  function draft(patch: Partial<EvidenceSearchState>, scopeChange = false) {
+    reset(scopeChange);
+    const next = { assetId, allDocs, question, queryType: queryType as EvidenceSearchState["queryType"], page: 1, ...patch, draft: true };
+    if (next.allDocs) { next.assetId = ""; next.queryType = "document"; }
+    remember(next);
+  }
+  function clear() { draft({ question: "" }); setQuestion(""); input.current?.focus(); }
+  function cancel() { active.current?.abort(); remember(run ? completedRequest.current : { assetId: allDocs ? "" : assetId, allDocs, question, queryType: allDocs ? "document" : queryType as EvidenceSearchState["queryType"], page: 1, draft: true }); setBusy(false); setCancelled(true); input.current?.focus(); }
+  async function ask(value = question, attributeKey?: string, page = 1, pageChange = false, requestedType = queryType, restored?: EvidenceSearchState) {
+    const trimmed = value.trim(), selectedId = restored?.assetId ?? assetId, corpus = restored?.allDocs ?? allDocs;
+    if (trimmed.length < 2 || (!corpus && !selectedId)) return;
     active.current?.abort();
     const controller = new AbortController(); active.current = controller;
-    const resolvedType = attributeKey ? "attribute" : allDocs ? "document" : requestedType === "attribute" || requestedType === "document" ? requestedType : "auto";
+    const resolvedType = attributeKey ? "attribute" : corpus ? "document" : requestedType === "attribute" || requestedType === "document" ? requestedType : "auto";
     lastRequest.current = { question: trimmed, attributeKey, page, queryType: resolvedType };
-    remember({ question: trimmed, assetId: allDocs ? "" : assetId, allDocs, queryType: resolvedType, attributeKey, page });
-    setQuestion(trimmed); setBusy(true); setError(""); setRun(null);
-    const selected = assets.find(a => a.id === assetId);
-    const scopeName = allDocs ? "all authorized PDFs · no asset attribution" : selected ? assetDisplayName(selected) : "selected asset";
+    const requestState: EvidenceSearchState = { question: trimmed, assetId: corpus ? "" : selectedId, allDocs: corpus, queryType: resolvedType, attributeKey, page };
+    remember(requestState);
+    setQuestion(trimmed); setBusy(true); setError(""); setCancelled(false);
+    if (!pageChange) setRun(null);
+    const selected = assets.find(a => a.id === selectedId);
+    const scopeName = corpus ? "all authorized PDFs · no asset attribution" : selected ? assetDisplayName(selected) : "selected asset";
     try {
       const response = await fetch("/api/rag-lite", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: trimmed, asset_id: allDocs ? null : assetId,
-          all_authorized_docs: allDocs, mode: "evidence_only", query_type: resolvedType,
+        body: JSON.stringify({ question: trimmed, asset_id: corpus ? null : selectedId,
+          all_authorized_docs: corpus, mode: "evidence_only", query_type: resolvedType,
           ...(attributeKey ? { attribute_key: attributeKey } : {}), page, page_size: 5 }),
         signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]),
       });
-      if (!response.ok) throw new Error(response.status === 429 ? "Search limit reached. Wait a minute, then retry." : response.status === 404 ? "This experimental search is currently disabled." : "Search could not be completed. Check the local connection and retry.");
+      if (!response.ok) throw new Error(evidenceRequestError(response.status));
       const result: RagResult = await response.json();
       if (!controller.signal.aborted) {
-        if (result.pagination) remember({ question: trimmed, assetId: allDocs ? "" : assetId, allDocs, queryType: resolvedType, attributeKey, page: result.pagination.page });
+        const completed = { ...requestState, page: result.pagination?.page ?? page };
+        completedRequest.current = completed; remember(completed);
         setRun({ result, scopeName, pageChange });
       }
     } catch (e) {
-      if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Search could not be completed. Please retry.");
+      if (!controller.signal.aborted) setError(e instanceof Error && e.name === "TimeoutError" ? "Search timed out. Check the local connection and retry." : e instanceof Error ? e.message : "Search could not be completed. Please retry.");
     } finally { if (!controller.signal.aborted) setBusy(false); }
   }
 
   const currentCoverage = coverage && (allDocs ? !coverage.diagnostics : coverage.diagnostics?.asset_id === assetId) ? coverage : null;
-  function searchCorpus() { reset(true); setAllDocs(true); input.current?.focus(); }
+  function searchCorpus() { draft({ allDocs: true }, true); setAllDocs(true); input.current?.focus(); }
 
   return <section className={`panel ${styles.searchPanel}`} aria-label="Evidence search">
 
       <form onSubmit={e => { e.preventDefault(); void ask(); }}>
-        <fieldset className={styles.scope} disabled={busy}>
+        <fieldset className={styles.scope}>
           <legend>Search in</legend>
-          <label><input type="radio" name="evidence-scope" checked={!allDocs} onChange={() => { reset(true); setAllDocs(false); }} />Selected asset</label>
-          <label><input type="radio" name="evidence-scope" checked={allDocs} onChange={() => { reset(true); setAllDocs(true); }} />All authorized PDFs</label>
+          <label><input type="radio" name="evidence-scope" checked={!allDocs} onChange={() => { draft({ allDocs: false, assetId }, true); setAllDocs(false); }} />Selected asset</label>
+          <label><input type="radio" name="evidence-scope" checked={allDocs} onChange={() => { draft({ allDocs: true }, true); setAllDocs(true); }} />All authorized PDFs</label>
         </fieldset>
         <div className={`${styles.searchRow} ${allDocs ? styles.corpusRow : ""}`}>
           {!allDocs && <label className={styles.field}>Asset or component
-            <select disabled={busy} value={assetId} onChange={e => { reset(true); setAssetId(e.target.value); }}>
+            <select value={assetId} onChange={e => { draft({ assetId: e.target.value }, true); setAssetId(e.target.value); }}>
               {evidenceAssetGroups(assets).map(({ parent, children }) => children.length ? <optgroup key={parent.id} label={assetDisplayName(parent)}>
                 <option value={parent.id}>{assetDisplayName(parent)} (parent only)</option>
                 {children.map(asset => <option key={asset.id} value={asset.id}>↳ {assetDisplayName(asset)}</option>)}
@@ -124,12 +149,12 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
             </select>
           </label>}
           <label className={styles.field}>Question or document keywords
-            <input ref={input} type="search" value={question} minLength={2} maxLength={1000} required autoComplete="off" disabled={busy}
-              onChange={e => { reset(); setQuestion(e.target.value); }} placeholder="Search historical values or original document keywords" />
+            <input ref={input} type="search" value={question} minLength={2} maxLength={1000} required autoComplete="off"
+              onChange={e => { draft({ question: e.target.value }); setQuestion(e.target.value); }} placeholder="Search historical values or original document keywords" />
           </label>
           <button className={`button ${styles.submit}`} type="submit" disabled={busy || question.trim().length < 2 || (!allDocs && !assetId)}>{busy ? "Searching…" : "Search evidence"}<span aria-hidden="true">↗</span></button>
         </div>
-        {allDocs && <p className={styles.scopeNotice}>Corpus-wide · not attributed to any asset.</p>}
+        <p className="scope-context">{allDocs ? "Corpus-wide · not attributed to any asset." : assets.find(a => a.id === assetId) ? assetDisplayName(assets.find(a => a.id === assetId)!) : "Select an asset or component"}</p>
         <p className={styles.readiness} role="status" aria-label="Evidence availability">
           {currentCoverage ? <>
             {!allDocs && <span>{currentCoverage.diagnostics?.reviewed_attributes ?? 0} reviewed fields</span>}
@@ -146,7 +171,7 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
               <summary>Search options</summary>
               <div className={styles.optionBody}>
                 {!allDocs && <label className={styles.field}>Search mode
-                  <select disabled={busy} value={queryType} onChange={e => { reset(); setQueryType(e.target.value); }}>
+                  <select value={queryType} onChange={e => { draft({ queryType: e.target.value as EvidenceSearchState["queryType"] }); setQueryType(e.target.value); }}>
                     <option value="auto">Technical fields, then PDF passages</option><option value="attribute">Technical fields only</option><option value="document">Document passages only</option>
                   </select>
                 </label>}
@@ -165,14 +190,15 @@ export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: Se
         </div>
       </form>
     <div aria-live="polite" aria-atomic="true" className={styles.srOnly}>{busy ? "Searching historical evidence" : run ? `${run.result.citations.length} ${run.result.citations.length === 1 ? "reference" : "references"} returned for ${run.scopeName}` : ""}</div>
-    <div className={styles.outcome}>
-      {busy && <p className={styles.progress} role="status">Searching…</p>}
+    <div className={styles.outcome} aria-busy={busy}>
+      {busy && <p className={styles.progress} role="status">{run ? "Loading the requested page…" : "Searching historical evidence…"}</p>}
+      {cancelled && <p className={styles.progress} role="status">Search cancelled. Your keywords are kept.</p>}
       {error && <div ref={errorHeading} tabIndex={-1} role="alert" className={styles.error}>
         <h2>Search unavailable</h2><p>{error}</p><button className="text-link" onClick={() => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, lastRequest.current?.page ?? 1, false, lastRequest.current?.queryType ?? queryType)}>Retry search</button>
       </div>}
       {run && <EvidenceResults result={run.result} headingRef={heading} onCorpus={!allDocs ? searchCorpus : undefined}
         onPage={page => void ask(lastRequest.current?.question ?? question, lastRequest.current?.attributeKey, page, true, lastRequest.current?.queryType ?? queryType)} />}
-      {!busy && !run && !error && <p className={styles.startState}>Enter keywords to search historical evidence.</p>}
+      {!busy && !run && !error && !cancelled && <p className={styles.startState}>Enter keywords to search historical evidence.</p>}
     </div>
   </section>;
 }

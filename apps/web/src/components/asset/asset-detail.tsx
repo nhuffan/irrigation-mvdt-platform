@@ -2,7 +2,7 @@ import { PanelSection, PanelDisclosure } from "@/components/ui/panel-section";
 import { AssetDataAvailability } from "./asset-data-availability";
 import { AssetHierarchy } from "./asset-hierarchy";
 import { Suspense } from "react";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { getReservoir, getReservoirAssets, getAssetTechnical } from "@/lib/api";
 import { getExplorerData } from "@/lib/explorer-data";
 import type { Asset } from "@/types/asset";
@@ -19,7 +19,7 @@ export async function AssetDetail({asset}:{asset:Asset}) {
  const parent=assets?.find(a=>a.id===asset.parent_asset_id);
  return <div className="asset-properties-layout">
  <aside className="component-tree">
- <PanelSection title="Current asset"><AssetDisplayName asset={asset}/><AssetMetadata asset={asset}/><Link className="text-link" href={`/reservoirs/${asset.reservoir_id}?asset=${encodeURIComponent(asset.id)}#asset-gis`}>Open on GIS →</Link></PanelSection>
+ <PanelSection title="Current asset"><AssetDisplayName asset={asset}/><AssetMetadata asset={asset}/><Link className="text-link" href={`/reservoirs/${asset.reservoir_id}?asset=${encodeURIComponent(asset.id)}#asset-gis`}>Open on GIS →</Link><Link className="text-link" href={`/ai-research-preview?scope=asset&asset=${asset.id}&search=auto&page=1&draft=1`}>Search asset evidence →</Link></PanelSection>
  <PanelSection title="Asset navigation">{assets===null?<p>Hierarchy unavailable</p>:<Suspense fallback={<p>Loading hierarchy coverage…</p>}><AssetHierarchy assets={assets} selected={asset} records={hierarchyRecords}/></Suspense>}</PanelSection>
  </aside>
  <div className="asset-properties"><nav className="om-nav" aria-label="Evidence sections"><a href="#data-availability">Availability</a><a href="#technical">Technical</a><a href="#sources">Sources</a><a href="#location">Location</a><a href="#timeline">O&amp;M</a><a href="#model">3D</a></nav>{parent && <nav aria-label="Parent breadcrumb"><Link className="text-link" href={`/assets/${parent.id}`}><AssetDisplayName asset={parent}/></Link> / <AssetDisplayName asset={asset}/></nav>}<section className="panel"><h2>Overview</h2><StatusBadge>{"RS"}</StatusBadge><p>{asset.category.name} · {reservoir.name}</p><PanelDisclosure title="Asset notes"><p className="muted">{asset.description??"Description unavailable."}</p></PanelDisclosure><AssetLocationSummary asset={asset}/></section>

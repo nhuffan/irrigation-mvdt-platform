@@ -1,7 +1,2 @@
-export default function Loading() {
-  return (
-    <main className="page-shell" role="status">
-      Loading reservoir 3D models…
-    </main>
-  );
-}
+import { ViewPending } from "@/components/ui/view-pending";
+export default function Loading() { return <ViewPending title="3D Workspace" workspace={true}/>; }

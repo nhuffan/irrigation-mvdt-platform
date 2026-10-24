@@ -1,9 +1,9 @@
 "use client";
 export default function AssetError({
-  reset,
+  retry,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  retry: () => void;
 }) {
   return (
     <main className="page-shell">
@@ -14,7 +14,7 @@ export default function AssetError({
           We could not load the latest asset information. Please try again
           shortly.
         </p>
-        <button className="button" onClick={reset}>
+        <button className="button" onClick={retry}>
           Try again
         </button>
       </section>

@@ -1,4 +1,5 @@
 "use client";
+import { documentHref } from "@/lib/document-navigation";
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -82,7 +83,7 @@ export function ReservoirMap({ reservoirs }: { reservoirs: Reservoir[] }) {
             level.textContent = `MVDT Level: ${reservoir.mvdt_level}`;
             const link = document.createElement("a");
             link.textContent = "View Reservoir →";
-            link.href = `/reservoirs/${encodeURIComponent(reservoir.id)}`;
+            link.href = documentHref(`/reservoirs/${encodeURIComponent(reservoir.id)}`, window.location.pathname + window.location.search + window.location.hash);
             content.append(title, code, status, level, link);
             const popup = new Popup({
               offset: 20,

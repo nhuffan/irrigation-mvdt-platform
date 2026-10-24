@@ -1,7 +1,7 @@
 import { linkedDocumentCounts, publicEvidenceText } from "@/lib/asset-information";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { TechnicalMetadataPopover } from "./presentation";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import { getAssetDocuments, getAssetModelLinks, getModels } from "@/lib/api";
 import { DocumentList } from "@/components/documents/document-list";
 import { VerificationBadge } from "./source-info";

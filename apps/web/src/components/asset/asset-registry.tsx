@@ -1,7 +1,7 @@
 import { AssetSymbol } from "./asset-symbol";
 import { AssetDisplayName, AssetMetadata } from "./presentation";
 import { LocationBadge } from "./location-badge";
-import Link from "next/link";
+import { OriginLink as Link } from "@/components/documents/document-link";
 import type { Asset } from "@/types/asset";
 import type { ExplorerRecords } from "@/lib/explorer-data";
 import { modelHref } from "@/lib/explorer-state";

@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { documentReturnTo, documentBackLabel } from "@/lib/document-navigation";
 import { publicModels } from "@/lib/public-client-data";
 import { PageHeader } from "@/components/ui/page-header";
 import { notFound } from "next/navigation";
@@ -8,7 +10,7 @@ export default async function ThreeDPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ model?: string; object?: string; paper?: string }>;
+  searchParams: Promise<{ model?: string; object?: string; paper?: string; returnTo?: string | string[] }>;
 }) {
   const { id } = await params;
   const query = await searchParams;
@@ -23,6 +25,7 @@ export default async function ThreeDPage({
   if (query.model && !models.some(m => m.id === query.model)) notFound();
   return (
     <main className={query.paper==="1"?"page-shell model-page clean-paper":"page-shell model-page"}>
+      {documentReturnTo(query.returnTo) && <Link className="text-link" href={documentReturnTo(query.returnTo)!}>← {documentBackLabel(documentReturnTo(query.returnTo)!)}</Link>}
       <PageHeader eyebrow="Representation" title="3D Models" description="A representative 3D view for exploring linked assets and evidence. Model appearance and placement do not certify surveyed geometry, building identity or present asset condition." />
       <ModelBrowser
         models={publicModels(models)}
