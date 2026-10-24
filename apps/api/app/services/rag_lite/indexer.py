@@ -133,14 +133,23 @@ def load_index(path: Path, doc):
         or value["document_id"] != str(doc.id)
         or value["source_id"] != str(doc.source_id)
         or value["checksum_sha256"] != doc.checksum_sha256
-        or not 0 < value["page_count"] <= MAX_PAGES
+        or type(value["page_count"]) is not int
+        or value["page_count"] < 1
+        or (
+            value["page_count"] > MAX_PAGES
+            and value.get("profile") != "section-pages-v1"
+        )
     ):
         raise ValueError("STALE_INDEX")
     if "profile" in value:
         from app.services.rag_lite.sections import validate_sections
 
         validate_sections(value, doc)
-    elif any("asset_ids" in c for c in value["chunks"]):
+    elif (
+        "included_pages" in value
+        or "extraction_sha256" in value
+        or any("asset_ids" in c for c in value["chunks"])
+    ):
         raise ValueError("MISSING_SCOPE_PROFILE")
     for chunk in value["chunks"]:
         if not 1 <= chunk["page"] <= value["page_count"]:
@@ -183,19 +192,25 @@ def build_index(
         try:
             data = read_pdf(storage, doc)
             path = directory / f"{doc.id}.json"
+            scoped = False
             try:
                 index = load_index(path, doc)
-                if (
-                    scope_pins.get(str(doc.id))
-                    and index.get("scope_sha256") != scope_pins[str(doc.id)]
-                ):
+                scoped = "profile" in index
+                if scope_pins.get(str(doc.id)) != index.get("scope_sha256"):
                     raise ValueError("SCOPE_AUTHORIZATION_MISMATCH")
             except (OSError, ValueError, KeyError, TypeError):
-                if scope_pins.get(str(doc.id)):
+                if scope_pins.get(str(doc.id)) or scoped:
                     entry["status"] = "SECTION_REVIEW_REQUIRED"
                     continue
                 index = extract(doc, data)
                 atomic_json(path, index)
+            if "included_pages" in index:
+                entry.update(
+                    partial=True,
+                    included_pages=index["included_pages"],
+                    processed_pages=len(index["coverage"]),
+                    omitted_pages=index["page_count"] - len(index["coverage"]),
+                )
             entry.update(
                 page_count=index["page_count"],
                 text_pages=sum(p["indexed"] for p in index["coverage"]),
@@ -229,6 +244,9 @@ def inspect_document(storage, settings, doc, allowlist):
         pages = index["coverage"]
         if not pages or any(not isinstance(p["characters"], int) for p in pages):
             raise ValueError("INVALID_COVERAGE")
+        if "included_pages" in index:
+            # Unprocessed pages are unknown, even if every selected page is text.
+            return index, ["EXTRACTION_LIMITED"]
         if not index["chunks"]:
             return index, [
                 "IMAGE_ONLY"

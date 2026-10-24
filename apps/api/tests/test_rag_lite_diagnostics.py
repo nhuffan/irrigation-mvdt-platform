@@ -77,6 +77,8 @@ def test_document_failure_reasons(rag, monkeypatch, failure, expected):
     data = coverage(client, body).json()
     assert data["searchable_documents"] == 0
     assert expected in data["diagnostics"]["reason_codes"]
+    assert data["diagnostics"]["unscoped_documents"] == 0
+    assert "NO_SCOPED_PASSAGE" not in data["diagnostics"]["reason_codes"]
     result = client.post(
         URL, json={**body, "query_type": "document", "question": "synthetic inspection"}
     ).json()
@@ -223,3 +225,63 @@ def test_numeric_query_cannot_match_the_decimal_zero_fragment():
         record, "hành trình 4650.1", tokens("hành trình 4650.1")
     )
     assert attribute_matches(record, "hành trình 4650.0", tokens("hành trình 4650.0"))
+
+
+def test_valid_shared_original_with_no_exact_scoped_passage_is_available(rag):
+    import json
+
+    from app.services.rag_lite.sections import extract_sections
+
+    client, body, assets, doc, storage, *_ = rag
+    index = extract_sections(
+        doc,
+        storage.path(doc.storage_key).read_bytes(),
+        [
+            {
+                "page": 1,
+                "start": "DEVELOPMENT ONLY - SYNTHETIC DOCUMENT",
+                "asset_ids": [str(assets[1].id)],
+            }
+        ],
+        "Synthetic extraction scope review; no engineering approval",
+    )
+    atomic_json(settings.rag_lite_index_dir / f"{doc.id}.json", index)
+    allow = json.loads(settings.rag_lite_allowlist_path.read_text())
+    allow["documents"][0]["scope_sha256"] = index["scope_sha256"]
+    atomic_json(settings.rag_lite_allowlist_path, allow)
+
+    selected = coverage(client, body).json()
+    assert selected["authorized_documents"] == 1
+    assert selected["searchable_documents"] == 0
+    assert selected["image_only_documents"] == 0
+    assert selected["unavailable_documents"] == 0
+    assert selected["diagnostics"]["reviewed_attributes"] == 1
+    assert selected["diagnostics"]["unscoped_documents"] == 1
+    assert "NO_SCOPED_PASSAGE" in selected["diagnostics"]["reason_codes"]
+
+    request = {**body, "query_type": "document", "question": "synthetic inspection"}
+    scoped = client.post(URL, json=request).json()
+    assert scoped["status"] == "NOT_ENOUGH_EVIDENCE"
+    assert scoped["reason_codes"] == ["NO_SCOPED_PASSAGE"]
+    assert not scoped["citations"]
+    assert client.post(URL, json=body).json()["citations"][0]["kind"] == (
+        "technical_attribute"
+    )
+    corpus = client.post(
+        URL, json={**request, "asset_id": None, "all_authorized_docs": True}
+    ).json()
+    assert corpus["citations"] and all(
+        c["asset_id"] is None for c in corpus["citations"]
+    )
+    assert "NO_SCOPED_PASSAGE" not in corpus["reason_codes"]
+    corpus_coverage = client.get(
+        "/api/v1/experimental/rag-lite/coverage",
+        params={"reservoir_id": body["reservoir_id"]},
+    ).json()
+    assert corpus_coverage["searchable_documents"] == 1
+    assert corpus_coverage["unavailable_documents"] == 0
+
+    atomic_json(settings.rag_lite_allowlist_path, {**allow, "documents": []})
+    revoked = client.post(URL, json=request).json()
+    assert revoked["reason_codes"] == ["NOT_AUTHORIZED"]
+    assert coverage(client, body).json()["diagnostics"]["unscoped_documents"] == 0

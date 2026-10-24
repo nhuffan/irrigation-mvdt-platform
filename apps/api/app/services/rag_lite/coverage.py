@@ -73,6 +73,11 @@ def search_coverage(db, storage, settings, reservoir_id, asset_id=None):
             result.searchable_documents += 1
             result.searchable_pages += len({c["page"] for c in chunks})
             result.indexed_chunks += len(chunks)
+        elif asset_id and index and index["chunks"]:
+            # The authorized original and its index are usable, but the shared
+            # source has no reviewed passage for this exact asset/component.
+            reasons.append("NO_SCOPED_PASSAGE")
+            diag.unscoped_documents += 1
         elif "IMAGE_ONLY" in issues:
             result.image_only_documents += 1
         else:

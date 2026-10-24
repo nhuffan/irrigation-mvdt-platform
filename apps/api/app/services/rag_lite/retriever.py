@@ -14,8 +14,11 @@ from app.services.rag_lite.indexer import digest, inspect_document, load_allowli
 from app.services.rag_lite.sections import scoped_chunks
 from app.services.rag_lite.vocabulary import (
     ALIASES,
+    FIELD_ALIASES,
+    equivalent_queries,
     normalize_numbers,
     numeric_literals,
+    scoped_question,
 )
 
 STOP = {
@@ -126,7 +129,7 @@ def rank_literal_chunks(candidates, question, query_tokens):
     explicit_diacritics = {
         signature
         for word, signature in word_signatures(question).items()
-        if word != fold(word) and fold(word) in query_tokens
+        if (signature[1] or "đ" in word) and fold(word) in query_tokens
     }
     # Preserve original word order inside the meaningful part of the question.
     # Only trim leading/trailing scaffolding or the selected asset's name/code;
@@ -239,6 +242,14 @@ def rank_document_chunks(candidates, question, query_tokens):
 
 
 def attribute_matches(record, question, query_tokens):
+    ignored = tokens(question) - query_tokens
+    return any(
+        attribute_matches_literal(record, alternative, tokens(alternative) - ignored)
+        for alternative in equivalent_queries(question, FIELD_ALIASES)
+    )
+
+
+def attribute_matches_literal(record, question, query_tokens):
     # Field meaning must match every meaningful keyword. Half-overlap confused
     # test/design pressure. Values can refine a field query, never select it alone.
     field = record.attribute_key + " " + record.attribute_label
@@ -258,7 +269,7 @@ def attribute_matches(record, question, query_tokens):
     explicit = {
         signature
         for word, signature in word_signatures(question).items()
-        if word != fold(word) and fold(word) in query_tokens
+        if (signature[1] or "đ" in word) and fold(word) in query_tokens
     }
     return explicit <= set(word_signatures(field + " " + value).values())
 
@@ -356,6 +367,7 @@ def retrieve(db, storage, settings, request):
             reason_codes=["OUT_OF_SCOPE"],
         )
     records = []
+    search_question = request.question
     if request.asset_id:
         asset = db.get(Asset, request.asset_id)
         if asset is None or asset.reservoir_id != request.reservoir_id:
@@ -365,28 +377,25 @@ def retrieve(db, storage, settings, request):
                 ["Unknown asset in the selected reservoir; choose its exact UUID"],
                 reason_codes=["SCOPE_MISMATCH"],
             )
-        # Never resolve aliases or inherit evidence across parent/child boundaries.
-        for other in db.scalars(
-            select(Asset).where(Asset.reservoir_id == request.reservoir_id)
-        ):
-            if other.id != asset.id and re.search(
-                rf"(?<![a-z0-9-]){re.escape(other.asset_code.lower())}(?![a-z0-9-])",
-                request.question.lower(),
-            ):
-                return respond(
-                    request,
-                    [],
-                    [
-                        "Question names another asset; select exactly one asset/component"
-                    ],
-                    reason_codes=["SCOPE_MISMATCH"],
-                )
+        # Human-readable labels only clarify the selected scope. They cannot
+        # change its UUID or admit a different component's reviewed evidence.
+        assets = list(
+            db.scalars(select(Asset).where(Asset.reservoir_id == request.reservoir_id))
+        )
+        search_question, mismatch = scoped_question(request.question, asset, assets)
+        if mismatch:
+            return respond(
+                request,
+                [],
+                ["Question names another asset; select exactly one asset/component"],
+                reason_codes=["SCOPE_MISMATCH"],
+            )
         records = [
             r
             for r in reviewed_records(db, asset.id)
             if r.source.reservoir_id == request.reservoir_id
         ]
-    query_tokens = tokens(request.question)
+    query_tokens = tokens(search_question)
     if request.asset_id:
         query_tokens -= tokens(asset.asset_code) | tokens(asset.name)
     if request.query_type != "document" and request.asset_id:
@@ -397,7 +406,7 @@ def retrieve(db, storage, settings, request):
             exact = request.attribute_key == record.attribute_key
             if (request.attribute_key and exact) or (
                 not request.attribute_key
-                and attribute_matches(record, request.question, query_tokens)
+                and attribute_matches(record, search_question, query_tokens)
             ):
                 ranked.append((score, str(record.id), record))
         ranked.sort(key=lambda row: (-row[0], row[1]))
@@ -446,16 +455,22 @@ def retrieve(db, storage, settings, request):
             )
         if "IMAGE_ONLY" in issues or "EXTRACTION_LIMITED" in issues:
             limitations.append(
-                "An authorized PDF has limited or no usable extracted text; OCR is outside scope"
+                "Search covers only indexed passages; some authorized original pages were excluded or have limited extracted text. OCR is outside scope"
             )
         if not index:
             continue
-        for chunk in scoped_chunks(index, request.asset_id):
+        chunks = scoped_chunks(index, request.asset_id)
+        if request.asset_id and index["chunks"] and not chunks:
+            reasons.append("NO_SCOPED_PASSAGE")
+            limitations.append(
+                "An authorized shared source has no reviewed passage for this exact asset/component; no parent/child inheritance"
+            )
+        for chunk in chunks:
             if any(phrase in fold(chunk["text"]) for phrase in UNSUPPORTED[15:]):
                 limitations.append("A potentially instructional passage was excluded")
                 continue
             candidates.append((doc, chunk, tokens(chunk["text"])))
-    ranked = rank_document_chunks(candidates, request.question, query_tokens)
+    ranked = rank_document_chunks(candidates, search_question, query_tokens)
     limitations.append(
         "PDF search requires all search keywords; exact normalized phrases rank first. "
         "Explicit query diacritics constrain matches; unaccented words remain "

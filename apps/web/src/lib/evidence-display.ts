@@ -1,6 +1,14 @@
 // Display translations only; original values, filenames and provenance remain unchanged.
 const english: Record<string, string> = {
   "W2-historic-eia.pdf": "Historic environmental impact assessment, 2003",
+  "siwrr.pdf": "SIWRR research report, October 2010",
+  "office-design.pdf": "Office building repair drawings, 2026",
+  "office-completion.pdf": "Office complex condition record, 31 March 2026",
+  "cao trình ngưỡng": "Sill elevation",
+  "lưu lượng": "Discharge",
+  "cửa chính": "Main door",
+  "bồn nước": "Water tank",
+  "sê nô": "Roof gutter",
   "vật liệu đập": "Dam material",
   "tường bentonite": "Bentonite core wall",
   "thoát nước": "Drainage",

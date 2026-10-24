@@ -19,7 +19,7 @@ def suggested_questions(db, storage, settings, asset):
     ]
     fields = [
         {
-            "question": r.attribute_label,
+            "question": r.attribute_label.partition(" theo ")[0],
             "attribute_key": r.attribute_key,
             "attribute_label": r.attribute_label,
         }
@@ -46,6 +46,11 @@ def suggested_questions(db, storage, settings, asset):
         "quan trắc thấm",
         "cao trình đỉnh",
         "chiều dài đỉnh",
+        "cao trình ngưỡng",
+        "lưu lượng",
+        "cửa chính",
+        "bồn nước",
+        "sê nô",
     ):
         ranked = rank_document_chunks(
             candidates,

@@ -62,6 +62,7 @@ class Citation(BaseModel):
 
 EvidenceReason = Literal[
     "NO_DIRECT_DOCUMENT",
+    "NO_SCOPED_PASSAGE",
     "NO_REVIEWED_ATTRIBUTE",
     "NOT_AUTHORIZED",
     "IMAGE_ONLY",
@@ -99,6 +100,7 @@ class RagCoverageDiagnostics(BaseModel):
     asset_id: UUID
     reviewed_attributes: int = 0
     direct_documents: int = 0
+    unscoped_documents: int = 0
     not_authorized_documents: int = 0
     missing_documents: int = 0
     invalid_documents: int = 0

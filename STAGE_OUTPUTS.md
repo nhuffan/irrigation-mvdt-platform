@@ -1299,3 +1299,57 @@ All13 non-document table fingerprints match baseline, including all48 technical 
 Three retained dam drawing originals remain image-only; OCR is outside this stage, and no direct child/component mapping was invented. The additional2017 ESIA lacks an admitted Main Dam source/link; SIWRR2010 is currently admitted for intake components, lacks Main Dam association and has355 pages above the300-page limit. Further enrichment requires actual reviewed source/asset associations and supporting originals; new VERIFIED engineering parameters require real review evidence. No new material/O&M/current-condition record was fabricated from proposal or hypothesis text. Known extraction/metadata/keyword limits remain; embedded in-app PDF rendering has its existing limitation, while the actual Chrome original page works.
 
 No task server/container/port was started. Preexisting web3000 PID48430, API8000 supervisor61514 (worker auto-reloaded with source edits) and healthy PostGIS remain; no explicit restart or user-workload stop. Build/tests/rendering processes exited. No duplicate runbook, slide, stage plan or output markdown was created.
+
+## Stage 9 output — Multi-asset evidence expansion and presentation demo
+
+### Actual onboarding and scope
+
+Extended the guarded Stage 8 importer and applied the retained, previously authorized originals on the existing database. Three new documents; no new assets, sources, technical fields or review approvals. Source status/authority/date and all existing engineering values stay unchanged.
+
+| New original | Exact available scope | Live result |
+|---|---|---|
+| RS-DOC-043 `224161a4-a365-51fa-8885-6b7be6d6a433`, SIWRR2010, source020 | Three separate intake paragraphs on physical47, matching existing reviewed C01/C02/C03 source bindings | Each component:6 existing reviewed fields,1 searchable PDF,1 scoped page/1 chunk. Full355-page original preserved; only47 extracted,354 omitted. Processed page has6 corpus chunks;3 belong to individual components. |
+| RS-DOC-044 `b5258e05-2d4c-5f18-8fac-decf9e5198d3`, office-design.pdf, source021 | Office only: physical10 HT.02,4 chunks | Office:5 reviewed fields and1 searchable PDF. All61 extracted pages/97 chunks available only in explicit corpus mode unless section-mapped. Sail keeps1 reviewed floor field; shared original has0 reviewed Sail passages. |
+| RS-DOC-045 `8009aaa7-e40f-5821-99c5-32dba880fd86`, office-completion.pdf, source022 | Existing Dining direct source association |3 existing reviewed fields;10-page original is image-only,0 searchable chunks; no OCR. |
+
+New original SHA256 pins: SIWRR `e4a1b8a7a7e0c14e735eb11b8aff0eb5b9df697b22440c51b84822feaad720e6`; Office `29c66edbd40c865482093bc51aa807ee7dce368bc002a37c9ff496e79a0f07e5`; Dining `09a193b390f3e508c5efad713883ad0066e6857fb1f33bbc717c1a2385e68dd8`. Actual dry-run3 WOULD_IMPORT → apply3 IMPORTED → repeat apply3 SKIPPED. No original PDF bytes modified.
+
+Whole live corpus: **10 authorized /5 searchable /5 image-only /0 unavailable**,258 indexed physical pages and576 chunks. Main Dam and Spillway scoped documents/pages/chunks remain unchanged. Intake and Management parents have no reviewed direct fields/documents and do not inherit component evidence. Sail's mixed drawing text order on physical5 cannot defensibly bind its floor label/value as a searchable paragraph; the original and existing reviewed record remain accessible. Other retained searchable reports lack admitted reviewed direct source/asset associations and were not forced into asset scope.
+
+### Implemented behavior
+
+- Optional `included_pages` /repeated `--include-page` enables bounded extraction from longer originals. Existing25MiB byte limit and maximum300 extracted pages remain. Original checksum/full page count/physical IDs survive unchanged. New `section-pages-v1` pins selected pages, original count, sections and extraction completeness; invalid/expanded/omitted/tampered caches fail authorization/integrity gates. Existing full section profile/cache bytes remain unchanged. Generic rebuild cannot replace reviewed scoped extraction with an unscoped index. Processed/unprocessed counts and limited-coverage diagnostics are explicit.
+- Deterministic source-attested intake/building concepts support VN/EN field and PDF wording, including SIWRR's literal `lư u lượng` spacing, sill elevation, discharge, opening dimensions, tank capacity and roof/gutter/door terms. Exact selected component names/codes clarify query context; another unambiguous component fails scope validation. Longer component labels do not accidentally select their parent. Asset nouns within full engineering concepts remain intact, preventing generic material overlaps. `m³/s`, `m3/s` and unit adjacency retain literal values; units are never converted. Original excerpts/spelling/engineering data remain unchanged.
+- Live suggestions use valued reviewed fields and currently matching exact-scoped PDF passages. Field questions omit metadata qualifiers while full labels/caveats stay displayed. No asset-specific fake answers or demo ranking overrides.
+- Grouped parent/component selection retains exact UUID scope. Compact live availability reports reviewed fields, searchable PDFs, image-only/unavailable/unscoped originals; it is not engineering validation. `NO_SCOPED_PASSAGE` and `unscoped_documents` distinguish a usable shared original with no reviewed section for the selected asset from a missing/invalid file. Existing partial citations/retry behavior stays intact.
+- URL request state restores exact asset/corpus scope, keywords, mode, field and page after Document details Back or reload. Only a validated request is stored; returned excerpts are fetched afresh through current evidence gates. Unknown/duplicate/malformed scope parameters do not broaden search. Existing five-per-page results and original/record links remain.
+- Existing AI README now contains a tested4–6 minute Main Dam → Spillway → C01/C03/parent → Office/Sail → explicit corpus pagination → current-condition refusal sequence, with source/record IDs and physical pages. No additional runbook, slide, inventory or stage-output file created.
+
+### Source checks and regressions
+
+New `rag_lite_multi_asset_cases.csv` pins source titles/IDs, exact field identity/value/unit, physical pages/keywords, boundary reasons and null corpus attribution. Original16 and Stage8 MainDam17 files and all historical result CSVs stay unchanged. Optional evaluator pins preserve the legacy output schema. Authorization/index/original failure cases use isolated fixtures, without corrupting the live corpus.
+
+| Actual verification | Result |
+|---|---|
+| Multi-asset source-pinned HTTP cohort |18/18 PASS;10/10 citation links resolvable; all PDF bytes/excerpts checked at physical47/10 |
+| Main Dam source-pinned HTTP regression, final |17/17 PASS;16/16 links resolvable |
+| Original fixed HTTP regression, final |16/16 PASS;11/11 links resolvable |
+| Focused backend RAG tests |192/192 PASS, including partial-profile tamper/selection/budget/recovery, exact-scope/alias/numeric and availability cases |
+| Frontend tests /scoped ESLint /Ruff /format /diff check |147/147 PASS; checks PASS |
+| Production webpack build |PASS, ID `hd2qFjaEPNHvAZYRWHcWJ`; all146 frontend files match isolated temporary build; existing dev `.next` preserved |
+
+Main Dam regression initially caught material retrieval widening when selected-name stripping removed the asset noun from `vật liệu đập`; full-concept preservation fixes it and has a focused regression. Final HTTP returns only the intended Main Dam table at physical20. The failed intermediate measurement remains outside the repo, unaltered. Existing Starlette deprecation and synthetic rollback transaction warnings remain.
+
+Actual supported examples: C01 `Intake 1 discharge` → existing93m3/s; C03 `sill elevation` →15.75m reviewed field; each intake `cao trình ngưỡng` → its own physical47 paragraph; C03 `lưu lượng thiết kế` →12,8m3/s original; Office `dung tích bồn nước` →1500L field and `MÁI LỢP NGÓI` →physical10; Sail floor28.76m stays a reviewed datum-unknown field with no scoped PDF passage. C03 searching East Canal fails scope validation; parent has no inherited evidence. These are historical/source-reported quantities, not present-condition certification.
+
+Practical Chrome smoke: real C03 discharge suggestion, separate PDF paragraph, repeated query changes and Document details Back, reload restoration, Intake parent no-evidence, Office physical10, Sail truthful zero-passage state, explicit corpus `thủy lực`29 references over6 numbered pages, page2→Document details→Back preserving scope/query/mode/page, Main Dam material physical20, Spillway pressure physical10/9, current-condition refusal. Original SIWRR physically rendered47/355. Responsive390×844 and820×1180 have no horizontal document overflow; mobile numbered controls fit, temporary viewport reset. User browser tabs preserved; task smoke tabs closed. Proof screenshots outside repo: `stage9-intake.jpg`, `stage9-mobile.jpg`, `stage9-original-p47.jpg` in the existing visualization workspace.
+
+Fresh outputs remain outside repo under `/tmp/rag-lite-stage9-2026-10-24/`: fixed-final SHA256 `62dd40c6ebba1903a9556b93ed2ff5c8e0033195fafc673b29e02feae9b2e2f2`; main-dam-final `0e21e5291afbe19b2b8bbf430bec0c8b46c40cfaa30c4ba9291544813cfda4ab`; multi-asset-evaluation `eb8b062b766966d6d08f87c70dae19c256af0787779aae971741dbb317719f20`. These controlled source checks are implementing-agent verification, not an independent engineering/relevance study or participant-study outcome change.
+
+### Preservation and limits
+
+Read-only comparison confirms all13 non-document table fingerprints unchanged, all9 preexisting document rows identical, exactly3 added documents, all58 retained PDF paths byte-identical, all88 protected research files unchanged and preexisting indexes unchanged. Only selected new caches plus allowlist/manifest were added/updated. Previous root output prefix is preserved. No migration, reset/reseed, source promotion, speculative technical record, external LLM, OCR, vector service or operational inference.
+
+Further searchable Sail evidence requires extraction with defensible label/value boundaries or a separately reviewed original; image-only Dining/dam drawings require a separately scoped OCR stage. Additional reports need actual admitted source/asset review; count targets do not authorize invented associations. SIWRR unprocessed354 pages remain unavailable to search; shared report proposals do not establish completed works/current condition. Date/authority gaps and keyword extraction limits remain, including interleaved Office proposal/condition columns; inspect original pages. The existing in-app PDF iframe limitation remains; Chrome original links work.
+
+No service/container/port started for Stage9. Preexisting web3000 PID48430, API8000 supervisor61514 (worker auto-reloaded after source edits) and healthy PostGIS remain; task build/tests/rendering processes exited. Preexisting unrelated result-disclosure removal is preserved outside the focused stage commit.

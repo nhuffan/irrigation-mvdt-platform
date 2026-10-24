@@ -18,7 +18,7 @@ def main():
     parser.add_argument(
         "--manifest",
         type=Path,
-        help="Batch {documents:[{file,source_code,document_code,asset_ids,checksum_sha256?,sections?,scope_review?}]}",
+        help="Batch {documents:[{file,source_code,document_code,asset_ids,checksum_sha256?,sections?,scope_review?,included_pages?}]}",
     )
     parser.add_argument("--file", type=Path)
     parser.add_argument("--source-code")
@@ -31,12 +31,18 @@ def main():
     parser.add_argument(
         "--sections",
         type=Path,
-        help="Optional reviewed {sections:[{page,start,end,asset_ids}],scope_review} boundary mapping",
+        help="Reviewed {sections:[{page,start,end,asset_ids}],scope_review,included_pages?} mapping",
     )
     parser.add_argument(
         "--section",
         action="append",
         help="Reviewed boundary: PAGE|ASSET_UUID|START_TEXT|END_TEXT (empty end means page end)",
+    )
+    parser.add_argument(
+        "--include-page",
+        type=int,
+        action="append",
+        help="Physical original page to extract (repeat); requires reviewed section boundaries",
     )
     parser.add_argument(
         "--scope-review",
@@ -83,6 +89,7 @@ def main():
                     args.checksum_sha256,
                     args.section,
                     args.scope_review,
+                    args.include_page,
                 ]
             ):
                 parser.error("Choose a manifest or a single file, not both")
@@ -119,9 +126,16 @@ def main():
                 if not isinstance(section_review, dict) or set(section_review) - {
                     "sections",
                     "scope_review",
+                    "included_pages",
                 }:
                     raise ValueError("SECTION_FILE_CANNOT_OVERRIDE_DOCUMENT_IDENTITY")
                 entries[0].update(section_review)
+            if args.include_page:
+                if args.sections and "included_pages" in entries[0]:
+                    parser.error(
+                        "Choose included_pages in --sections or --include-page flags"
+                    )
+                entries[0]["included_pages"] = args.include_page
             if args.section:
                 if not args.scope_review:
                     parser.error("Section boundaries require --scope-review")

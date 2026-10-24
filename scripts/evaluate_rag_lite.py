@@ -182,6 +182,13 @@ def main():
             if allowed_pages
             else 0
         )
+        expected_reasons = set(row.get("expected_reasons", "").split("|")) - {""}
+        reasons_ok = expected_reasons <= set(value.get("reason_codes", []))
+        attribution = row.get("expected_asset_attribution", "")
+        attribution_ok = not attribution or all(
+            c["asset_id"] == (None if attribution == "none" else attribution)
+            for c in citations
+        )
         passed = (
             value["status"] == row["expected_status"]
             and (hit if expected_hit else not citations)
@@ -189,6 +196,8 @@ def main():
             and content_ok
             and source_ok
             and irrelevant == 0
+            and reasons_ok
+            and attribution_ok
         )
         results.append(
             {
@@ -222,6 +231,12 @@ def main():
             results[-1].update(
                 grounded_content=content_ok and source_ok,
                 irrelevant_passages=irrelevant,
+            )
+        if row.get("expected_reasons") or row.get("expected_asset_attribution"):
+            results[-1].update(
+                expected_reasons_present=reasons_ok,
+                exact_asset_attribution=attribution_ok,
+                returned_reasons="|".join(value.get("reason_codes", [])),
             )
     with args.output.open("x") as output:
         writer = csv.DictWriter(

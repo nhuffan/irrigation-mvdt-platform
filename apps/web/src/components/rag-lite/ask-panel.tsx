@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { Asset } from "@/types/asset";
 import { assetDisplayName } from "@/lib/asset-display";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import type { RagCoverage, RagDemo, RagResult } from "@/lib/rag-lite";
+import { evidenceAssetGroups, evidenceSearchUrl, type EvidenceSearchState } from "@/lib/evidence-search-state";
 import { SearchCoverage } from "./search-coverage";
 import { EvidenceResults } from "./evidence-results";
 import styles from "./rag-lite.module.css";
@@ -12,11 +13,11 @@ import styles from "./rag-lite.module.css";
 type SearchAsset = Pick<Asset, "id" | "asset_code" | "name" | "parent_asset_id">;
 type SearchRun = { result: RagResult; scopeName: string; pageChange: boolean };
 
-export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; initialAssetId?: string }) {
-  const [assetId, setAssetId] = useState(initialAssetId ?? assets[0]?.id ?? "");
-  const [allDocs, setAllDocs] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [queryType, setQueryType] = useState("auto");
+export function AskPanel({ assets, initialAssetId, initialSearch }: { assets: SearchAsset[]; initialAssetId?: string; initialSearch?: EvidenceSearchState | null }) {
+  const [assetId, setAssetId] = useState(initialSearch?.assetId || initialAssetId || assets[0]?.id || "");
+  const [allDocs, setAllDocs] = useState(initialSearch?.allDocs ?? false);
+  const [question, setQuestion] = useState(initialSearch?.question ?? "");
+  const [queryType, setQueryType] = useState<string>(initialSearch?.queryType ?? "auto");
   const [demos, setDemos] = useState<RagDemo[]>([]);
   const [coverage, setCoverage] = useState<RagCoverage | null>(null);
   const [coverageError, setCoverageError] = useState(false);
@@ -30,7 +31,10 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
   const input = useRef<HTMLInputElement | null>(null);
   const lastRequest = useRef<{ question: string; attributeKey?: string; page: number; queryType: string } | null>(null);
 
-  useEffect(() => () => active.current?.abort(), []);
+  const restoreSearch = useEffectEvent(() => {
+    if (initialSearch) void ask(initialSearch.question, initialSearch.attributeKey, initialSearch.page, false, initialSearch.queryType);
+  });
+  useEffect(() => { restoreSearch(); return () => active.current?.abort(); }, []);
   useEffect(() => {
     if (run) {
       heading.current?.focus({ preventScroll: true });
@@ -59,19 +63,24 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
     return () => controller.abort();
   }, [assetId, allDocs]);
 
+  function remember(state: EvidenceSearchState | null) {
+    window.history.replaceState(null, "", evidenceSearchUrl(window.location.href, state));
+  }
   function reset(clearDemos = false) {
+    remember(null);
     active.current?.abort(); setBusy(false); setRun(null); setError(""); lastRequest.current = null;
     if (clearDemos) { setDemos([]); setCoverage(null); setCoverageError(false); }
   }
   function clear() { reset(); setQuestion(""); input.current?.focus(); }
-  function cancel() { active.current?.abort(); setBusy(false); input.current?.focus(); }
+  function cancel() { active.current?.abort(); remember(null); setBusy(false); input.current?.focus(); }
   async function ask(value = question, attributeKey?: string, page = 1, pageChange = false, requestedType = queryType) {
     const trimmed = value.trim();
     if (trimmed.length < 2 || (!allDocs && !assetId)) return;
     active.current?.abort();
     const controller = new AbortController(); active.current = controller;
-    const resolvedType = attributeKey ? "attribute" : allDocs ? "document" : requestedType;
+    const resolvedType = attributeKey ? "attribute" : allDocs ? "document" : requestedType === "attribute" || requestedType === "document" ? requestedType : "auto";
     lastRequest.current = { question: trimmed, attributeKey, page, queryType: resolvedType };
+    remember({ question: trimmed, assetId: allDocs ? "" : assetId, allDocs, queryType: resolvedType, attributeKey, page });
     setQuestion(trimmed); setBusy(true); setError(""); setRun(null);
     const selected = assets.find(a => a.id === assetId);
     const scopeName = allDocs ? "all authorized PDFs · no asset attribution" : selected ? assetDisplayName(selected) : "selected asset";
@@ -85,7 +94,10 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
       });
       if (!response.ok) throw new Error(response.status === 429 ? "Search limit reached. Wait a minute, then retry." : response.status === 404 ? "This experimental search is currently disabled." : "Search could not be completed. Check the local connection and retry.");
       const result: RagResult = await response.json();
-      if (!controller.signal.aborted) setRun({ result, scopeName, pageChange });
+      if (!controller.signal.aborted) {
+        if (result.pagination) remember({ question: trimmed, assetId: allDocs ? "" : assetId, allDocs, queryType: resolvedType, attributeKey, page: result.pagination.page });
+        setRun({ result, scopeName, pageChange });
+      }
     } catch (e) {
       if (!controller.signal.aborted) setError(e instanceof Error ? e.message : "Search could not be completed. Please retry.");
     } finally { if (!controller.signal.aborted) setBusy(false); }
@@ -105,7 +117,10 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
         <div className={`${styles.searchRow} ${allDocs ? styles.corpusRow : ""}`}>
           {!allDocs && <label className={styles.field}>Asset or component
             <select disabled={busy} value={assetId} onChange={e => { reset(true); setAssetId(e.target.value); }}>
-              {assets.map(asset => <option key={asset.id} value={asset.id}>{asset.parent_asset_id ? "Component: " : ""}{assetDisplayName(asset)}</option>)}
+              {evidenceAssetGroups(assets).map(({ parent, children }) => children.length ? <optgroup key={parent.id} label={assetDisplayName(parent)}>
+                <option value={parent.id}>{assetDisplayName(parent)} (parent only)</option>
+                {children.map(asset => <option key={asset.id} value={asset.id}>↳ {assetDisplayName(asset)}</option>)}
+              </optgroup> : <option key={parent.id} value={parent.id}>{assetDisplayName(parent)}</option>)}
             </select>
           </label>}
           <label className={styles.field}>Question or document keywords
@@ -115,6 +130,16 @@ export function AskPanel({ assets, initialAssetId }: { assets: SearchAsset[]; in
           <button className={`button ${styles.submit}`} type="submit" disabled={busy || question.trim().length < 2 || (!allDocs && !assetId)}>{busy ? "Searching…" : "Search evidence"}<span aria-hidden="true">↗</span></button>
         </div>
         {allDocs && <p className={styles.scopeNotice}>Corpus-wide · not attributed to any asset.</p>}
+        <p className={styles.readiness} role="status" aria-label="Evidence availability">
+          {currentCoverage ? <>
+            {!allDocs && <span>{currentCoverage.diagnostics?.reviewed_attributes ?? 0} reviewed fields</span>}
+            <span>{currentCoverage.searchable_documents} searchable PDFs</span>
+            {currentCoverage.image_only_documents > 0 && <span>{currentCoverage.image_only_documents} image-only</span>}
+            {currentCoverage.unavailable_documents > 0 && <span>{currentCoverage.unavailable_documents} unavailable</span>}
+            {!!currentCoverage.diagnostics?.unscoped_documents && <span>{currentCoverage.diagnostics.unscoped_documents} without reviewed passages</span>}
+            {!!currentCoverage.diagnostics?.not_authorized_documents && <span>{currentCoverage.diagnostics.not_authorized_documents} not authorized</span>}
+          </> : coverageError ? "Evidence availability unknown · retry in Search options" : "Checking evidence availability…"}
+        </p>
         <div className={styles.searchToolbar}>
           <div className={styles.tools}>
             <details className={styles.options}>

@@ -52,6 +52,7 @@ export type RagCoverage = {
     invalid_documents: number;
     invalid_indexes: number;
     extraction_limited_documents: number;
+    unscoped_documents?: number;
     unknown_metadata_sources: number;
     reason_codes: string[];
   };
@@ -122,7 +123,8 @@ export function evidenceReasonText(code: string): string | null {
     INDEX_INVALID: "The local index is absent, stale or invalid. Verify it against the authorized original before retrying.",
     DOCUMENT_MISSING: "An authorized original PDF is missing from local storage. Its indexed text cannot be used.",
     DOCUMENT_INVALID: "An authorized original could not pass its checksum or file checks. Its indexed text cannot be used.",
-    EXTRACTION_LIMITED: "Some original pages have too little usable extracted text. Search covers only indexed passages, not the entire original.",
+    EXTRACTION_LIMITED: "Search covers only indexed passages. Some pages were excluded or have limited extracted text; inspect the original.",
+    NO_SCOPED_PASSAGE: "The linked PDF has no reviewed passage for this exact asset. Its other sections stay separate; reviewed fields may still be available.",
     NO_MATCH: "No passage or reviewed field matched these keywords. Try wording from the original; missing hits do not prove evidence is absent.",
     SOURCE_METADATA_UNKNOWN: "Some source dates or authorities are not recorded. Unknown metadata is not independent source verification.",
     OUT_OF_SCOPE: "This request asks beyond historical evidence retrieval or to bypass evidence rules. Current condition and operational advice are outside scope.",
@@ -155,6 +157,7 @@ export function searchFeedback(result: RagResult): { title: string; description:
   if (codes.includes("NOT_AUTHORIZED") && !codes.includes("NO_MATCH")) return { title: "Search access limited", description: "Linked PDFs are not authorized for local search." };
   if (codes.includes("IMAGE_ONLY") && !codes.includes("NO_MATCH")) return { title: "No searchable text", description: "The linked PDFs are image-only. Text search cannot read them." };
   if (codes.includes("EXTRACTION_LIMITED") && !codes.includes("NO_MATCH")) return { title: "No searchable match", description: "The linked originals have limited extracted text." };
+  if (codes.includes("NO_SCOPED_PASSAGE") && !codes.includes("NO_MATCH")) return { title: "No reviewed PDF passages", description: "The linked original has no reviewed passage for this exact asset. Try a reviewed field or search all authorized PDFs." };
   if (codes.includes("NO_REVIEWED_ATTRIBUTE")) return { title: "No reviewed fields", description: "No reviewed technical fields are available for this asset." };
   return { title: "No matches", description: "Try fewer keywords or wording from the original document." };
 }

@@ -13,7 +13,6 @@ from app.models.data_source import DataSource
 from app.models.media import Document
 from app.services.rag_lite.indexer import (
     MAX_BYTES,
-    MAX_PAGES,
     VERSION,
     atomic_json,
     digest,
@@ -22,7 +21,11 @@ from app.services.rag_lite.indexer import (
     load_index,
 )
 from app.services.rag_lite.retriever import source_scopes
-from app.services.rag_lite.sections import extract_sections, scoped_chunks
+from app.services.rag_lite.sections import (
+    extract_sections,
+    reviewed_pages,
+    scoped_chunks,
+)
 
 
 def prepare(db, storage, settings, entries, authorization_reference=None):
@@ -42,8 +45,12 @@ def prepare(db, storage, settings, entries, authorization_reference=None):
         if not data.startswith(b"%PDF-"):
             raise ValueError("PDF_SIGNATURE_INVALID")
         reader = PdfReader(io.BytesIO(data))
-        if reader.is_encrypted or not 0 < len(reader.pages) <= MAX_PAGES:
+        if reader.is_encrypted:
             raise ValueError("ENCRYPTED_OR_PAGE_COUNT_LIMIT")
+        included_pages = entry.get("included_pages")
+        reviewed_pages(len(reader.pages), included_pages)
+        if included_pages is not None and not entry.get("sections"):
+            raise ValueError("PARTIAL_DOCUMENT_REQUIRES_SECTIONS")
         source = db.scalar(
             select(DataSource).where(DataSource.source_code == entry["source_code"])
         )
@@ -105,7 +112,9 @@ def prepare(db, storage, settings, entries, authorization_reference=None):
         if authorization.get(str(doc.id)) != checksum and not authorization_reference:
             raise ValueError("EXPLICIT_LOCAL_INDEX_AUTHORIZATION_REQUIRED")
         index = (
-            extract_sections(doc, data, sections, entry.get("scope_review", ""))
+            extract_sections(
+                doc, data, sections, entry.get("scope_review", ""), included_pages
+            )
             if sections
             else extract(doc, data)
         )
@@ -142,6 +151,9 @@ def outcome(prepared, applied):
                 else "WOULD_REINDEX",
                 "asset_ids": sorted(ids),
                 "page_count": index["page_count"],
+                "partial": "included_pages" in index,
+                "processed_pages": len(index["coverage"]),
+                "omitted_pages": index["page_count"] - len(index["coverage"]),
                 "searchable_pages": len({c["page"] for c in index["chunks"]}),
                 "chunks": len(index["chunks"]),
                 "asset_coverage": {
@@ -226,6 +238,21 @@ def apply_prepared(db, storage, settings, prepared, authorization_reference=None
                 characters=sum(p["characters"] for p in index["coverage"]),
                 chunk_count=len(index["chunks"]),
             )
+            if "included_pages" in index:
+                item.update(
+                    partial=True,
+                    included_pages=index["included_pages"],
+                    processed_pages=len(index["coverage"]),
+                    omitted_pages=index["page_count"] - len(index["coverage"]),
+                )
+            else:
+                for key in (
+                    "partial",
+                    "included_pages",
+                    "processed_pages",
+                    "omitted_pages",
+                ):
+                    item.pop(key, None)
             if old_entry is not None:
                 manifest["documents"][manifest["documents"].index(old_entry)] = item
             else:
