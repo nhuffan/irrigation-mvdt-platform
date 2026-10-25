@@ -2,7 +2,7 @@ import { evidenceDisplayText } from "@/lib/evidence-display";
 import { OriginLink as Link } from "@/components/documents/document-link";
 import { DocumentLink } from "@/components/documents/document-link";
 import { modelHref, reviewedPreview } from "@/lib/explorer-state";
-import { hierarchy } from "@/lib/asset-location";
+import { hierarchy, assetLocation } from "@/lib/asset-location";
 import type { Asset } from "@/types/asset";
 import type { ExplorerData } from "@/lib/explorer-data";
 import { PanelSection, PanelDisclosure } from "@/components/ui/panel-section";
@@ -16,13 +16,13 @@ export function ExplorerPanel({asset,assets,data,onSelect}:{asset:Asset;assets:A
  <PanelSection title="Selected asset" actions={<StatusBadge>RS</StatusBadge>}>
  <nav aria-label="Asset hierarchy">{ancestors.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}><AssetDisplayName asset={a}/></button>)}</nav>
  <h3 className="selected-asset-name"><AssetDisplayName asset={asset}/></h3><p className="asset-code">{asset.category.name}</p><AssetMetadata asset={asset}/>
- {children.length>0 && <div className="component-actions">{children.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}><AssetDisplayName asset={a}/></button>)}</div>}
+ {children.length>0 && <div className="component-actions"><p className="summary-note">Components · Each keeps its own location evidence.</p>{children.map(a=><button className="text-link" key={a.id} onClick={()=>onSelect(a)}><AssetDisplayName asset={a}/></button>)}</div>}
  <Link className="button compact-button" href={`/assets/${asset.id}`}>Open Asset Detail →</Link>
  </PanelSection>
  <PanelSection title="Technical preview" description="Reviewed fields for this asset">
  {technical?.length?technical.map(t=><article className="explorer-record" key={t.id}><h4>{evidenceDisplayText(t.attribute_label)}</h4><p className="preview-value">{t.value_number??(t.value_text?evidenceDisplayText(t.value_text):"Unavailable")} {t.unit==="text"?"":t.unit} <StatusBadge>{t.reviewed_provenance!.verification_level}</StatusBadge></p><TechnicalMetadataPopover fields={{"Record UUID":t.id,"Source code":t.reviewed_provenance!.source_code,"Evidence ID":t.reviewed_provenance!.evidence_id,Locator:t.reviewed_provenance!.source_locator,Authority:t.reviewed_provenance!.authority,Verification:t.verification_status}}/></article>):<p className="muted">{data.technical===null?"Unavailable":"No reviewed technical preview available."}</p>}
  </PanelSection>
- <PanelDisclosure title="Location & coverage"><AssetLocationSummary asset={asset}/><AssetInformationCoverage asset={asset} data={data} compact/></PanelDisclosure>
+ <PanelDisclosure title="Location & coverage" open={assetLocation(asset).location_status === "NO_LOCATION"}><AssetLocationSummary asset={asset}/><AssetInformationCoverage asset={asset} data={data} compact/></PanelDisclosure>
  <PanelDisclosure title="Sources & evidence"><AssetEvidenceSummary asset={asset} data={data}/></PanelDisclosure>
  <PanelSection title="Documents & 3D">
  <div className="resource-group"><h4>Documents</h4>{data.documents===null?<p>Unavailable</p>:data.documents.length?data.documents.map(d=><p key={d.id}><DocumentLink className="text-link" href={`/documents/${d.id}`}>{evidenceDisplayText(d.original_file_name)} →</DocumentLink></p>):<p className="muted">No linked documents.</p>}</div>

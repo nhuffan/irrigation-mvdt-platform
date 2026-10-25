@@ -25,12 +25,28 @@ function publicGeometry(geometry: GeoJsonGeometry | null): GeoJsonGeometry | nul
 }
 function publicLocation(location: AssetLocation | null | undefined): AssetLocation | null | undefined {
   return location == null ? location : {
-    location_status: location.location_status, geometry: publicGeometry(location.geometry),
+    location_status: location.location_status, geometry: location.location_status === "NO_LOCATION" ? null : publicGeometry(location.geometry),
     geometry_type: location.geometry_type, crs: location.crs, source: text(location.source),
     source_url: publicEvidenceHref(location.source_url), locator: text(location.locator),
     evidence_id: location.evidence_id, accuracy_limitation: publicEvidenceText(location.accuracy_limitation),
     verification_note: publicEvidenceText(location.verification_note), reviewer: null,
     reviewed_at: location.reviewed_at, review_state: location.review_state,
+    spatial_disposition: location.spatial_disposition, candidate_count: location.candidate_count,
+    reason: location.reason == null ? null : publicEvidenceText(location.reason),
+    next_action: location.next_action == null ? null : publicEvidenceText(location.next_action),
+    coordinate_basis: location.coordinate_basis == null ? null : publicEvidenceText(location.coordinate_basis),
+    estimated_accuracy_m: location.estimated_accuracy_m, physical_page: location.physical_page,
+    document_id: location.document_id, source_id: location.source_id, source_sha256: location.source_sha256,
+    reviewer_role: location.reviewer_role,
+    candidates: location.candidates?.map(candidate => ({
+      candidate_id: candidate.candidate_id, source_label: publicEvidenceText(candidate.source_label),
+      source: publicEvidenceText(candidate.source), source_url: publicEvidenceHref(candidate.source_url),
+      document_id: candidate.document_id, physical_page: candidate.physical_page,
+      locator: publicEvidenceText(candidate.locator), coordinate_basis: publicEvidenceText(candidate.coordinate_basis),
+      source_crs: publicEvidenceText(candidate.source_crs), identity_basis: publicEvidenceText(candidate.identity_basis),
+      accuracy_limitation: publicEvidenceText(candidate.accuracy_limitation),
+      issues: candidate.issues.map(publicEvidenceText),
+    })),
   };
 }
 export function publicAssets(assets: Asset[]): Asset[] {

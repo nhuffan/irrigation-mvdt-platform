@@ -1,4 +1,6 @@
 {
   "version": 1,
-  "records": {}
+  "records": {},
+  "candidates": [],
+  "dispositions": {}
 }

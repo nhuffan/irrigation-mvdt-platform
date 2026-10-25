@@ -102,3 +102,14 @@ def test_verified_geometry_requires_exact_existing_rs_geometry(tmp_path, monkeyp
     e["location_status"] = "VERIFIED_GEOMETRY"
     sidecar(tmp_path, monkeypatch, a, e)
     assert asset_location(a).location_status == "REFERENCE_LOCATION"
+
+
+def test_accepted_location_does_not_publish_keyed_source_url(tmp_path, monkeypatch):
+    a = asset()
+    review = entry(a)
+    review["source_url"] = "https://example.org/source.pdf?token=private"
+    sidecar(tmp_path, monkeypatch, a, review)
+    result = asset_location(a)
+    assert result.location_status == "REFERENCE_LOCATION"
+    assert result.source_url is None
+    assert result.geometry.coordinates == (106, 11)

@@ -17,6 +17,7 @@ from pydantic import (
 
 from app.core.config import settings
 from app.schemas.asset import AssetLocation, AssetResponse, GeoJsonGeometry
+from app.services.spatial_candidates import candidate_metadata, public_source_url
 
 
 class LocationReview(BaseModel):
@@ -36,6 +37,13 @@ class LocationReview(BaseModel):
     verification_note: str = Field(min_length=1)
     reviewer: str = Field(min_length=1)
     reviewed_at: datetime
+    coordinate_basis: str | None = None
+    estimated_accuracy_m: float | None = Field(default=None, gt=0, allow_inf_nan=False)
+    physical_page: int | None = Field(default=None, ge=1)
+    document_id: UUID | None = None
+    source_id: UUID | None = None
+    source_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    reviewer_role: str | None = None
 
     @field_validator("geometry")
     @classmethod
@@ -79,8 +87,27 @@ def asset_location(asset: AssetResponse) -> AssetLocation:
         bundle = json.loads(path.read_text())
         if bundle.get("version") != 1 or not isinstance(bundle.get("records"), dict):
             raise ValueError("Unsupported location sidecar")
+    except FileNotFoundError:
+        result.spatial_disposition = (
+            result.location_status if result.geometry else "NO_DEFENSIBLE_LOCATION"
+        )
+        return result
+    except (OSError, ValueError, TypeError, AttributeError):
+        result.review_state = "UNAVAILABLE"
+        result.verification_note = "Location review unavailable or invalid; no sidecar coordinates applied. F02 unchanged."
+        return result
+    try:
+        metadata = candidate_metadata(bundle, asset)
+        result = AssetLocation.model_validate(result.model_dump() | metadata)
+    except (ValueError, TypeError, AttributeError, ValidationError):
+        result.review_state = "UNAVAILABLE"
+        result.reason = "Candidate review metadata is unavailable or invalid."
+        result.next_action = "Repair identity-bound candidate metadata; unapproved coordinates remain hidden."
+    try:
         entry = bundle["records"].get(str(asset.id))
         if entry is None:
+            if result.geometry:
+                result.spatial_disposition = result.location_status
             return result
         review = LocationReview.model_validate(entry)
         if (review.asset_id, review.reservoir_id, review.asset_code) != (
@@ -101,15 +128,20 @@ def asset_location(asset: AssetResponse) -> AssetLocation:
             raise ValueError(
                 "Reference overlays must be points, not invented boundaries"
             )
+        public_review = review.model_dump(
+            mode="json", exclude={"asset_id", "reservoir_id", "asset_code"}
+        )
+        public_review["source_url"] = public_source_url(review.source_url)
         return AssetLocation(
-            **review.model_dump(
-                mode="json", exclude={"asset_id", "reservoir_id", "asset_code"}
-            ),
+            **public_review,
             geometry_type=review.geometry.type,
             review_state="AVAILABLE",
+            spatial_disposition=review.location_status,
+            candidate_count=result.candidate_count,
+            reason=result.reason,
+            next_action=result.next_action,
+            candidates=result.candidates,
         )
-    except FileNotFoundError:
-        return result
     except (OSError, ValueError, TypeError, AttributeError, ValidationError):
         result.review_state = "UNAVAILABLE"
         result.verification_note = (

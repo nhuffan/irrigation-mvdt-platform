@@ -26,6 +26,23 @@ GeoJsonGeometry = Annotated[
 ]
 
 
+class SpatialCandidateSummary(BaseModel):
+    candidate_id: str
+    source_label: str
+    source: str
+    source_url: str | None = None
+    source_id: UUID | None = None
+    document_id: UUID | None = None
+    physical_page: int
+    locator: str
+    coordinate_basis: str
+    source_crs: str
+    identity_basis: str
+    accuracy_limitation: str
+    estimated_accuracy_m: float | None = None
+    issues: list[str] = []
+
+
 class AssetLocation(BaseModel):
     location_status: Literal["VERIFIED_GEOMETRY", "REFERENCE_LOCATION", "NO_LOCATION"]
     geometry: GeoJsonGeometry | None = None
@@ -40,6 +57,24 @@ class AssetLocation(BaseModel):
     reviewer: str | None = None
     reviewed_at: str | None = None
     review_state: Literal["AVAILABLE", "PENDING", "UNAVAILABLE"] = "PENDING"
+    spatial_disposition: Literal[
+        "VERIFIED_GEOMETRY",
+        "REFERENCE_LOCATION",
+        "CANDIDATE_NEEDS_REVIEW",
+        "CONFLICTED",
+        "NO_DEFENSIBLE_LOCATION",
+    ] = "NO_DEFENSIBLE_LOCATION"
+    candidate_count: int = 0
+    reason: str | None = None
+    next_action: str | None = None
+    candidates: list[SpatialCandidateSummary] = []
+    coordinate_basis: str | None = None
+    estimated_accuracy_m: float | None = None
+    physical_page: int | None = None
+    document_id: UUID | None = None
+    source_id: UUID | None = None
+    source_sha256: str | None = None
+    reviewer_role: str | None = None
 
 
 class AssetCategoryResponse(BaseModel):

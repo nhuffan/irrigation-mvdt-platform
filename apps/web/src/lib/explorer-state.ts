@@ -22,7 +22,7 @@ export function modelHref(asset: Asset, link: NonNullable<ExplorerData["links"]>
 export function explorerFilters(params: Pick<URLSearchParams, "get">) {
   const location = params.get("location");
   return { query: (params.get("q") ?? "").slice(0, 200), type: params.get("type") ?? "",
-    location: ["VERIFIED_GEOMETRY", "REFERENCE_LOCATION", "NO_LOCATION"].includes(location ?? "") ? location! : "all",
+    location: ["VERIFIED_GEOMETRY", "REFERENCE_LOCATION", "NO_LOCATION", "CANDIDATE_NEEDS_REVIEW", "CONFLICTED", "UNRESOLVED", "NO_DEFENSIBLE_LOCATION"].includes(location ?? "") ? location! : "all",
     contextVisible: params.get("context") !== "0", modelOnly: params.get("modelOnly") === "1" };
 }
 export function explorerFilterUrl(href: string, key: "q" | "type" | "location" | "context" | "modelOnly", value: string) {

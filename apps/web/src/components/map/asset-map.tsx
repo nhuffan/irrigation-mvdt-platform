@@ -4,7 +4,7 @@ import { mapView, readView, saveView, viewStorage } from "@/lib/workspace-view-s
 import { observeCanvasResize } from "@/lib/workspace-layout";
 import { AssetSymbol } from "@/components/asset/asset-symbol";
 import { assetSymbolSvg, assetSymbols } from "@/lib/asset-symbol";
-import { assetDisplayName, locationSourceTitle } from "@/lib/asset-display";
+import { assetDisplayName } from "@/lib/asset-display";
 import { useEffect, useRef, useState } from "react";
 import type {
   Map as LibreMap,
@@ -12,7 +12,8 @@ import type {
   LngLatLike,
 } from "maplibre-gl";
 import type { ExplorerRecords } from "@/lib/explorer-data";
-import { assetLocation, mapGeometry, locationLayer } from "@/lib/asset-location";
+import { assetLocation, mapGeometry, locationLayer, pointGroups, pointNeighbors } from "@/lib/asset-location";
+import { locationEvidence } from "@/lib/location-evidence";
 import { geometryPositions } from "@/lib/asset-geometry";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
@@ -48,6 +49,7 @@ export function AssetMap({
   const [mapState, setMapState] = useState<"loading" | "ready" | "error">(
     "loading",
   );
+  const selected = assets.find(asset => asset.id === selectedId);
   const mapped = assets.filter((asset) => mapGeometry(asset) !== null);
   const assetsJson = JSON.stringify(assets);
   useEffect(() => {
@@ -128,17 +130,33 @@ export function AssetMap({
 
             `Category: ${asset.category.name}`,
             `${asset.data_status} · ${assetLocation(asset).location_status.replaceAll("_", " ")}`,
-            assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Map-symbol reference location only. Not surveyed geometry." : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
+            assetLocation(asset).location_status === "REFERENCE_LOCATION" ? "Reference only — not surveyed geometry" : `Geometry: ${mapGeometry(asset)?.type ?? "Unavailable"}`,
           ]) {
             const line = document.createElement("p");
             line.textContent = value;
             content.append(line);
           }
           const location = assetLocation(asset);
-          if (location.location_status === "REFERENCE_LOCATION") {
-            const source = document.createElement("p"); source.textContent = locationSourceTitle(location.source); content.append(source);
-            const scale = location.accuracy_limitation.match(/1:[\d,]+/)?.[0];
-            if (scale) { const line = document.createElement("p"); line.textContent = `Map scale · ${scale}`; content.append(line); }
+          const evidence = locationEvidence(asset);
+          for (const [key, value] of evidence.fields) {
+            const line = document.createElement("p"); line.textContent = `${key}: ${value}`; content.append(line);
+          }
+          if (evidence.href) {
+            const source = document.createElement("a");
+            source.textContent = `Open source${evidence.page ? ` · PDF page ${evidence.page}` : ""} →`;
+            source.href = evidence.href.startsWith("/") ? documentHref(evidence.href, window.location.pathname + window.location.search + window.location.hash) : evidence.href;
+            if (!evidence.href.startsWith("/")) { source.target = "_blank"; source.rel = "noopener noreferrer"; }
+            content.append(source);
+          }
+          const neighbors = pointNeighbors(assets, asset.id, point => instance.project(point));
+          if (neighbors.length > 1) {
+            const label = document.createElement("p"); label.textContent = "Nearby / shared reference points · Select the exact asset"; content.append(label);
+            for (const neighbor of neighbors) {
+              const choice = document.createElement("button"); choice.type = "button"; choice.className = "text-link";
+              choice.textContent = assetDisplayName(neighbor); choice.setAttribute("aria-pressed", String(neighbor.id === asset.id));
+              choice.addEventListener("click", () => { selection.current.onSelect(neighbor); selectAsset.current?.(neighbor); });
+              content.append(choice);
+            }
           }
           const metadata = document.createElement("details"); const summary = document.createElement("summary"); summary.textContent = "Technical details"; metadata.append(summary);
           for (const [key,value] of Object.entries({"Asset code":asset.asset_code,UUID:asset.id,Source:location.source,Locator:location.locator,CRS:location.crs,"Evidence ID":location.evidence_id,Limitation:location.accuracy_limitation})) {
@@ -239,23 +257,38 @@ export function AssetMap({
           }
           instance.addLayer({ id: "selected-halo", type: "circle", source: "assets", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 18, "circle-opacity": 0, "circle-stroke-width": 3, "circle-stroke-color": "#047857", "circle-stroke-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0] } });
           for (const geometryType of ["LineString", "Polygon"]) instance.addLayer({ id: `selected-${geometryType}`, type: "line", source: "assets", filter: ["==", ["geometry-type"], geometryType], paint: { "line-width": 6, "line-color": "#047857", "line-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 1, 0] } });
-          for (const asset of assets.filter(a => mapGeometry(a)?.type === "Point")) {
+          for (const group of pointGroups(assets)) {
+            const asset = group[0], coordinate = geometryPositions(mapGeometry(asset)!)[0];
             const reference = assetLocation(asset).location_status === "REFERENCE_LOCATION";
             const button = document.createElement("button");
+            button.type = "button";
             button.className = `asset-map-symbol ${reference ? "is-reference" : "is-geometry"} ${locationLayer(asset) === "DEV" ? "is-dev" : ""}`;
             button.innerHTML = assetSymbolSvg(asset.category.code);
-            button.setAttribute("aria-label", `Select ${reference ? "reference location" : "geometry"} ${assetDisplayName(asset)}`);
-            if (reference) { const label=document.createElement("span"); label.textContent="Reference"; button.append(label); }
-            button.addEventListener("click", event => { event.stopPropagation(); selection.current.onSelect(asset); selectAsset.current?.(asset); });
-            symbolButtons.set(asset.id, button);
-            new Marker({ element: button }).setLngLat(geometryPositions(mapGeometry(asset)!)[0]).addTo(instance);
+            button.setAttribute("aria-label", group.length > 1 ? `Select shared location · ${group.map(assetDisplayName).join("; ")}` : `Select ${reference ? "reference location" : "geometry"} ${assetDisplayName(asset)}`);
+            button.dataset.assetIds = JSON.stringify(group.map(item => item.id));
+            if (reference || group.length > 1) { const label=document.createElement("span"); label.textContent=group.length > 1 ? `${group.length} assets` : "Reference"; button.append(label); }
+            button.addEventListener("click", event => {
+              event.stopPropagation();
+              if (group.length === 1) { selection.current.onSelect(asset); selectAsset.current?.(asset); return; }
+              popup?.remove();
+              const choices = document.createElement("div"); choices.className = "asset-popup";
+              const heading = document.createElement("strong"); heading.textContent = "Shared location · Choose an asset"; choices.append(heading);
+              const warning = document.createElement("p"); warning.textContent = "Reference only — not surveyed geometry. Source coordinates are unchanged."; choices.append(warning);
+              for (const item of group) {
+                const choice = document.createElement("button"); choice.type = "button"; choice.className = "text-link"; choice.textContent = assetDisplayName(item);
+                choice.addEventListener("click", () => { selection.current.onSelect(item); selectAsset.current?.(item); }); choices.append(choice);
+              }
+              popup = new Popup({ maxWidth:"min(380px, calc(100vw - 60px))", focusAfterOpen:false }).setLngLat(coordinate).setDOMContent(choices).addTo(instance);
+            });
+            for (const item of group) symbolButtons.set(item.id, button);
+            new Marker({ element: button }).setLngLat(coordinate).addTo(instance);
           }
           instance.on("click", (event) => {
             const hit = instance.queryRenderedFeatures(event.point, {
               layers: interactiveLayers,
             })[0];
             const asset = assets.find((item) => item.id === hit?.properties.id);
-            if (asset) { selection.current.onSelect(asset); showPopup(asset, event.lngLat); }
+            if (asset) { selection.current.onSelect(asset); selectAsset.current?.(asset); }
           });
           instance.on("mousemove", (event) => {
             instance.getCanvas().style.cursor = instance.queryRenderedFeatures(
@@ -267,7 +300,7 @@ export function AssetMap({
           });
           selectAsset.current = (asset) => {
             const geometry = mapGeometry(asset);
-            if (!geometry) { setLocationUnavailable(true); fitContext(); return; }
+            if (!geometry) { popup?.remove(); setLocationUnavailable(true); fitContext(); return; }
             setLocationUnavailable(false);
             const assetBounds = new LngLatBounds();
             for (const position of geometryPositions(geometry))
@@ -281,7 +314,7 @@ export function AssetMap({
             showPopup(asset, center);
           };
           highlight.current = (id) => {
-            for (const [key,button] of symbolButtons) { button.classList.toggle("is-selected", key === id); button.setAttribute("aria-pressed", String(key === id)); }
+            for (const button of new Set(symbolButtons.values())) { const selected = (JSON.parse(button.dataset.assetIds ?? "[]") as string[]).includes(id ?? ""); button.classList.toggle("is-selected", selected); button.setAttribute("aria-pressed", String(selected)); }
             for (const asset of assets) instance.setFeatureState({ source: "assets", id: asset.id }, { selected: asset.id === id });
             const asset = assets.find(a => a.id === id);
             popup?.remove();
@@ -343,11 +376,11 @@ export function AssetMap({
           <div><span className="status-dot" style={{ background: "#2563eb" }} />RS verified geometry</div>
           <div><span className="status-dot reference-dot" />RS reference location</div>
           <div><span className="status-dot context-dot" />Context only{!contextVisible ? " (hidden)" : ""}</div>
-          <div><span className="status-dot context-dot" />NO LOCATION · registry only</div>
+          <div><span className="status-dot context-dot" />Candidates / no location · No pin</div>
           <div><span className="status-dot" style={{ background: "#059669" }} />Selected asset</div>
         </details>
       </div>
-      {locationUnavailable && <p className="location-unavailable" role="status">Location unavailable for this asset · Showing reservoir context only.</p>}
+      {locationUnavailable && <p className="location-unavailable" role="status">{selected ? (assetLocation(selected).reason ?? "No accepted location for this asset.") : "No accepted location for this asset."} Candidate coordinates are not displayed.</p>}
       {assets.length === 0 ? (
         <p className="muted mt-3">
           No asset locations match the filters. Reservoir context is navigation only.
@@ -361,7 +394,7 @@ export function AssetMap({
           <p className="muted mt-3 text-sm">
             {mapped.length} of {assets.length} assets have display locations. Reference locations are navigation / presentation only, not verified GIS evidence.
             {mapped.length < assets.length &&
-              ` ${assets.length - mapped.length} asset(s) with NO LOCATION remain in the registry.`}
+              ` ${assets.length - mapped.length} asset(s) without accepted locations remain in the explorer.`}
           </p>
           <div
             className="asset-locate-controls"

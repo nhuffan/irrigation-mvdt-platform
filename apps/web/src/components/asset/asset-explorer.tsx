@@ -8,7 +8,8 @@ import type { ExplorerRecords } from "@/lib/explorer-data";
 import { AssetMap } from "@/components/map/asset-map";
 import { AssetRegistry } from "./asset-registry";
 import { selectedAsset, filterAssets, recordTotal, explorerFilters, explorerFilterUrl } from "@/lib/explorer-state";
-import { assetLocation, matchesSearch } from "@/lib/asset-location";
+import { locationMatches, matchesSearch } from "@/lib/asset-location";
+import { SpatialCoverage } from "./spatial-coverage";
 import { ExplorerPanel } from "./explorer-panel";
 export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reservoir; assets: Asset[]; records: ExplorerRecords }) {
   const params = useSearchParams();
@@ -21,7 +22,7 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
   }
   const scoped = assets;
   const visible = filterAssets(assets, scope, false, modelOnly, records).filter(a =>
-    (locationFilter === "all" || assetLocation(a).location_status === locationFilter) && matchesSearch(a, query, type));
+    locationMatches(a, locationFilter) && matchesSearch(a, query, type));
   const types = [...new Map(scoped.map(a => [a.category.code, a.category.name])).entries()];
   function select(asset?: Asset) {
     const url = new URL(window.location.href);
@@ -34,19 +35,19 @@ export function AssetExplorer({ reservoir, assets, records }: { reservoir: Reser
   return <div className={paper ? "asset-explorer paper-mode" : "asset-explorer"}>
     <div className="explorer-summary" aria-label="Dataset summary">
       <MetricCard label="Research assets" value={scoped.length}/>
-      <MetricCard label="Locations" value={`${scoped.filter(a => assetLocation(a).location_status === "VERIFIED_GEOMETRY").length} / ${scoped.filter(a => assetLocation(a).location_status === "REFERENCE_LOCATION").length} / ${scoped.filter(a => assetLocation(a).location_status === "NO_LOCATION").length}`} note="Verified / reference / missing"/>
       <MetricCard label="Technical records" value={total("technical")}/>
       <MetricCard label="Verified O&M" value={total("events")}/>
       <MetricCard label="3D links" value={total("links")}/>
     </div>
 
 
+    <SpatialCoverage assets={scoped} onSelect={select} onFilter={value => filter("location", value)} activeFilter={locationFilter}/>
     {params.get("asset") && !selected && <p role="alert">Selected asset is unavailable in this reservoir.</p>}
     {selected && !visible.includes(selected) && <p role="status">Selected asset is excluded by the layer filters. Its information remains open.</p>}
     <Workspace title="map" panel={<>
     <PanelSection title="Search & filters"><div className="explorer-filters">
     <label>Search assets <input type="search" placeholder="Name, ID or component" value={query} onChange={e => filter("q", e.target.value)} /></label>
-    <label>Location <select value={locationFilter} onChange={e => filter("location", e.target.value)}><option value="all">All location states</option><option value="VERIFIED_GEOMETRY">Verified geometry</option><option value="REFERENCE_LOCATION">Reference location</option><option value="NO_LOCATION">Missing location</option></select></label>
+    <label>Location <select value={locationFilter} onChange={e => filter("location", e.target.value)}><option value="all">All location states</option><option value="VERIFIED_GEOMETRY">Verified geometry</option><option value="REFERENCE_LOCATION">Reference location</option><option value="UNRESOLVED">Unresolved candidates</option><option value="CANDIDATE_NEEDS_REVIEW">Candidate needs review</option><option value="CONFLICTED">Conflicted</option><option value="NO_DEFENSIBLE_LOCATION">No defensible location</option><option value="NO_LOCATION">All without a pin</option></select></label>
     <label>Asset type <select value={type} onChange={e => filter("type", e.target.value)}><option value="">All types</option>{types.map(([code,name]) => <option key={code} value={code}>{name}</option>)}</select></label>
     <label><input type="checkbox" checked={contextVisible} onChange={e => filter("context", e.target.checked ? "1" : "0")} /> Reservoir context</label>
     <label><input type="checkbox" checked={modelOnly} onChange={e => filter("modelOnly", e.target.checked ? "1" : "0")} /> With 3D</label></div></PanelSection>

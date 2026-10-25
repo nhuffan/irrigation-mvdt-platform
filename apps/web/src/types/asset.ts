@@ -19,7 +19,34 @@ export type Asset = {
   location?: AssetLocation | null;
 };
 
+export type SpatialDisposition = "VERIFIED_GEOMETRY" | "REFERENCE_LOCATION" | "CANDIDATE_NEEDS_REVIEW" | "CONFLICTED" | "NO_DEFENSIBLE_LOCATION";
+export type SpatialCandidate = {
+  candidate_id: string;
+  source_label: string;
+  source: string;
+  source_url?: string | null;
+  document_id?: string | null;
+  physical_page?: number | null;
+  locator: string;
+  coordinate_basis: string;
+  source_crs: string;
+  identity_basis: string;
+  accuracy_limitation: string;
+  issues: string[];
+};
 export type AssetLocation = {
+  spatial_disposition?: SpatialDisposition;
+  candidate_count?: number;
+  reason?: string | null;
+  next_action?: string | null;
+  candidates?: SpatialCandidate[];
+  coordinate_basis?: string | null;
+  estimated_accuracy_m?: number | null;
+  physical_page?: number | null;
+  document_id?: string | null;
+  source_id?: string | null;
+  source_sha256?: string | null;
+  reviewer_role?: string | null;
   location_status: "VERIFIED_GEOMETRY" | "REFERENCE_LOCATION" | "NO_LOCATION";
   geometry: GeoJsonGeometry | null;
   geometry_type: GeoJsonGeometry["type"] | null;

@@ -41,11 +41,13 @@ Các cửa sổ dưới đây là **ngân sách presenter**, gồm click, tải 
 
 ### 0:25–1:05 · GIS và representative 3D
 
-**Click/proof:** GIS Map có hai marker **REFERENCE** Main Dam/Spillway và provider attribution. Chọn **3D**; đợi **LOCAL · Ready**, thấy management object được chọn và linked asset đúng parent. Có thể kéo orbit nhẹ, không chọn thêm object.
+**Click/proof:** GIS Map có hai marker **REFERENCE** Main Dam/Spillway và provider attribution. Chỉ nhanh **Spatial coverage**:2 accepted references,0 verified geometries,3 unresolved assets và5 no-location assets theo readback Stage13 ngày26/10/2026; các nhóm không cộng trùng. **Evidence and unresolved locations** truy vết từng asset; C01/C02 conflicted,C03 needs review đều chưa có pin. Giữ disclosure đóng trong tuyến5 phút. Chọn **3D**; đợi **LOCAL · Ready**, thấy management object được chọn và linked asset đúng parent. Có thể kéo orbit nhẹ, không chọn thêm object.
 
-**Nói:** “GIS cung cấp ngữ cảnh và vị trí tham chiếu; đây chưa phải geometry khảo sát. 3D là biểu diễn liên kết với khu quản lý, không xác nhận vị trí hay định danh từng nhà.”
+**Nói:** “GIS có hai vị trí tham chiếu đã chấp nhận; ba cống đang chờ review nguồn và mapping nên chưa có pin. Đây chưa phải geometry khảo sát; 3D chỉ đại diện khu quản lý, chưa xác nhận từng nhà.”
 
 **Đi tiếp/fallback:** **Overview** → dòng Main Dam → **View Detail**. Nếu basemap/GLB lỗi, chỉ label/reference hoặc linked-asset panel còn đọc được; bỏ orbit, nói rõ renderer chưa kiểm tra được thay vì đợi vô hạn.
+
+Stage13 chỉ kiểm tra lại phần GIS/điều hướng, không đo lại toàn bộ tuyến187.79s. Các candidate có nguồn, trang gốc và việc cần review trong explorer; chúng không được tính như vị trí đã chấp nhận. GeoPDF cần Document binding và quyết định mapping riêng; chưa tăng số marker để làm đẹp demo.
 
 ### 1:05–1:40 · Main Dam record
 
