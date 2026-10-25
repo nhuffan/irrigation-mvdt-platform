@@ -110,11 +110,6 @@ export function EvidenceResults({ result, headingRef, onCorpus, onPage }: {
     </div>}
     {attributes.length > 0 && <div className={styles.attributeGrid}>{attributes.map(c => <AttributeCard key={c.citation_id} citation={c} />)}</div>}
     {documents.map(group => <DocumentCard key={group.documentId} citations={group.citations} />)}
-    <details className={styles.limitations}>
-      <summary>Search details &amp; limitations</summary>
-      {!!result.reason_codes?.length && <ul>{result.reason_codes.map(evidenceReasonText).filter(Boolean).map(message => <li key={message}>{message}</li>)}</ul>}
-      <ul>{result.limitations.map((line, i) => <li key={i}>{line}</li>)}</ul>
-    </details>
     {paging && paging.total_pages > 1 && <nav className={styles.pagination} aria-label="Search result pages">
       <span className={styles.pageRange}>{(paging.page - 1) * paging.page_size + 1}–{Math.min(paging.page * paging.page_size, paging.total_results)} of {paging.total_results}</span>
       <div className={styles.pageButtons}>
