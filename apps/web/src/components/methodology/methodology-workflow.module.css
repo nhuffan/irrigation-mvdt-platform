@@ -1,0 +1,54 @@
+.workflow { margin: 1.5rem 0; min-width: 0; }
+.overview { background: #edf5ef; border: 1px solid #ccded1; border-radius: 12px; padding: 1.125rem 1.25rem; }
+.statusPair { display: flex; flex-wrap: wrap; gap: .375rem 2rem; }
+.statusPair p { margin: 0; }
+.statusPair strong { color: #174c41; }
+.statusPair strong.pending { color: #8a5e18; }
+.overview > p { margin: .5rem 0 .75rem; }
+.metadata { display: flex; gap: .5rem 1.25rem; flex-wrap: wrap; font-size: var(--type-sm); color: #536d62; }
+.steps { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); margin: 1.25rem 0 0; border: 1px solid #ccdad0; border-radius: 12px 12px 0 0; background: #f8faf8; overflow: hidden; }
+.steps a { display: flex; align-items: center; gap: .625rem; padding: 1rem .875rem; text-decoration: none; border-right: 1px solid #dce5de; color: #526a5b; font-size: 14px; line-height: 1.4; min-width: 0; }
+.steps a:last-child { border-right: 0; }
+.steps a[aria-current] { color: #174c41; background: white; box-shadow: inset 0 -3px #23795a; }
+.steps a:hover { background: #edf5ef; }
+.steps strong { display: block; font-size: 14px; font-weight: 650; }
+.steps small { display: block; margin-top: .25rem; font-size: 12px; }
+.stepNumber { flex-shrink: 0; display: grid; place-items: center; border: 1px solid #bdcfc1; border-radius: 50%; width: 1.75rem; height: 1.75rem; font-size: 13px; }
+.steps a[aria-current] .stepNumber { background: #174c41; color: white; border-color: #174c41; }
+.stepPanel { background: white; border: 1px solid #ccdad0; border-top: 0; border-radius: 0 0 12px 12px; scroll-margin-top: 1.25rem; }
+.stepHeading { display: flex; gap: 1rem; align-items: center; justify-content: space-between; border-bottom: 1px solid #e1e9e3; padding: 1rem 1.125rem; }
+.stepHeading h2 { font-size: 14px; font-weight: 700; margin: 0; }
+.badge { display: inline-flex; background: #f1f5f2; border: 1px solid #d3dfd6; border-radius: 5px; padding: .2rem .6rem; font-size: var(--type-xs); }
+.stepBody { padding: 1.125rem; }
+.counts { display: flex; flex-wrap: wrap; gap: .75rem 2rem; margin: 0 0 1.125rem; }
+.counts div { min-width: 6rem; }
+.counts dt { font-size: var(--type-sm); color: #5d7264; }
+.counts dd { font-size: 1.375rem; font-weight: 650; margin: .125rem 0 0; }
+.nextAction { padding: .875rem 1rem; background: #f5f8f5; border-radius: 8px; border-left: 3px solid #8bb59a; }
+.nextAction h3, .blockerHeading { font-size: 16px; font-weight: 650; }
+.nextAction p { margin: .375rem 0 0; overflow-wrap: anywhere; }
+.blockerHeading { margin: 1.25rem 0 .625rem; }
+.blockers { list-style: none; padding: 0; margin: 0; }
+.blockers > li { border-bottom: 1px solid #e4eae5; padding: .875rem 0; }
+.blockers > li:last-child { border-bottom: 0; }
+.blockers p { margin: 0 0 .375rem; }
+.blockers small { color: #5c7165; font-size: var(--type-xs); }
+.evidence { margin-top: 1rem; }
+.evidence summary { cursor: pointer; color: #325d48; font-size: 16px; font-weight: 600; }
+.evidence ul { margin: .75rem 0; padding-left: 1.25rem; }
+.evidence li { margin: .5rem 0; overflow-wrap: anywhere; }
+.evidence small, .evidence code { display: block; font-size: var(--type-xs); color: #64776b; overflow-wrap: anywhere; }
+.readback { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: space-between; margin-top: .75rem; color: #617568; font-size: var(--type-xs); }
+.resultMeta { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin: 1.25rem 0 .625rem; font-size: var(--type-sm); }
+.results { min-width: 0; }
+@media (max-width: 1000px) { .steps { display: flex; overflow-x: auto; } .steps a { flex: 1 0 155px; } }
+@media (max-width: 600px) { .overview { padding: 1rem; } .statusPair { display: block; } .stepBody { padding: .875rem; } .counts { gap: .75rem 1.25rem; } }
+
+.evidenceDetail > section { margin: 1.25rem 0; scroll-margin-top: 1.25rem; }
+
+.approvals { margin-top: 1.25rem; }
+.approvals h3 { font-size: 16px; font-weight: 650; }
+.approvals ul { list-style: none; padding: 0; margin: .5rem 0 0; }
+.approvals li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .625rem 0; border-bottom: 1px solid #e4eae5; }
+.approvals li:last-child { border-bottom: 0; }
+.approvals small { display: block; font-size: var(--type-sm); color: #617568; }

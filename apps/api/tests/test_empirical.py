@@ -4,6 +4,8 @@ from copy import deepcopy
 from uuid import uuid4
 
 import pytest
+from test_research import observation, sample, scope
+
 from scripts.evaluate_research_dataset import evaluate
 from scripts.export_research_results import summarize_retrieval, summarize_usability
 from scripts.prepare_empirical_scope import (
@@ -12,7 +14,6 @@ from scripts.prepare_empirical_scope import (
     compile_scope,
 )
 from scripts.research_common import validate_scope
-from test_research import observation, sample, scope
 
 
 def inputs():

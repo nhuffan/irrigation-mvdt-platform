@@ -7,6 +7,8 @@ import json
 from copy import deepcopy
 
 import pytest
+from test_empirical import inputs
+
 from scripts.methodology_review import (
     PROTOCOL,
     REQUIRED_GATES,
@@ -20,7 +22,6 @@ from scripts.prepare_empirical_scope import (
     validate_compiled_scope,
 )
 from scripts.research_common import validate_scope
-from test_empirical import inputs
 
 STAMP = {"reviewer": "TEST ONLY", "reviewed_at": "2026-10-11T00:00:00+00:00"}
 
@@ -498,8 +499,9 @@ def test_mc_component_with_unknown_parent_is_rejected_without_reparenting():
 
 
 def test_child_measurement_does_not_fill_parent_technical_requirement():
-    from scripts.evaluate_research_dataset import evaluate
     from test_empirical import empirical_sample
+
+    from scripts.evaluate_research_dataset import evaluate
 
     snapshot = empirical_sample()
     baseline = evaluate(snapshot)["metrics"]["technical_coverage"]

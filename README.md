@@ -30,6 +30,19 @@ Không migrate, seed lại hoặc reset database nghiên cứu hiện có để 
 
 Dừng frontend/API bằng Ctrl+C; `pnpm db:down` dừng database và giữ volume.
 
+## Methodology workflow
+
+Trang [Methodology](http://localhost:3000/methodology) kiểm tra bằng chứng hiện có theo 5 bước; software workflow sẵn sàng không đồng nghĩa nghiên cứu đã hoàn tất. Preflight và bộ input trống không thay đổi database hay phê duyệt:
+
+```sh
+cd apps/api
+uv run python -m scripts.research_workflow --output /tmp/methodology-preflight.json
+uv run python -m scripts.research_workflow --templates /tmp/methodology-inputs
+uv run python -m scripts.research_workflow --help
+```
+
+Chỉ dùng `--apply` cho import/freeze/evaluate/export khi đã có input được review hợp lệ. Mỗi lần freeze dùng thư mục riêng trong `research/`; thiếu approval, acceptance hoặc quan sát thực tế sẽ chặn bước tương ứng. Giao diện đọc trạng thái mới qua API hiện có, không cần chạy service bổ sung.
+
 ## Kiểm tra
 
 ```sh

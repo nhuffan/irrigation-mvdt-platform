@@ -1,5 +1,6 @@
 import "server-only";
 import snapshot from "@/data/methodology.json";
+import { workflowFromResponse, workflowExportAlignment, type WorkflowResult } from "./research-workflow";
 import { getReservoirAssets, getSourceDocuments, getModels, getResearchSource } from "./api";
 import type { ExplorerRecords } from "./explorer-data";
 import { getExplorerData } from "./explorer-data";
@@ -17,6 +18,9 @@ export async function getResearchSummary() {
   if (controlled.reservoir_id !== MANAGED_RESERVOIR_ID || !snapshotVersionSupported(controlled)) {
     throw new Error("Controlled summary does not match the managed site");
   }
+  const workflowPromise: Promise<WorkflowResult> = fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1"}/research/workflow`, {
+    cache: "no-store", signal: AbortSignal.timeout(15000),
+  }).then(async response => response.ok ? workflowFromResponse(await response.json(), MANAGED_RESERVOIR_ID) : {status:"UNAVAILABLE",data:null} as const).catch(() => ({status:"UNAVAILABLE",data:null} as const));
   const assets = await getReservoirAssets(MANAGED_RESERVOIR_ID);
   const records: ExplorerRecords = Object.fromEntries(await Promise.all(assets.map(async a => [a.id, await getExplorerData(a.id)])));
   const rows = coverageRows(assets, records).map(row => ({ ...row,
@@ -65,6 +69,8 @@ export async function getResearchSummary() {
     exporter: controlled.exporter, exporter_sha256: controlled.exporter_sha256,
   });
   return {
+    workflow: await workflowPromise,
+    export_alignment: workflowExportAlignment(models === null || sources.some(s=>s.id && !s.link_available) || Object.values(records).some(r=>r.technical === null || r.documents === null || r.events === null || r.links === null || r.conditionError), drift || extendedAlignment === "DIFFERENT_OR_UNAVAILABLE"),
     controlled: publicControlled, completion, quantitative_status: quantitative.status, completion_alignment: extendedAlignment, read_at: new Date().toISOString(), rows: publicResearchValue(rows), totals: coverageTotals(rows), sources: publicResearchValue(sources),
     controlled_alignment: drift || extendedAlignment === "DIFFERENT_OR_UNAVAILABLE" ? "DIFFERENT_OR_UNAVAILABLE" : "RECORD_READBACK_MATCH",
     // No raw source notes, receipts, storage keys or reviewer metadata crosses this adapter.
