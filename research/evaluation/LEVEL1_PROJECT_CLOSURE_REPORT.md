@@ -8,7 +8,7 @@ Software commit `414e9a3f3f2c0c49497b79e7b5a788538a214fda` on main; production b
 
 DB/media fingerprint `3e1004b5a6b0b68c4ed990bdf8a3d473218b100175f03a069bc1d105e2aa334c`. DB capture SHA `a315cb4337bcfaaac3af594de29792048b79838d47d1b3a6a36d81a55d5c5ad3`; API capture SHA `3945517e6d73f5b8fd2c6401d4b7cad6d71379afd212089cd1a7420badc9b8f8`. Exact measurement time: `2026-10-21T07:09:51.095673+00:00`. The 22 July 2026 scope reference is a mixed historical/design boundary, not a certification date: unknown source dates are not inferred before it.
 
-Private evidence is retained in `evidence/LEVEL1-CLOSURE/`, protected by the existing .gitignore. [Acceptance](level1_acceptance.csv), [paper delta](post_paper_delta.csv), [presentation](LEVEL1_POST_PAPER_IMPROVEMENTS_PRESENTATION.md), [two-minute runbook](PRESENTATION_DEMO_RUNBOOK.md). The private `level1_snapshot_manifest.json` binds exact files, commands, media hashes and the content-addressed presentation evidence snapshot; it does not label DT-R1 FROZEN.
+Private evidence is retained in `evidence/LEVEL1-CLOSURE/`, protected by the existing .gitignore. [Acceptance](level1_acceptance.csv), [paper delta](post_paper_delta.csv), [presentation](LEVEL1_POST_PAPER_IMPROVEMENTS_PRESENTATION.md), [current project demo](../../DEMO.md). The private `level1_snapshot_manifest.json` binds exact files, commands, media hashes and the content-addressed presentation evidence snapshot; it does not label DT-R1 FROZEN.
 
 ## Measured availability
 

@@ -1,6 +1,6 @@
-# Current Level 1 prototype — presentation evidence
+# Level 1 prototype — historical comparison evidence
 
-Use this with the current local source snapshot, measured 21 October 2026. The 19-page FINAL EN paper is an earlier reporting cohort and remains unchanged. This companion is a completed comparison of measured data; it does not add results to the historical paper. Current software interaction acceptance is **LEVEL1_ACCEPTED_WITH_DISCLOSED_LIMITS**, based on actual browser observations; full Stage5B independently remains **NOT_READY**.
+This report retains the source snapshot measured 21 October 2026. The current live presenter route is [root DEMO.md](../../DEMO.md). The 19-page FINAL EN paper is an earlier reporting cohort and remains unchanged. This companion is a completed comparison of measured data; it does not add results to the historical paper. Current software interaction acceptance is **LEVEL1_ACCEPTED_WITH_DISCLOSED_LIMITS**, based on actual browser observations; full Stage5B independently remains **NOT_READY**.
 
 ## Opening statement
 
@@ -32,16 +32,9 @@ The fresh production build succeeds. All 25 availability indicators replay from 
 
 [Use the seven new current captures](../../docs/paper_img/level1-current/README.md). Historical Figures 3/4/5 and old controlled Table 6 retain their original capture/review scope. PDF preview is blank in the in-app browser but works in Chrome; use Chrome and configured `http://localhost:3000` for the live demonstration. The `127.0.0.1` client origin is not in the current API CORS allowlist. No provider/security policy was changed. The fallback image is explicitly labeled fault injection.
 
-## Suggested narration beside the live tabs
+## Current demonstration guide
 
-1. **Overview / registry:** “Four primary assets and six supplementary components share stable identifiers. Direct and descendant record counts are separated.”
-2. **DAM or SPILLWAY technical evidence:** “This value carries its unit, source identity, EVID ID and exact locator. L2 describes evidence in the document, not present-day structural condition.”
-3. **INTAKE C01:** “These six records belong to C01. The parent still has zero direct technical claims; no values from other intake structures were merged.”
-4. **Document:** “Six reviewed PDF byte hashes exist in retained storage; only two asset-document links are currently retrievable. An empty link list does not mean no real-world file exists.”
-5. **GIS / 3D:** “Reference points support navigation. The model is LOCAL and representative. Neither establishes surveyed coordinates or complete model semantics.”
-6. **Methodology:** “Availability is measured separately from mandatory completeness. Unknown denominators remain unknown; full Stage5B still has 11 unresolved gates.”
-
-The recorded steps were observed on the matching current build/data. If data or software changes, recheck the affected demonstration before presenting it as this snapshot. The [runbook](PRESENTATION_DEMO_RUNBOOK.md) supplies a two-minute sequence; the [closure report](LEVEL1_PROJECT_CLOSURE_REPORT.md) records current limitations and exact replay commands.
+Use [root DEMO.md](../../DEMO.md) for the current whole-project sequence. The measurements and browser observations in this report retain their original build, dataset and dates; recheck the live application before treating them as current. The [closure report](LEVEL1_PROJECT_CLOSURE_REPORT.md) preserves the original limitations and replay commands.
 
 ## Scientific limits to state explicitly
 

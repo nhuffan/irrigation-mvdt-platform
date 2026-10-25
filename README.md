@@ -6,6 +6,8 @@ Nghiên cứu: [dataset/import/freeze](research/dataset/README.md) · [evaluatio
 
 Experimental future work: [historical evidence search preview](research/ai-poc/README.md).
 
+Demo toàn bộ project: [DEMO.md](DEMO.md).
+
 ## Chạy local
 
 Từ **repository root**, với Docker Desktop đang chạy, dependencies/env và database/storage hiện có đã được cấu hình, mở đúng hai terminal:
@@ -32,7 +34,7 @@ Dừng frontend/API bằng Ctrl+C; `pnpm db:down` dừng database và giữ volu
 
 ## Methodology workflow
 
-Trang [Methodology](http://localhost:3000/methodology) kiểm tra bằng chứng hiện có theo 5 bước; software workflow sẵn sàng không đồng nghĩa nghiên cứu đã hoàn tất. Preflight và bộ input trống không thay đổi database hay phê duyệt:
+Trang [Methodology](http://localhost:3000/methodology) mặc định hiển thị framework Level 1, bằng chứng đang có và giới hạn nghiên cứu. Luồng 5 bước và các gate giữ trong **Research Workflow & Acceptance (advanced)**; software workflow sẵn sàng không đồng nghĩa nghiên cứu đã hoàn tất. Preflight và bộ input trống không thay đổi database hay phê duyệt:
 
 ```sh
 cd apps/api
