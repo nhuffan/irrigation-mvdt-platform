@@ -20,7 +20,7 @@ export function AssetLocationSummary({asset, anchor=true}:{asset:Asset;anchor?:b
   const l=assetLocation(asset), missing=l.location_status==="NO_LOCATION";
   return <section id={anchor ? "location" : undefined} aria-label="Asset location"><h3>Location</h3><LocationBadge asset={asset}/>
     {missing ? <><p>{l.reason ?? "No accepted asset-specific location evidence."}</p>{l.next_action && <p className="summary-note">Next: {l.next_action}</p>}{l.review_state === "UNAVAILABLE" && <p role="status">Location review unavailable; no candidate pin is displayed.</p>}</>
-      : <><p>{locationSourceTitle(l.source)}</p><p className={styles.warning}>{l.location_status==="REFERENCE_LOCATION" ? "Reference only — not surveyed geometry" : "Spatial verification applies to the bound geometry only."}</p>
+      : <><p>{evidenceDisplayText(locationSourceTitle(l.source))}</p><p className={styles.warning}>{l.location_status==="REFERENCE_LOCATION" ? "Reference only — not surveyed geometry" : "Spatial verification applies to the bound geometry only."}</p>
         <p className="summary-note">Accuracy: {l.estimated_accuracy_m == null ? "Unknown" : `±${l.estimated_accuracy_m} m`} · Review: {l.review_state === "AVAILABLE" ? "Accepted" : l.review_state.toLowerCase()}</p>
         <SourceLink documentId={l.document_id} page={l.physical_page} href={l.source_url}/>
         {!!l.candidate_count && <><p className="summary-note">Source comparison: {l.reason ?? "Additional candidates await review. The accepted reference is preserved."}</p>{l.next_action && <p className="summary-note">Next: {l.next_action}</p>}</>}

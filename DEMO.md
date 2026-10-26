@@ -41,13 +41,13 @@ Các cửa sổ dưới đây là **ngân sách presenter**, gồm click, tải 
 
 ### 0:25–1:05 · GIS và representative 3D
 
-**Click/proof:** GIS Map có hai marker **REFERENCE** Main Dam/Spillway và provider attribution. Chỉ nhanh **Spatial coverage**:2 accepted references,0 verified geometries,3 unresolved assets và5 no-location assets theo readback Stage13 ngày26/10/2026; các nhóm không cộng trùng. **Evidence and unresolved locations** truy vết từng asset; C01/C02 conflicted,C03 needs review đều chưa có pin. Giữ disclosure đóng trong tuyến5 phút. Chọn **3D**; đợi **LOCAL · Ready**, thấy management object được chọn và linked asset đúng parent. Có thể kéo orbit nhẹ, không chọn thêm object.
+**Click/proof:** GIS Map có năm marker **REFERENCE**: Main Dam, Spillway và Intake C01/C02/C03. Bấm **View reviewed references** để lấy góc nhìn bao quát các điểm. Chỉ nhanh **Spatial coverage**:5 accepted references,0 verified geometries,0 unresolved point-candidate assets và5 no-location assets theo readback Stage13.1 ngày26/10/2026. Nguồn của ba cống là **RS-DOC-046**, GeoPDF physical1/1; C01/C02 giữ so sánh World Bank trong evidence. Giữ disclosure đóng trong tuyến5 phút. Chọn **3D**; đợi **LOCAL · Ready**, thấy management object được chọn và linked asset đúng parent. Có thể kéo orbit nhẹ, không chọn thêm object.
 
-**Nói:** “GIS có hai vị trí tham chiếu đã chấp nhận; ba cống đang chờ review nguồn và mapping nên chưa có pin. Đây chưa phải geometry khảo sát; 3D chỉ đại diện khu quản lý, chưa xác nhận từng nhà.”
+**Nói:** “GIS hiện có năm vị trí tham chiếu đã duyệt, gồm ba cống theo đúng kênh. Đây là tham chiếu từ ký hiệu bản đồ, độ chính xác khảo sát chưa biết; 3D chỉ đại diện khu quản lý, chưa xác nhận từng nhà.”
 
 **Đi tiếp/fallback:** **Overview** → dòng Main Dam → **View Detail**. Nếu basemap/GLB lỗi, chỉ label/reference hoặc linked-asset panel còn đọc được; bỏ orbit, nói rõ renderer chưa kiểm tra được thay vì đợi vô hạn.
 
-Stage13 chỉ kiểm tra lại phần GIS/điều hướng, không đo lại toàn bộ tuyến187.79s. Các candidate có nguồn, trang gốc và việc cần review trong explorer; chúng không được tính như vị trí đã chấp nhận. GeoPDF cần Document binding và quyết định mapping riêng; chưa tăng số marker để làm đẹp demo.
+Stage13.1 đã kiểm tra trực tiếp năm reference, chọn đúng từng cống, nguồn GeoPDF trang1, native original và Back giữ asset/search. Ba mapping mới có quyết định reference-only riêng; mâu thuẫn World Bank được giữ, không tuyên bố đã sửa nguồn. Năm asset chưa có pin gồm hai parent và ba building; không kế thừa vị trí con/3D. Không đo lại toàn bộ tuyến187.79s.
 
 ### 1:05–1:40 · Main Dam record
 
@@ -75,7 +75,7 @@ Stage13 chỉ kiểm tra lại phần GIS/điều hướng, không đo lại to�
 
 ### 3:50–4:35 · Methodology overview
 
-**Click/proof:** Chỉ **Level-1 information framework** và **Live evidence snapshot**: registry↔GIS/3D↔records↔sources,10 assets/44 L2/6 distinct linked PDF hashes,2 reference locations,0 verified O&M,1 representative link tại rehearsal. Các số là live readback; hash metadata không thay kiểm tra original. Giữ **Research Workflow & Acceptance (advanced)** đóng.
+**Click/proof:** Chỉ **Level-1 information framework** và **Live evidence snapshot**: registry↔GIS/3D↔records↔sources,10 assets/44 L2/6 distinct linked PDF hashes,5 reference locations,0 verified O&M,1 representative link theo readback Stage13.1 ngày26/10/2026. Document046 đã đăng ký cho spatial provenance; số linked PDF hashes của summary vẫn6 theo phạm vi liên kết hiện có. Các số là live readback; hash metadata không thay kiểm tra original. Giữ **Research Workflow & Acceptance (advanced)** đóng.
 
 **Nói:** “Đóng góp Phase1 là mô hình thông tin Level1 có truy vết và công cụ phần mềm đã hoàn thành. Research acceptance vẫn pending, dataset NOT_FROZEN; workflow và các approval gate được giữ ở Advanced.”
 

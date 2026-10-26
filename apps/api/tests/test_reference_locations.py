@@ -15,7 +15,11 @@ from app.models.asset_technical_attribute import AssetTechnicalAttribute
 from app.models.data_source import DataSource
 from app.models.media import Document
 from app.services.coordinate_input import CoordinateInput, parse_coordinates
-from app.services.spatial_candidates import HumanReview, SpatialCandidate
+from app.services.spatial_candidates import (
+    HumanReview,
+    SpatialCandidate,
+    SpatialDisposition,
+)
 from scripts.reference_locations import (
     apply_candidates,
     atomic_write,
@@ -852,3 +856,125 @@ def test_explicitly_rejected_source_cannot_be_accepted_by_spatial_receipt(refere
         apply_candidates(
             db, {"version": 1, "records": {}}, [candidate], [candidate.candidate_id]
         )
+
+
+def test_public_candidate_revisions_use_disposition_order_and_keep_private_history(
+    reference, monkeypatch
+):
+    client, db, asset, candidate, path = reference
+    old = candidate.model_copy(
+        deep=True, update={"candidate_id": "old-R1", "document_id": None}
+    )
+    current = candidate.model_copy(deep=True, update={"candidate_id": "registered-R2"})
+    comparison = candidate.model_copy(
+        deep=True, update={"candidate_id": "source-comparison", "coordinates": None}
+    )
+    original = merge_candidates(
+        db, {"version": 1, "records": {}}, [old, current, comparison], {}
+    )
+    sidecar = path / "revisions.json"
+    atomic_write(sidecar, original)
+    monkeypatch.setattr(settings, "asset_locations_path", sidecar)
+    legacy = client.get(f"/api/v1/assets/{asset.id}").json()["location"]
+    assert {item["candidate_id"] for item in legacy["candidates"]} == {
+        old.candidate_id,
+        current.candidate_id,
+        comparison.candidate_id,
+    }
+    disposition = SpatialDisposition(
+        asset_id=asset.id,
+        reservoir_id=asset.reservoir_id,
+        asset_code=asset.asset_code,
+        status="CONFLICTED",
+        reason="Registered original; alternate source remains conflicted",
+        next_action="Obtain exact spatial review",
+        candidate_ids=[current.candidate_id, comparison.candidate_id],
+    )
+    staged = merge_candidates(db, original, [], {str(asset.id): disposition})
+    atomic_write(sidecar, staged)
+    before = sidecar.read_bytes()
+    location = client.get(f"/api/v1/assets/{asset.id}").json()["location"]
+    assert [
+        item["candidate_id"] for item in location["candidates"]
+    ] == disposition.candidate_ids
+    assert location["candidate_count"] == 2
+    assert location["candidates"][0]["document_id"] == str(current.document_id)
+    assert location["location_status"] == "NO_LOCATION" and location["geometry"] is None
+    assert staged["candidates"] == original["candidates"]
+    assert sidecar.read_bytes() == before
+
+
+def test_accepted_reference_exposes_only_remaining_comparison_and_no_stale_review_action(
+    reference, monkeypatch
+):
+    client, db, asset, candidate, path = reference
+    old = candidate.model_copy(
+        deep=True, update={"candidate_id": "old-R1", "document_id": None}
+    )
+    current = candidate.model_copy(deep=True, update={"candidate_id": "registered-R2"})
+    comparison = candidate.model_copy(
+        deep=True, update={"candidate_id": "source-comparison", "coordinates": None}
+    )
+    approve(current, path)
+    disposition = SpatialDisposition(
+        asset_id=asset.id,
+        reservoir_id=asset.reservoir_id,
+        asset_code=asset.asset_code,
+        status="CANDIDATE_NEEDS_REVIEW",
+        reason="Review pending",
+        next_action="Supply a review",
+        candidate_ids=[current.candidate_id, comparison.candidate_id],
+    )
+    staged = merge_candidates(
+        db,
+        {"version": 1, "records": {}},
+        [old, current, comparison],
+        {str(asset.id): disposition},
+    )
+    accepted, _ = apply_candidates(
+        db, staged, [old, current, comparison], [current.candidate_id]
+    )
+    private_history = deepcopy(accepted["candidates"])
+    sidecar = path / "accepted-revisions.json"
+    atomic_write(sidecar, accepted)
+    monkeypatch.setattr(settings, "asset_locations_path", sidecar)
+    location = client.get(f"/api/v1/assets/{asset.id}").json()["location"]
+    assert location["location_status"] == "REFERENCE_LOCATION"
+    assert location["evidence_id"] == current.candidate_id
+    assert location["candidate_count"] == 1
+    assert [item["candidate_id"] for item in location["candidates"]] == [
+        comparison.candidate_id
+    ]
+    assert location["reason"] == disposition.reason
+    accepted["dispositions"][str(asset.id)]["candidate_ids"] = [current.candidate_id]
+    atomic_write(sidecar, accepted)
+    location = client.get(f"/api/v1/assets/{asset.id}").json()["location"]
+    assert location["candidate_count"] == 0 and location["candidates"] == []
+    assert location["reason"] is None and location["next_action"] is None
+    assert accepted["candidates"] == private_history
+    assert asset.geometry is None
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("source_sha256", "0" * 64),
+        ("source_id", str(uuid4())),
+        ("document_id", str(uuid4())),
+        ("physical_page", 2),
+    ],
+)
+def test_candidate_is_not_hidden_when_accepted_id_has_different_source_binding(
+    reference, monkeypatch, field, value
+):
+    client, db, asset, candidate, path = reference
+    approve(candidate, path)
+    staged = merge_candidates(db, {"version": 1, "records": {}}, [candidate], {})
+    accepted, _ = apply_candidates(db, staged, [candidate], [candidate.candidate_id])
+    accepted["records"][str(asset.id)][field] = value
+    sidecar = path / "different-binding.json"
+    atomic_write(sidecar, accepted)
+    monkeypatch.setattr(settings, "asset_locations_path", sidecar)
+    location = client.get(f"/api/v1/assets/{asset.id}").json()["location"]
+    assert location["candidate_count"] == 1
+    assert location["candidates"][0]["candidate_id"] == candidate.candidate_id

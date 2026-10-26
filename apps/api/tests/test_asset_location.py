@@ -113,3 +113,25 @@ def test_accepted_location_does_not_publish_keyed_source_url(tmp_path, monkeypat
     assert result.location_status == "REFERENCE_LOCATION"
     assert result.source_url is None
     assert result.geometry.coordinates == (106, 11)
+
+
+@pytest.mark.parametrize("candidates", [None, "malformed", [None], {}])
+def test_malformed_candidate_metadata_cannot_remove_an_accepted_reference(
+    tmp_path, monkeypatch, candidates
+):
+    a = asset()
+    accepted = entry(a) | {
+        "evidence_id": "accepted-revision",
+        "source_sha256": "1" * 64,
+    }
+    path = tmp_path / "locations.json"
+    path.write_text(
+        json.dumps(
+            {"version": 1, "records": {str(a.id): accepted}, "candidates": candidates}
+        )
+    )
+    monkeypatch.setattr(settings, "asset_locations_path", path)
+    result = asset_location(a)
+    assert result.location_status == "REFERENCE_LOCATION"
+    assert result.geometry.coordinates == (106, 11)
+    assert a.geometry is None

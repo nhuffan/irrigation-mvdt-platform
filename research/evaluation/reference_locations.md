@@ -10,6 +10,17 @@ Unapproved coordinates remain private and never provide map geometry. Public ass
 
 Run from `apps/api` with the existing environment/database/storage configured. Default commands are dry-run; `--apply` is the only write opt-in. Keep packets, originals, candidate reports and actual review receipts in the ignored spatial evidence folder. The commands below use placeholder paths/IDs; do not substitute a candidate label or example receipt for a real human decision.
 
+Register an already-retained original with the existing reviewed-document importer before binding a spatial candidate to it. For new admissions, pin both `source_id` and `reservoir_id` in the manifest and matching evidence row; the importer checks the exact live UUID pair, retained checksum/size/page count and non-rejected source. Keep the actual byte/source-check reviewer and scope explicit. Document registration alone does not establish human spatial approval, source authority, asset mapping or RAG admission.
+
+```sh
+# Existing guarded importer: isolated-storage dry-run, then explicit selective apply.
+# Keep a one-document manifest for the exact retained spatial original.
+uv run python -m scripts.import_reviewed_documents \
+  --manifest PRIVATE_MANIFEST.csv --evidence PRIVATE_EVIDENCE.csv \
+  --evidence-root PRIVATE_ORIGINALS --output PRIVATE_DRY_RUN
+# Repeat with a fresh --output PRIVATE_APPLY and --apply only after reviewing the dry-run.
+```
+
 ```sh
 # Create an empty private packet without overwriting an existing file.
 uv run python -m scripts.reference_locations template --output PRIVATE_PACKET.json --apply

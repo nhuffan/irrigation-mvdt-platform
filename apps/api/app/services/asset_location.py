@@ -132,15 +132,46 @@ def asset_location(asset: AssetResponse) -> AssetLocation:
             mode="json", exclude={"asset_id", "reservoir_id", "asset_code"}
         )
         public_review["source_url"] = public_source_url(review.source_url)
+        comparisons = result.candidates
+        if review.evidence_id and review.source_sha256:
+            # An accepted reference already exposes its own bound provenance.
+            # Suppress only that exact evidence revision from pending/comparison
+            # cards; differing originals/bindings remain visible for review.
+            binding = review.model_dump(mode="json")
+            raw_candidates = bundle.get("candidates", [])
+            if not isinstance(raw_candidates, list):
+                raw_candidates = []
+            if any(
+                isinstance(value, dict)
+                and value.get("candidate_id") == review.evidence_id
+                and all(
+                    value.get(key) == binding[key]
+                    for key in (
+                        "asset_id",
+                        "reservoir_id",
+                        "asset_code",
+                        "source_sha256",
+                        "source_id",
+                        "document_id",
+                        "physical_page",
+                    )
+                )
+                for value in raw_candidates
+            ):
+                comparisons = [
+                    value
+                    for value in comparisons
+                    if value.candidate_id != review.evidence_id
+                ]
         return AssetLocation(
             **public_review,
             geometry_type=review.geometry.type,
             review_state="AVAILABLE",
             spatial_disposition=review.location_status,
-            candidate_count=result.candidate_count,
-            reason=result.reason,
-            next_action=result.next_action,
-            candidates=result.candidates,
+            candidate_count=len(comparisons),
+            reason=result.reason if comparisons else None,
+            next_action=result.next_action if comparisons else None,
+            candidates=comparisons,
         )
     except (OSError, ValueError, TypeError, AttributeError, ValidationError):
         result.review_state = "UNAVAILABLE"

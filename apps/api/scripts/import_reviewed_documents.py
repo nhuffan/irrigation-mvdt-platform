@@ -7,7 +7,7 @@ import mimetypes
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from uuid import NAMESPACE_URL, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from pypdf import PdfReader
 from sqlalchemy import select
@@ -31,6 +31,21 @@ STATUSES = {
 }
 
 
+def source_identity_pin(row):
+    """Optional exact identity pins for new retained-original admissions; legacy rows remain valid."""
+    source_id, reservoir_id = row.get("source_id", ""), row.get("reservoir_id", "")
+    if not source_id and not reservoir_id:
+        return None
+    if not source_id or not reservoir_id:
+        raise ValueError(
+            "Both source_id and reservoir_id are required for exact source pins"
+        )
+    try:
+        return UUID(source_id), UUID(reservoir_id)
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise ValueError("Source identity pins must be valid UUIDs") from exc
+
+
 def validate_manifest(rows, evidence, root):
     evidence_map = {e["evidence_id"]: e for e in evidence}
     if len(evidence_map) != len(evidence):
@@ -51,6 +66,9 @@ def validate_manifest(rows, evidence, root):
         ):
             raise ValueError("Reviewer and timezone-aware timestamp required")
         e = evidence_map[row["evidence_id"]]
+        pin = source_identity_pin(row)
+        if pin != source_identity_pin(e):
+            raise ValueError("Reviewed physical evidence source identity pin mismatch")
         if (
             not row["source_code"].startswith("RS-")
             or any(
@@ -111,6 +129,11 @@ def import_reviewed(db, storage, selected):
             or not source.source_code.startswith("RS-")
         ):
             raise ValueError("Existing non-rejected RS source required")
+        pin = source_identity_pin(row)
+        if pin is not None and pin != (source.id, source.reservoir_id):
+            raise ValueError(
+                "Exact source/reservoir identity differs from reviewed manifest"
+            )
         stable_id = uuid5(NAMESPACE_URL, f"B03:{source.id}:{row['document_code']}")
         by_code = db.scalar(
             select(Document).where(Document.document_code == row["document_code"])

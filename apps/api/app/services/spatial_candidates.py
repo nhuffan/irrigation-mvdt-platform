@@ -180,6 +180,11 @@ def candidate_metadata(bundle, asset):
         <= {value.candidate_id for value in selected}
     ):
         raise ValueError("Spatial disposition identity or candidate binding mismatch")
+    # The disposition names the active evidence revisions. Retain superseded
+    # candidates privately without presenting obsolete source bindings as current.
+    if disposition:
+        by_id = {value.candidate_id: value for value in selected}
+        selected = [by_id[key] for key in disposition.candidate_ids]
     return {
         "spatial_disposition": disposition.status
         if disposition
