@@ -2,6 +2,7 @@
 import { documentHref } from "@/lib/document-navigation";
 import { mapView, readView, saveView, viewStorage } from "@/lib/workspace-view-state";
 import { observeCanvasResize } from "@/lib/workspace-layout";
+import { satelliteConfig, STREET_LAYER } from "@/lib/satellite-provider";
 import { AssetSymbol } from "@/components/asset/asset-symbol";
 import { assetSymbolSvg, assetSymbols } from "@/lib/asset-symbol";
 import { assetDisplayName } from "@/lib/asset-display";
@@ -18,6 +19,7 @@ import { geometryPositions } from "@/lib/asset-geometry";
 import type { Asset } from "@/types/asset";
 import type { Reservoir } from "@/types/reservoir";
 
+const basemapConfig = satelliteConfig({ provider: "maptiler", maptilerKey: process.env.NEXT_PUBLIC_MAPTILER_KEY });
 const emptyRecords: ExplorerRecords = {};
 const ignoreSelection = () => {};
 const LAYERS = [
@@ -43,6 +45,7 @@ export function AssetMap({
   const container = useRef<HTMLDivElement>(null);
   const resetView = useRef<(() => void) | null>(null);
   const selectAsset = useRef<((asset: Asset) => void) | null>(null);
+  const retryBasemap = useRef<(() => void) | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [basemapUnavailable, setBasemapUnavailable] = useState(false);
   const [locationUnavailable, setLocationUnavailable] = useState(false);
@@ -88,10 +91,60 @@ export function AssetMap({
         instance.addControl(new NavigationControl(), "top-right");
         instance.addControl(new AttributionControl({ compact: false }), "bottom-right");
         instance.addControl(new ScaleControl({ unit: "metric" }), "bottom-left");
-        instance.on("error", (event) => {
+        // Switch only the background source; asset layers, popups and camera survive.
+        let basemapId: string | null = null;
+        let basemapRevision = 0;
+        let basemapProvider: "maptiler" | "osm" = "osm";
+        let providerLogo: { onAdd: () => HTMLElement; onRemove: () => void } | undefined;
+        const removeBasemap = () => {
+          if (basemapTimer) clearTimeout(basemapTimer);
+          const previous = basemapId;
+          basemapId = null; // Ignore late source events from the removed attempt.
+          if (previous && instance.getLayer(previous)) instance.removeLayer(previous);
+          if (previous && instance.getSource(previous)) instance.removeSource(previous);
+          if (providerLogo) { instance.removeControl(providerLogo); providerLogo = undefined; }
+        };
+        const failBasemap = () => {
+          if (disposed || !basemapId) return;
+          const fallback = basemapProvider === "maptiler";
+          removeBasemap();
+          if (fallback) startBasemap("osm");
+          else setBasemapUnavailable(true);
+        };
+        const startBasemap = (provider: "maptiler" | "osm") => {
           if (disposed) return;
-          if ("sourceId" in event && event.sourceId === "basemap") setBasemapUnavailable(true);
-          else setMapState("error");
+          removeBasemap();
+          setBasemapUnavailable(false);
+          basemapProvider = provider;
+          const id = `asset-basemap-${++basemapRevision}`;
+          basemapId = id;
+          instance.addSource(id, provider === "maptiler" && basemapConfig.status === "CONFIGURED"
+            ? { type: "raster", url: `https://api.maptiler.com/maps/streets/256/tiles.json?key=${encodeURIComponent(basemapConfig.key)}`, tileSize: 256,
+                attribution: '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> | ' + STREET_LAYER.attribution }
+            : { type: "raster", tiles: STREET_LAYER.tiles, tileSize: STREET_LAYER.tileSize, maxzoom: STREET_LAYER.maxzoom, attribution: STREET_LAYER.attribution });
+          instance.addLayer({ id, type: "raster", source: id }, instance.getLayer("reservoir-context") ? "reservoir-context" : undefined);
+          if (provider === "maptiler") {
+            const logo = document.createElement("a"); logo.className = "maplibregl-ctrl observation-provider-logo";
+            logo.href = "https://www.maptiler.com/"; logo.target = "_blank"; logo.rel = "noreferrer";
+            const image = document.createElement("img"); image.src = "https://api.maptiler.com/resources/logo.svg"; image.alt = "MapTiler logo"; image.width = 88;
+            logo.append(image);
+            providerLogo = { onAdd: () => logo, onRemove: () => logo.remove() };
+            instance.addControl(providerLogo, "bottom-right");
+          }
+          basemapTimer = setTimeout(() => { if (basemapId === id) failBasemap(); }, 15000);
+        };
+        retryBasemap.current = () => startBasemap(basemapConfig.status === "CONFIGURED" ? "maptiler" : "osm");
+        instance.on("sourcedata", event => {
+          if (!disposed && event.sourceId === basemapId && event.isSourceLoaded) {
+            if (basemapTimer) clearTimeout(basemapTimer);
+            setBasemapUnavailable(false);
+          }
+        });
+        instance.on("error", event => {
+          if (disposed) return;
+          if ("sourceId" in event && typeof event.sourceId === "string" && event.sourceId.startsWith("asset-basemap-")) {
+            if (event.sourceId === basemapId) failBasemap();
+          } else setMapState("error");
         });
         timer = setTimeout(() => {
           if (!disposed && !instance.loaded()) setMapState("error");
@@ -189,11 +242,7 @@ export function AssetMap({
         };
         instance.on("load", () => {
           if (disposed) return;
-          instance.addSource("basemap", { type: "raster", tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"], tileSize: 256, maxzoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>' });
-          instance.addLayer({ id: "basemap", type: "raster", source: "basemap" });
-          basemapTimer = setTimeout(() => {
-            if (!disposed && !instance.isSourceLoaded("basemap")) setBasemapUnavailable(true);
-          }, 15000);
+          retryBasemap.current?.();
           instance.addSource("reservoir-context", {
             type: "geojson",
             data: { type: "FeatureCollection", features: contextVisible ? [{ type: "Feature", geometry: { type: "Point", coordinates: [reservoir.longitude, reservoir.latitude] }, properties: {} }] : [] },
@@ -341,6 +390,7 @@ export function AssetMap({
       popup?.remove();
       stopResize?.();
       resetView.current = null;
+      retryBasemap.current = null;
       map?.remove();
     };
   }, [reservoir, assetsJson, records, contextVisible, attempt]);
@@ -355,7 +405,7 @@ export function AssetMap({
           aria-label={`Asset geometry map for ${reservoir.name}`}
         />
         <div className="map-context-heading">{reservoir.name}<span>Basemap / registry center · Context only</span></div>
-        {basemapUnavailable && <p className="basemap-notice" role="status">Basemap unavailable · Asset locations and panel remain available.</p>}
+        {basemapUnavailable && <p className="basemap-notice" role="status">Basemap unavailable. <button className="text-link" onClick={() => retryBasemap.current?.()}>Retry basemap</button></p>}
         {mapState === "loading" && (
           <p className="map-notice" role="status">
             Loading asset map…

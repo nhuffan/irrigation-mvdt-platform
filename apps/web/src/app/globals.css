@@ -1354,3 +1354,7 @@ h3, h4, h5, h6, summary, .workspace-toolbar strong, .map-context-heading { font-
 .asset-table th .text-link { font-size: 14px; }
 .asset-table th > .asset-code { font-size: 11px; }
 @media (max-width: 480px) { .map-context-heading { font-size: 12px; } }
+
+/* Keep asset-map recovery and reset controls clear of the navigation buttons. */
+.asset-map-frame .map-reset { top: 146px; }
+.asset-map-frame .basemap-notice { top: auto; bottom: 100px; max-width: calc(100% - 88px); margin: 0; }

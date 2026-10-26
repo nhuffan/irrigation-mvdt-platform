@@ -8,6 +8,7 @@ import {publicAssets} from '../src/lib/public-client-data.ts';
 import {locationEvidence, locationSource} from '../src/lib/location-evidence.ts';
 import {explorerFilters} from '../src/lib/explorer-state.ts';
 import {evidenceDisplayText} from '../src/lib/evidence-display.ts';
+import {satelliteConfig, STREET_LAYER} from '../src/lib/satellite-provider.ts';
 const require=createRequire(import.meta.url), ts=require('typescript'), React=require('react');
 const {renderToStaticMarkup}=require('react-dom/server');
 const base={id:'asset',reservoir_id:'reservoir',asset_code:'RS-TEST',name:'Asset',parent_asset_id:null,category:{code:'INTAKE',name:'Intake'},geometry:null};
@@ -108,23 +109,55 @@ test('candidate client metadata rejects local/keyed URLs and private fields with
  }
 });
 
-test('actual shared-marker click offers every identity and selection opens its exact unchanged point',async()=>{
+function descendants(node){
+ if(!node||typeof node!=='object')return [];
+ return [node,...React.Children.toArray(node.props?.children).flatMap(descendants)];
+}
+async function assetMapHarness({configured=true}={}){
  class Element {
   constructor(tag){this.tag=tag;this.children=[];this.attributes={};this.dataset={};this.events={};this.classList={toggle:()=>{}};}
-  append(...nodes){this.children.push(...nodes);}setAttribute(key,value){this.attributes[key]=value;}addEventListener(name,callback){this.events[name]=callback;}
+  append(...nodes){this.children.push(...nodes);}remove(){this.removed=true;}setAttribute(key,value){this.attributes[key]=value;}addEventListener(name,callback){this.events[name]=callback;}
  }
- const markers=[],popups=[],maps=[],effects=[],selections=[];let refIndex=0;
+ const markers=[],popups=[],maps=[],selections=[],refs=[],states=[],effectSlots=[],timers=new Set();
+ const all=[reference('first'),reference('second'),candidate()],before=JSON.stringify(all);
+ const reservoir={id:'reservoir',name:'Reservoir',longitude:106.3,latitude:11.3};
+ let refIndex=0,stateIndex=0,effectIndex=0,pending=[],tree;
  class Map {
-  constructor(){this.events={};this.layers=[];this.sources={};maps.push(this);}
-  on(name,callback){(this.events[name]??=[]).push(callback);}addControl(){}resize(){}jumpTo(){}flyTo(){}
-  addSource(name,value){this.sources[name]=value;}addLayer(value){this.layers.push(value);}getStyle(){return {layers:this.layers};}removeLayer(id){this.layers=this.layers.filter(layer=>layer.id!==id);}
-  setFeatureState(){}getContainer(){return {clientWidth:600};}fitBounds(bounds){this.lastBounds=bounds;}project(point){return {x:point[0]*10000,y:point[1]*10000};}
+  constructor(options){this.events={};this.layers=[...(options.style.layers??[])];this.sources={};this.loadedSources=new Set();this.cameraMoves=0;maps.push(this);}
+  on(name,callback){(this.events[name]??=[]).push(callback);return this;}
+  off(name,callback){this.events[name]=(this.events[name]??[]).filter(value=>value!==callback);return this;}
+  emit(name,event={}){for(const callback of [...(this.events[name]??[])])callback(event);}
+  addControl(control){(this.controls??=[]).push(control);control.onAdd?.();}
+  removeControl(control){control.onRemove?.();this.controls=this.controls.filter(value=>value!==control);}
+  resize(){}jumpTo(){this.cameraMoves++;}flyTo(){this.cameraMoves++;}
+  addSource(name,value){this.sources[name]=value;}
+  getSource(name){return this.sources[name];}
+  removeSource(name){assert.ok(!this.layers.some(layer=>layer.source===name),'remove basemap layers before their source');delete this.sources[name];}
+  addLayer(value,beforeId){const index=this.layers.findIndex(layer=>layer.id===beforeId);if(index===-1)this.layers.push(value);else this.layers.splice(index,0,value);}
+  getLayer(id){return this.layers.find(layer=>layer.id===id);}
+  getStyle(){return {layers:this.layers,sources:this.sources};}
+  removeLayer(id){this.layers=this.layers.filter(layer=>layer.id!==id);}
+  isSourceLoaded(id){return this.loadedSources.has(id);}
+  setFeatureState(){}getContainer(){return {clientWidth:600};}
+  fitBounds(bounds){this.lastBounds=bounds;this.cameraMoves++;}
+  project(point){return {x:point[0]*10000,y:point[1]*10000};}
   getCenter(){return {lng:106.3,lat:11.3};}getZoom(){return 11;}getBearing(){return 0;}getPitch(){return 0;}loaded(){return true;}
+  remove(){this.removed=true;for(const control of this.controls??[])control.onRemove?.();}
  }
  class Marker {constructor({element}){this.element=element;markers.push(this);}setLngLat(point){this.point=point;return this;}addTo(){return this;}}
  class Popup {constructor(){popups.push(this);}setLngLat(point){this.point=point;return this;}setDOMContent(element){this.element=element;return this;}addTo(){return this;}remove(){}}
  class Bounds {constructor(){this.points=[];}extend(point){this.points.push(point);}getCenter(){return this.points[0];}}
- const hooks={...React,useRef:initial=>({current:refIndex++===2?{clientWidth:600}:initial}),useEffect:callback=>effects.push(callback),useState:initial=>[initial,()=>{}]};
+ const hooks={...React,
+  useRef:initial=>refs[refIndex++]??(refs[refIndex-1]={current:initial}),
+  useEffect:(callback,deps)=>{
+   const index=effectIndex++,previous=effectSlots[index];
+   if(!previous||!deps||deps.some((value,i)=>!Object.is(value,previous.deps?.[i])))pending.push(()=>{previous?.cleanup?.();effectSlots[index]={deps,cleanup:callback()};});
+  },
+  useState:initial=>{
+   const index=stateIndex++;if(!(index in states))states[index]=initial;
+   return [states[index],value=>{states[index]=typeof value==='function'?value(states[index]):value;}];
+  },
+ };
  const dependencies={
   react:hooks,'@/lib/document-navigation':{documentHref:href=>href},
   '@/lib/workspace-view-state':{mapView:()=>{},readView:()=>null,saveView:()=>{},viewStorage:()=>null},
@@ -132,20 +165,86 @@ test('actual shared-marker click offers every identity and selection opens its e
   '@/lib/asset-symbol':{assetSymbolSvg:()=>'<svg></svg>',assetSymbols:{}},'@/lib/asset-display':{assetDisplayName:a=>a.name},
   '@/lib/asset-location':{assetLocation,mapGeometry,locationLayer:()=> 'RS_REFERENCE',pointGroups,pointNeighbors},
   '@/lib/location-evidence':{locationEvidence},'@/lib/asset-geometry':{geometryPositions:g=>[g.coordinates]},
+  '@/lib/satellite-provider':{satelliteConfig,STREET_LAYER},
   'maplibre-gl':{Map,Marker,Popup,LngLatBounds:Bounds,NavigationControl:class{},AttributionControl:class{},ScaleControl:class{},setWorkerUrl:()=>{}},
  };
  const source=readFileSync(new URL('../src/components/map/asset-map.tsx',import.meta.url),'utf8');
  const compiled=ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS}}).outputText,exports={};
- vm.runInNewContext(compiled,{exports,require:id=>dependencies[id]??require(id),document:{createElement:tag=>new Element(tag)},window:{location:{pathname:'/map',search:'',hash:''}},setTimeout:()=>0,clearTimeout:()=>{},requestAnimationFrame:()=>{}});
- const all=[reference('first'),reference('second'),candidate()];const before=JSON.stringify(all);
- exports.AssetMap({reservoir:{id:'reservoir',name:'Reservoir',longitude:106.3,latitude:11.3},assets:all,onSelect:a=>selections.push(a),contextVisible:false});
- effects.forEach(effect=>effect());await new Promise(resolve=>setImmediate(resolve));
- const map=maps[0];assert.ok(map);map.events.load.forEach(callback=>callback());
+ vm.runInNewContext(compiled,{exports,require:id=>dependencies[id]??require(id),document:{createElement:tag=>new Element(tag)},window:{location:{pathname:'/map',search:'',hash:''}},
+  process:{env:configured?{NEXT_PUBLIC_SATELLITE_PROVIDER:'maptiler',NEXT_PUBLIC_MAPTILER_KEY:'unit_test_asset_map_owner_123'}:{}},
+  setTimeout:callback=>{const timer={callback};timers.add(timer);return timer;},clearTimeout:timer=>timers.delete(timer),requestAnimationFrame:()=>{},
+ });
+ const props={reservoir,assets:all,onSelect:a=>selections.push(a),contextVisible:false};
+ function render(){
+  refIndex=0;stateIndex=0;effectIndex=0;pending=[];tree=exports.AssetMap(props);
+  for(const node of descendants(tree))if(node.props?.className==='asset-map-canvas')node.props.ref.current={clientWidth:600};
+  for(const effect of pending)effect();return tree;
+ }
+ render();await new Promise(resolve=>setImmediate(resolve));
+ const map=maps[0];assert.ok(map);map.emit('load');render();
+ return {map,maps,markers,popups,selections,all,before,timers,render,
+  basemapId:()=>Object.keys(map.sources).find(id=>map.sources[id].type==='raster'),
+  retry:()=>{
+   const retry=descendants(render()).find(node=>node.type==='button'&&node.props.children==='Retry basemap');
+   assert.ok(retry,'failed basemap exposes a focused retry action');retry.props.onClick();
+  },
+  cleanup:()=>{for(const effect of effectSlots)effect.cleanup?.();},
+ };
+}
+
+test('actual shared-marker click offers every identity and selection opens its exact unchanged point',async()=>{
+ const {map,markers,popups,selections,all,before,cleanup}=await assetMapHarness();
  assert.equal(markers.length,1,'one marker represents the exact shared point, candidate gets none');
  assert.equal(JSON.stringify(markers[0].point),JSON.stringify([106.3,11.3]));
  markers[0].element.events.click({stopPropagation(){}});const choices=popups.at(-1).element.children.filter(child=>child.tag==='button');
  assert.equal(choices.length,2);assert.equal(choices[1].textContent,'second');choices[1].events.click();
  assert.equal(selections.at(-1).id,all[1].id);assert.equal(JSON.stringify(selections.at(-1)),JSON.stringify(all[1]));assert.equal(popups.at(-1).element.children[0].textContent,'second');
  assert.equal(JSON.stringify(map.lastBounds.points),JSON.stringify([[106.3,11.3]]));assert.equal(JSON.stringify(all),before);
- assert.equal(map.sources.assets.data.features.length,2,'both accepted identities remain in map data');
+ assert.equal(map.sources.assets.data.features.length,2,'both accepted identities remain in map data');cleanup();
+});
+
+test('asset basemap prefers the configured owner provider and accepts readiness only for its current source',async()=>{
+ const h=await assetMapHarness(),id=h.basemapId(),source=h.map.sources[id];
+ assert.match(source.url,/^https:\/\/api\.maptiler\.com\/maps\/streets\/256\/tiles\.json\?key=unit_test_asset_map_owner_123$/);
+ assert.equal(source.tileSize,256);assert.match(source.attribution,/MapTiler/);assert.match(source.attribution,/OpenStreetMap contributors/);
+ assert.equal(h.timers.size,1,'only the basemap deadline remains after independent asset initialization');
+ h.map.emit('sourcedata',{sourceId:'assets',isSourceLoaded:true});assert.equal(h.timers.size,1,'asset readiness cannot claim basemap success');
+ h.map.emit('sourcedata',{sourceId:id,isSourceLoaded:false});assert.equal(h.timers.size,1);
+ h.map.emit('sourcedata',{sourceId:id,isSourceLoaded:true});assert.equal(h.timers.size,0);
+ assert.equal(h.basemapId(),id);assert.equal(h.map.sources.assets.data.features.length,2);assert.equal(JSON.stringify(h.all),h.before);
+ h.cleanup();assert.ok(h.map.removed);assert.equal(h.timers.size,0);
+ h.map.emit('error',{sourceId:id});assert.equal(h.basemapId(),id,'late errors cannot restart a disposed map');
+});
+
+test('failed asset imagery falls back once, removes patchwork and retries without moving or recreating assets',async()=>{
+ const h=await assetMapHarness(),preferred=h.basemapId(),assetSource=h.map.sources.assets,moves=h.map.cameraMoves;
+ h.map.emit('error',{sourceId:preferred});const fallback=h.basemapId();
+ assert.notEqual(fallback,preferred);assert.equal(h.map.sources[preferred],undefined);assert.equal(h.map.getLayer(preferred),undefined);
+ assert.equal(JSON.stringify(h.map.sources[fallback].tiles),JSON.stringify(STREET_LAYER.tiles));
+ h.map.emit('error',{sourceId:preferred});assert.equal(h.basemapId(),fallback,'stale errors do not replace a newer source');
+ h.map.emit('error',{sourceId:fallback});assert.equal(h.basemapId(),undefined,'all failed raster fragments are removed');
+ assert.ok(!h.map.layers.some(layer=>layer.type==='raster'));assert.equal(h.map.sources.assets,assetSource);
+ assert.equal(h.maps.length,1);assert.equal(h.markers.length,1);assert.equal(h.map.cameraMoves,moves);
+ assert.equal(h.timers.size,0,'failed OSM does not loop through automatic retries');
+ h.retry();const retried=h.basemapId();assert.notEqual(retried,preferred);assert.notEqual(retried,fallback);
+ assert.match(h.map.sources[retried].url,/api\.maptiler\.com/);assert.equal(h.timers.size,1);
+ h.map.emit('sourcedata',{sourceId:fallback,isSourceLoaded:true});assert.equal(h.timers.size,1,'late fallback success cannot clear the retry deadline');
+ h.map.emit('sourcedata',{sourceId:retried,isSourceLoaded:true});assert.equal(h.timers.size,0);
+ assert.ok(!descendants(h.render()).some(node=>node.props?.className==='basemap-notice'),'successful recovery clears the unavailable notice');
+ assert.equal(h.map.sources.assets,assetSource);assert.equal(h.map.cameraMoves,moves);assert.equal(h.maps.length,1);assert.equal(h.markers.length,1);
+ assert.ok(h.map.layers.findIndex(layer=>layer.id===retried)<h.map.layers.findIndex(layer=>layer.id==='reservoir-context'),'retried basemap remains behind asset/context overlays');
+ h.markers[0].element.events.click({stopPropagation(){}});
+ const choices=h.popups.at(-1).element.children.filter(child=>child.tag==='button');choices[1].events.click();
+ assert.equal(h.selections.at(-1).id,'second');assert.equal(JSON.stringify(h.all),h.before);h.cleanup();
+});
+
+test('missing owner configuration uses OSM directly and timeouts leave clean context with a focused retry',async()=>{
+ const h=await assetMapHarness({configured:false}),first=h.basemapId();
+ assert.equal(h.map.sources[first].url,undefined);assert.equal(JSON.stringify(h.map.sources[first].tiles),JSON.stringify(STREET_LAYER.tiles));
+ const timer=[...h.timers][0];h.timers.delete(timer);timer.callback();
+ assert.equal(h.basemapId(),undefined);assert.ok(!h.map.layers.some(layer=>layer.type==='raster'));
+ const reset=descendants(h.render()).find(node=>node.type==='button'&&node.props.children==='Reset map');assert.equal(reset.props.disabled,false,'asset map remains usable after only basemap failure');
+ h.retry();assert.equal(JSON.stringify(h.map.sources[h.basemapId()].tiles),JSON.stringify(STREET_LAYER.tiles));
+ h.cleanup();assert.equal(h.timers.size,0);const active=h.basemapId();
+ h.map.emit('sourcedata',{sourceId:active,isSourceLoaded:true});h.map.emit('error',{sourceId:active});assert.equal(h.basemapId(),active,'cleanup prevents late source events from adding backgrounds');
 });
