@@ -11,11 +11,18 @@ class Settings(BaseSettings):
 
     reviewed_provenance_path: Path | None = None
 
-    # Local-only experimental retrieval. No provider credentials or network adapter.
+    # Local-only experimental retrieval and separately authorized generation.
     rag_lite_enabled: bool = False
     rag_lite_allowlist_path: Path | None = None
     rag_lite_index_dir: Path = Path(__file__).resolve().parents[4] / "storage/rag-lite"
     rag_lite_max_context_chars: int = 12000
+
+    rag_generation_enabled: bool = False
+    rag_provider: str = "none"
+    rag_ollama_model: str = ""
+    rag_generation_authorization_path: Path | None = None
+    rag_generation_daily_limit: int = Field(default=20, ge=1, le=200)
+    rag_generation_timeout_seconds: float = Field(default=8, ge=1, le=10)
 
     mcp_enabled: bool = Field(default=False, validation_alias="MVDT_MCP_ENABLED")
     mcp_grant_path: Path | None = Field(

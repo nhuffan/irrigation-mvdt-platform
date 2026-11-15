@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.db.session import read_only_session
 from app.schemas.rag_lite import RagCoverage, RagQuery, RagResponse
+from app.services.rag_lite.generation import generation_available, grounded_response
 from app.services.rag_lite.retriever import retrieve
 from app.services.storage_service import get_storage
 from app.storage.base import Storage
@@ -49,12 +50,13 @@ def rate_limit(request: Request):
 
 
 @router.get("/status")
-def preview_status(response: Response):
+def preview_status(response: Response, reservoir_id: UUID | None = None):
     response.headers["Cache-Control"] = "no-store"
+    available = generation_available(settings, reservoir_id)
     return {
         "enabled": settings.rag_lite_enabled,
-        "generation_available": False,
-        "mode": "retrieval_only",
+        "generation_available": available,
+        "mode": "grounded_answer" if available else "retrieval_only",
         "label": "EXPERIMENTAL / FUTURE WORK",
     }
 
@@ -71,7 +73,14 @@ def query(
     storage: Annotated[Storage, Depends(get_storage)],
 ):
     response.headers["Cache-Control"] = "no-store"
-    return retrieve(db, storage, settings, body)
+    if body.mode == "evidence_only" or not settings.rag_generation_enabled:
+        return retrieve(db, storage, settings, body)
+    evidence_request = body.model_copy(update={"mode": "evidence_only"})
+    evidence = retrieve(db, storage, settings, evidence_request)
+    # Everything needed for the answer is already materialized. Close the
+    # read-only transaction before checking or contacting the model.
+    db.close()
+    return grounded_response(settings, body, evidence)
 
 
 @router.get("/demo-questions", dependencies=[Depends(enabled)])
