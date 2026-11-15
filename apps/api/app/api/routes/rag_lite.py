@@ -7,11 +7,10 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.session import SessionLocal
+from app.db.session import read_only_session
 from app.schemas.rag_lite import RagCoverage, RagQuery, RagResponse
 from app.services.rag_lite.retriever import retrieve
 from app.services.storage_service import get_storage
@@ -28,11 +27,8 @@ def enabled():
 
 
 def get_rag_db():
-    with SessionLocal() as db:
-        db.execute(text("SET TRANSACTION READ ONLY"))
-        db.execute(text("SET LOCAL statement_timeout = '5000ms'"))
+    with read_only_session() as db:
         yield db
-        # Context closes with rollback, never commit.
 
 
 def rate_limit(request: Request):

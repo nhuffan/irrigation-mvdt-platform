@@ -1,6 +1,7 @@
 from collections.abc import Generator
+from contextlib import contextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
@@ -24,3 +25,12 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+@contextmanager
+def read_only_session() -> Generator[Session, None, None]:
+    with SessionLocal() as db:
+        db.execute(text("SET TRANSACTION READ ONLY"))
+        db.execute(text("SET LOCAL statement_timeout = '5000ms'"))
+        yield db
+        # Closing the session rolls back even when the caller raises.

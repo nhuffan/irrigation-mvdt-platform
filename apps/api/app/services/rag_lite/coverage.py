@@ -2,16 +2,28 @@
 
 from app.schemas.rag_lite import RagCoverage, RagCoverageDiagnostics
 from app.services.rag_lite.indexer import inspect_document, load_allowlist
-from app.services.rag_lite.retriever import documents_for_reservoir, reviewed_records
+from app.services.rag_lite.retriever import (
+    EvidenceSelection,
+    documents_for_reservoir,
+    reviewed_records,
+)
 from app.services.rag_lite.sections import scoped_chunks
 
 
-def search_coverage(db, storage, settings, reservoir_id, asset_id=None):
+def search_coverage(
+    db,
+    storage,
+    settings,
+    reservoir_id,
+    asset_id=None,
+    *,
+    selection: EvidenceSelection | None = None,
+):
     result = RagCoverage()
     records = (
         [
             r
-            for r in reviewed_records(db, asset_id)
+            for r in reviewed_records(db, asset_id, selection)
             if r.source.reservoir_id == reservoir_id
         ]
         if asset_id
@@ -20,7 +32,7 @@ def search_coverage(db, storage, settings, reservoir_id, asset_id=None):
     source_ids = {r.source_id for r in records}
     docs = [
         d
-        for d in documents_for_reservoir(db, reservoir_id)
+        for d in documents_for_reservoir(db, reservoir_id, selection)
         if not asset_id or d.source_id in source_ids
     ]
     reasons = []

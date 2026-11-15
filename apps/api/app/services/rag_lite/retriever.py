@@ -1,6 +1,9 @@
 import math
 import re
 import unicodedata
+from collections.abc import Mapping
+from dataclasses import dataclass
+from uuid import UUID
 
 from sqlalchemy import select
 
@@ -274,7 +277,15 @@ def attribute_matches_literal(record, question, query_tokens):
     return explicit <= set(word_signatures(field + " " + value).values())
 
 
-def reviewed_records(db, asset_id):
+@dataclass(frozen=True)
+class EvidenceSelection:
+    """Additional source/export restrictions for a caller of the retriever."""
+
+    source_ids: frozenset[UUID]
+    document_checksums: Mapping[UUID, str]
+
+
+def reviewed_records(db, asset_id, selection: EvidenceSelection | None = None):
     return [
         r
         for r in list_records(db, asset_id, "technical")
@@ -283,6 +294,7 @@ def reviewed_records(db, asset_id):
         and r.source
         and r.verification_status != "REJECTED"
         and r.source.verification_status != "REJECTED"
+        and (selection is None or r.source_id in selection.source_ids)
     ]
 
 
@@ -295,19 +307,31 @@ def source_scopes(db, reservoir_id):
     return {key: sorted(value) for key, value in scopes.items()}
 
 
-def documents_for_reservoir(db, reservoir_id):
-    return list(
-        db.scalars(
-            select(Document)
-            .join(DataSource)
-            .where(
-                DataSource.reservoir_id == reservoir_id,
-                DataSource.verification_status != "REJECTED",
-                Document.mime_type == "application/pdf",
-            )
-            .order_by(Document.id)
+def documents_for_reservoir(
+    db, reservoir_id, selection: EvidenceSelection | None = None
+):
+    query = (
+        select(Document)
+        .join(DataSource)
+        .where(
+            DataSource.reservoir_id == reservoir_id,
+            DataSource.verification_status != "REJECTED",
+            Document.mime_type == "application/pdf",
         )
     )
+    if selection is not None:
+        query = query.where(
+            Document.source_id.in_(selection.source_ids),
+            Document.id.in_(tuple(selection.document_checksums)),
+        )
+    docs = list(db.scalars(query.order_by(Document.id)))
+    if selection is not None:
+        docs = [
+            doc
+            for doc in docs
+            if selection.document_checksums[doc.id] == doc.checksum_sha256
+        ]
+    return docs
 
 
 def attribute_citation(record):
@@ -355,7 +379,9 @@ def result_window(request, ranked):
     )
 
 
-def retrieve(db, storage, settings, request):
+def retrieve(
+    db, storage, settings, request, *, selection: EvidenceSelection | None = None
+):
     limitations = []
     if any(phrase in fold(request.question) for phrase in UNSUPPORTED):
         return respond(
@@ -392,7 +418,7 @@ def retrieve(db, storage, settings, request):
             )
         records = [
             r
-            for r in reviewed_records(db, asset.id)
+            for r in reviewed_records(db, asset.id, selection)
             if r.source.reservoir_id == request.reservoir_id
         ]
     query_tokens = tokens(search_question)
@@ -435,7 +461,7 @@ def retrieve(db, storage, settings, request):
     candidates = []
     documents = [
         doc
-        for doc in documents_for_reservoir(db, request.reservoir_id)
+        for doc in documents_for_reservoir(db, request.reservoir_id, selection)
         if not request.asset_id or doc.source_id in source_ids
     ]
     reasons = []

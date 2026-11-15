@@ -228,7 +228,7 @@ def build_index(
 
 def inspect_document(storage, settings, doc, allowlist):
     """Read-only diagnostics; authorization precedes every filesystem access."""
-    if allowlist.get(str(doc.id)) != doc.checksum_sha256:
+    if not doc.checksum_sha256 or allowlist.get(str(doc.id)) != doc.checksum_sha256:
         return None, ["NOT_AUTHORIZED"]
     try:
         read_pdf(storage, doc)
