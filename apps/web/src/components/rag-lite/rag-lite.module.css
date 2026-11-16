@@ -47,7 +47,9 @@
 .excerpt:has(> details[open]) .clamp, .excerpt:has(> details[open]) .expandText { display: none; }
 .excerpt:has(> details[open]) .collapseText { display: block; }
 .fullExcerpt { white-space: pre-wrap; color: #334e3e; font-size: var(--type-control); line-height: 1.8; margin-top: 12px; }
-.answer { white-space: pre-wrap; line-height: 1.8; margin-bottom: 20px; }
+.answer { margin-bottom: 20px; }
+.answer h3 { margin-bottom: 8px; }
+.answer p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; }
 .srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @media (max-width: 900px) {
   .searchRow { grid-template-columns: minmax(0, 1fr) auto; }

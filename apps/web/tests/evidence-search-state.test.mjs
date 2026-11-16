@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseEvidenceSearch, evidenceSearchUrl, evidenceAssetGroups } from '../src/lib/evidence-search-state.ts';
+import { parseEvidenceSearch, evidenceSearchUrl, evidenceAssetGroups, evidenceQueryPayload } from '../src/lib/evidence-search-state.ts';
 const asset = '11111111-1111-4111-8111-111111111111';
 const base = { q: 'cao trình ngưỡng', scope: 'asset', asset, search: 'document', page: '2' };
 test('a returned search restores exact scope, query, mode, field and page, never excerpts', () => {
@@ -27,6 +27,16 @@ test('stale or malformed return queries cannot select unknown assets or broaden 
     { page: '0' }, { page: '-1' }, { page: '1.5' }, { page: '10001' }, { page: ['1', '2'] },
   ]) assert.equal(parseEvidenceSearch({ ...base, ...patch }, [asset]), null, JSON.stringify(patch));
 });
+
+test('only explicit grounded requests use top-k and history restores paginated evidence', () => {
+  const state = parseEvidenceSearch({ ...base, mode: 'grounded_answer' }, [asset]);
+  const scope = { question: base.q, asset_id: asset, all_authorized_docs: false, query_type: 'document' };
+  assert.deepEqual(evidenceQueryPayload(state, 'grounded_answer'), { ...scope, mode: 'grounded_answer', top_k: 5 });
+  const url = evidenceSearchUrl('/ai-research-preview', state);
+  assert.doesNotMatch(url, /grounded_answer/);
+  const restored = parseEvidenceSearch(Object.fromEntries(new URL(url, 'http://local').searchParams), [asset]);
+  assert.deepEqual(evidenceQueryPayload(restored), { ...scope, mode: 'evidence_only', page: 2, page_size: 5 });
+});
 test('grouped selection preserves all exact asset UUIDs including parents without inherited scope', () => {
   const assets = [{ id: 'dam', parent_asset_id: null }, { id: 'intake', parent_asset_id: null },
     { id: 'c1', parent_asset_id: 'intake' }, { id: 'c2', parent_asset_id: 'intake' },
@@ -46,6 +56,7 @@ test('Back restoration parses the actual URL and rejects duplicated hidden scope
   assert.equal(evidenceSearchFromUrl('/ai-research-preview',[asset]),null);
   assert.match(evidenceRequestError(429), /limit reached.*minute/);
   assert.match(evidenceRequestError(404), /disabled/);
+  assert.match(evidenceRequestError(504), /timed out/);
   assert.match(evidenceRequestError(503), /connection and retry/);
   assert.doesNotMatch(evidenceRequestError(500), /no evidence|no data/i);
 });

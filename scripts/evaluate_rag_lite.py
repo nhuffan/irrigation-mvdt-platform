@@ -5,6 +5,7 @@ import csv
 import hashlib
 import io
 import json
+import re
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
@@ -25,6 +26,35 @@ def fetch(url, payload=None):
     )
     with urlopen(request, timeout=20) as response:
         return response.read()
+
+
+def generated_answer_checks(row, response):
+    expected_text = (row.get("expected_answer_text") or "").strip()
+    answered = response["status"] == "ANSWERED"
+    if not (answered or row["expected_status"] == "ANSWERED" or expected_text):
+        return {}
+
+    answer = response.get("answer")
+    inline = (
+        set(re.findall(r"\[([^\]]+)\]", answer)) if isinstance(answer, str) else set()
+    )
+    returned_ids = [citation["citation_id"] for citation in response["citations"]]
+    returned = set(returned_ids)
+    return {
+        "expected_answer_text_matched": (
+            answered
+            and isinstance(answer, str)
+            and expected_text.casefold() in answer.casefold()
+            if expected_text
+            else ""
+        ),
+        "inline_citations_bound": (
+            answered
+            and bool(inline)
+            and inline == returned
+            and len(returned_ids) == len(returned)
+        ),
+    }
 
 
 def main():
@@ -189,6 +219,7 @@ def main():
             c["asset_id"] == (None if attribution == "none" else attribution)
             for c in citations
         )
+        generation_checks = generated_answer_checks(row, value)
         passed = (
             value["status"] == row["expected_status"]
             and (hit if expected_hit else not citations)
@@ -198,6 +229,7 @@ def main():
             and irrelevant == 0
             and reasons_ok
             and attribution_ok
+            and all(check is not False for check in generation_checks.values())
         )
         results.append(
             {
@@ -238,6 +270,7 @@ def main():
                 exact_asset_attribution=attribution_ok,
                 returned_reasons="|".join(value.get("reason_codes", [])),
             )
+        results[-1].update(generation_checks)
     with args.output.open("x") as output:
         writer = csv.DictWriter(
             output,

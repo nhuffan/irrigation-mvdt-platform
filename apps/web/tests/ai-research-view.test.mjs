@@ -9,19 +9,23 @@ const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 const source = readFileSync(new URL('../src/app/ai-research-preview/page.tsx',import.meta.url),'utf8');
 const compiled = ts.transpileModule(source,{compilerOptions:{jsx:ts.JsxEmit.ReactJSX,module:ts.ModuleKind.CommonJS}}).outputText;
-async function render({enabled=true,statusError=false,assetError=false}={}) {
+async function render({enabled=true,generationAvailable,statusError=false,assetError=false,assets=[]}={}) {
   const exports={};
   const dependencies = {
     '@/components/ui/retry-view':{RetryView:()=>React.createElement('button',null,'Retry')},
     '@/lib/evidence-search-state':{parseEvidenceSearch:()=>null},
-    '@/components/rag-lite/ask-panel':{AskPanel:()=>React.createElement('section',null,'Evidence form')},
-    '@/lib/api':{getReservoirAssets:async()=>{if(assetError)throw new Error('test unavailable');return[];}},
+    '@/components/rag-lite/ask-panel':{AskPanel:props=>React.createElement('section',null,props.generationAvailable?'Evidence form and grounded answers':'Evidence form')},
+    '@/lib/api':{getReservoirAssets:async()=>{if(assetError)throw new Error('test unavailable');return assets;}},
     '@/lib/site-scope':{MANAGED_RESERVOIR_ID:'synthetic-reservoir'},
     '@/components/rag-lite/rag-lite.module.css':{default:{}},
   };
   vm.runInNewContext(compiled,{
     exports,require:id=>dependencies[id]??require(id),process:{env:{}},AbortSignal,
-    fetch:async()=>{if(statusError)throw new Error('test network failure');return{ok:true,json:async()=>({enabled})};},
+    fetch:async(url)=>{
+      if(statusError)throw new Error('test network failure');
+      const reservoir=new URL(url).searchParams.get('reservoir_id');
+      return{ok:true,json:async()=>({enabled,generation_available:reservoir==='synthetic-reservoir'&&generationAvailable})};
+    },
   });
   return renderToStaticMarkup(await exports.default({searchParams:Promise.resolve({})}));
 }
@@ -36,4 +40,13 @@ test('asset API failure remains unknown and offers retry instead of a zero count
 });
 test('a successful empty asset response is distinct from a failed asset API',async()=>{
   const html=await render();assert.match(html,/No research assets are registered/);assert.doesNotMatch(html,/Retry|could not be loaded/);
+});
+test('only explicit backend readiness for the managed reservoir enables grounded answers',async()=>{
+  const assets=[{id:'synthetic-asset',asset_code:'RS-SYNTHETIC',name:'Synthetic asset',parent_asset_id:null}];
+  assert.match(await render({assets,generationAvailable:true}),/Evidence form and grounded answers/);
+  for(const generationAvailable of [undefined,false,'true']){
+    const html=await render({assets,generationAvailable});
+    assert.match(html,/Evidence form/);assert.doesNotMatch(html,/grounded answers/);
+  }
+  assert.doesNotMatch(await render({assets,enabled:false,generationAvailable:true}),/Evidence form/);
 });

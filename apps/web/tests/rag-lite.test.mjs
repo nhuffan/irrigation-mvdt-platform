@@ -38,7 +38,16 @@ test('retrieval and generation outcomes remain distinct while retained evidence 
     ['ANSWERED', '1 reference'],
   ];
   for (const [status, expected] of scenarios) assert.equal(resultHeading(result({ status })), expected);
-  assert.equal(resultHeading(result({ status: 'GENERATION_UNAVAILABLE', citations: [] })), 'No matches');
+  assert.equal(resultHeading(result({ status: 'GENERATION_UNAVAILABLE', citations: [] })), 'Grounded answer unavailable');
+});
+
+test('an unsupported grounded answer retains citations and distinguishes missing or invalid evidence', () => {
+  const unsupported = result({ status: 'NOT_ENOUGH_EVIDENCE' });
+  assert.match(searchFeedback(unsupported, 'grounded_answer').description, /insufficient evidence.*original evidence/);
+  assert.equal(searchFeedback({ ...unsupported, citations: [] }, 'grounded_answer').title, 'Not enough evidence');
+  const partlyUnavailable = searchFeedback({ ...unsupported, reason_codes: ['DOCUMENT_INVALID'] }, 'grounded_answer');
+  assert.equal(partlyUnavailable.title, '1 reference · incomplete');
+  assert.match(partlyUnavailable.description, /insufficient evidence.*could not be searched/);
 });
 
 test('exact source values retain numeric zero, original spelling and empty text without translation', () => {
@@ -204,7 +213,7 @@ test('provider failure and limited text coverage are distinct from document inte
   const retained = result({ status: 'GENERATION_UNAVAILABLE', limitations });
   assert.equal(resultHeading(retained), '1 reference');
   assert.equal(criticalRetrievalIssue(retained), false);
-  assert.equal(resultHeading({ ...retained, citations: [] }), 'No matches');
+  assert.equal(resultHeading({ ...retained, citations: [] }), 'Grounded answer unavailable');
 });
 
 

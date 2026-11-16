@@ -1,6 +1,6 @@
 # Experimental historical evidence search
 
-Optional future-work preview for read-only SQL attribute lookup and local PDF keyword search. The feature defaults to OFF. It preserves reviewed provenance, exact historical values/units and parent/component scope. No external LLM adapter is connected; grounded-answer requests return `GENERATION_UNAVAILABLE` with retrieval evidence.
+Optional research preview for read-only SQL attribute lookup and local PDF keyword search. The preview defaults to OFF. It preserves reviewed provenance, exact historical values and units, and parent/component scope. Evidence-only is the default search mode. The optional Ollama adapter uses a local model and requires a separate model-processing grant.
 
 ## Configuration
 
@@ -19,6 +19,28 @@ Follow the single [root local startup workflow](../../README.md#chạy-local), w
 Keep an existing valid checksum-pinned index. Section-pinned documents require the reviewed onboarding boundaries for recovery; a generic rebuild reports `SECTION_REVIEW_REQUIRED` and leaves their cache untouched. For other authorized documents, only if the index is absent or stale, explicitly rebuild it from `apps/api` with `uv run python -m scripts.build_rag_lite_index --reservoir-id 63adca21-9195-44e2-81a2-0475bd6829f3` before enabling the preview. Do not reseed or reset the database.
 
 Open [AI Research Preview](http://localhost:3000/ai-research-preview). Select an exact asset/component, or explicitly search all authorized documents. Use an attribute key for exact SQL lookup and source-language keywords for document search. Parent/child records are not inherited. Stop both processes with Ctrl+C; set `RAG_LITE_ENABLED=false` and restart the API to disable the preview.
+
+## Local MCP client
+
+From `apps/api`, run `uv sync --locked`. Configure the MCP client's command as `uv`, its arguments as `run --locked --directory /absolute/path/to/repo/apps/api python -m app.mcp.server`, and its environment with `MVDT_MCP_ENABLED=true` and `MVDT_MCP_GRANT_PATH=/absolute/path/to/ignored/host-grant.json`. The server uses the configured PostGIS, storage and RAG-lite index. The client launches the stdio process directly.
+
+The host grant is a JSON object with `version: 1`, a real permission reference in `authorization`, `reservoir_id`, `asset_ids` and `source_ids` arrays, and `document_checksums` mapping allowed document UUIDs to original SHA-256 hashes. `allow_evidence` permits excerpts and reviewed values, while `allow_links` additionally permits relative application URLs. Both permissions default to false. Check where the MCP client sends tool output before granting it evidence text. A revoked or unreadable grant stops tool access.
+
+List the four tools first. Use `get_asset_details` with exact reservoir and asset UUIDs, `get_document_provenance` with a granted source UUID, and `get_research_coverage` to check the available evidence. Call `search_evidence` with either that asset UUID or `all_authorized_docs=true`. A corpus-wide result has no asset attribution.
+
+## Local grounded answers
+
+Run a trusted Ollama daemon at `127.0.0.1:11434` with an installed local model, `OLLAMA_NO_CLOUD=1` and request-body logging disabled. Confirm cloud is disabled in the daemon startup log. Set `RAG_LITE_ENABLED=true`, `RAG_GENERATION_ENABLED=true`, `RAG_PROVIDER=ollama`, `RAG_OLLAMA_MODEL=<model:tag>` and `RAG_GENERATION_AUTHORIZATION_PATH=/absolute/path/to/ignored/model-grant.json` on the API. Use a local or otherwise access-controlled copy of the preview. [Ollama cloud settings](https://docs.ollama.com/faq#how-do-i-disable-ollamas-cloud-features) · [Structured outputs](https://docs.ollama.com/capabilities/structured-outputs)
+
+The separate model grant is a JSON object with `version: 1`, `authorization`, `provider: "ollama"`, `model` matching the configured tag, and `reservoir_id`. Add only granted entries to `records` (`source_id` and exact `citation_id` from an evidence-only result) or `documents` (`source_id`, `document_id` and `checksum_sha256`). A changed record fingerprint or PDF checksum requires a new grant. Keep authorizations outside Git.
+
+The preview shows **Grounded answer** when model readiness and the reservoir grant are available. Start with **Evidence only**, then ask for an answer in the same scope and follow its citation to the record or physical PDF page. Back and reload restore the evidence search. If the model fails, the retrieval evidence remains available. The daily limit and concurrency cap apply per API worker, so use one worker for a single local quota.
+
+## Optional remote MCP transport
+
+The standalone `app.mcp.remote:app` starts with `/mcp` disabled. For an authorized deployment, configure `MVDT_MCP_REMOTE_ENABLED=true`, the exact HTTPS URL ending in `/mcp`, the trusted issuer, its RS256 PEM public key and a separate remote disclosure grant using the variables in `apps/api/.env.example`. The reverse proxy must preserve the public Host and trusted HTTPS scheme. Apply shared rate and connection limits at the proxy and keep the original-content API private. Use the issuer's current public signing key and restart the resource server after key rotation.
+
+The identity provider must issue short-lived RS256 JWT access tokens with this URL in `aud` and limit `mvdt:read:<reservoir UUID>` to readers of that reservoir. Grant `mvdt:export:<reservoir UUID>` only to principals permitted to export excerpts and values. Export also requires `allow_evidence` in the remote disclosure grant. Remote tool responses omit original URLs. Verify TLS, identity-provider discovery, scope assignment, ingress limits and egress policy in the target environment before exposing the service. [MCP authorization specification](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)
 
 ## Incremental local PDF onboarding
 
@@ -59,9 +81,9 @@ pnpm --dir apps/web build
 node --test apps/web/tests/*.test.mjs
 ```
 
-The evaluator requires running enabled local services and the pinned corpus. Its default output is a new timestamped CSV; explicit output paths must not already exist. Existing measurements are never overwritten. Additional hit@1/hit@3 and returned-page columns preserve the original result columns. [Cases](rag_lite_eval_cases.csv) contain source-checked expected record/page IDs; [results](rag_lite_eval_results.csv) are written only by actual executions. They remain separate from the historical participant-study protocol.
+The evaluator requires running enabled local services and the pinned corpus. Its default output is a new timestamped CSV. Choose a fresh path for each run. For grounded-answer cases, use an optional `expected_answer_text` column to check a required phrase alongside the expected record or page. The evaluator also checks that an answered response binds every inline citation to the returned citations. Review all other generated claims against the cited source. [Cases](rag_lite_eval_cases.csv) contain source-checked expected record/page IDs and [results](rag_lite_eval_results.csv) are measured runs, separate from the historical participant study.
 
-Limits: 1,000-character questions, top-k 1–8, 25 MiB PDFs, 300 extracted pages per PDF (longer originals require explicit reviewed partial selection), 8 KiB web requests and 30 queries/minute per client host/process. This is a local retrieval-only prototype: no OCR, translation/embedding model, current-condition inference or operational advice. PDF searches require all meaningful keywords and prefer exact normalized phrases. A small local engineering vocabulary also matches attested concepts such as crest elevation, earthfill and bentonite core walls; the full concept must match, and explicit Vietnamese diacritics outside it remain constrained. Numbers are compared as whole literals: decimal commas with one/two fractional digits and spaced thousands are recognized; ambiguous three-digit comma forms stay literal. Original values/text are never reformatted and units are never converted. Explicitly accented query keywords constrain matches by base letters and diacritic inventory; unaccented keywords remain accent-insensitive. This removes the source-checked dày/đáy and tâm/tam collision in the fixed wall-thickness case. Missing source accents, identical diacritic inventories in different positions, and paraphrases can still cause misses or collisions. Check original PDF pages; keyword hits and citation validity do not prove engineering correctness. Public deployment needs access controls and shared rate limits.
+Limits include 1,000-character questions, top-k 1–8, 25 MiB PDFs, at most 300 extracted pages per PDF, 8 KiB web requests and 30 queries/minute per client host/process. Longer originals require explicit reviewed partial selection. Search and optional generation are for historical or reference evidence. PDF searches require all meaningful keywords and prefer exact normalized phrases. A small engineering vocabulary also matches attested concepts such as crest elevation, earthfill and bentonite core walls. Full concepts and explicitly accented keywords constrain matches. Numbers are compared as whole literals, including decimal commas with one or two fractional digits and spaced thousands. Ambiguous three-digit comma forms stay literal. Missing source accents, identical diacritic inventories in different positions, and paraphrases can still cause misses or collisions. Check the original PDF pages and preserve original units. Public deployment needs access controls and shared rate limits.
 
 
 ## Project demonstration

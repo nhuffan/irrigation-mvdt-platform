@@ -22,9 +22,9 @@ pnpm dev:web
 
 MVDT và **AI Research** dùng chung web [localhost:3000](http://localhost:3000) và API [localhost:8000](http://localhost:8000/docs). Mở [AI Research](http://localhost:3000/ai-research-preview) từ tab navigation. Dùng lại đúng instance của project nếu cổng3000/8000 đã được sử dụng; không mở stack thứ hai.
 
-Kiểm tra trạng thái: `curl http://localhost:8000/api/v1/experimental/rag-lite/status`. `enabled=true` cho phép tìm bằng chứng; `generation_available=false` là chủ đích retrieval-only, không phải lỗi. Allowlist được cấp quyền, PDF gốc đúng checksum và index local phải có sẵn; các tài liệu riêng và file runtime này không được commit. Xem [cấu hình và giới hạn](research/ai-poc/README.md).
+Kiểm tra trạng thái bằng `curl http://localhost:8000/api/v1/experimental/rag-lite/status`. `enabled=true` cho phép tìm bằng chứng. `generation_available=true` báo model local đã sẵn sàng trong phạm vi được cấp quyền. Tra cứu PDF dùng allowlist, PDF gốc đúng checksum và index local. [Hướng dẫn AI Research, MCP và quyền dữ liệu](research/ai-poc/README.md)
 
-Mặc định cấu hình `RAG_LITE_ENABLED=false`. Để tắt sau khi opt-in, dừng API bằng Ctrl+C rồi chạy `RAG_LITE_ENABLED=false pnpm dev:api`; hoặc `pnpm dev:api` nếu `.env` không bật cờ. Chưa kết nối LLM bên ngoài, sinh câu trả lời, OCR, dự đoán hiện trạng, tư vấn vận hành hay xác nhận chuyên môn độc lập.
+Tra cứu thử nghiệm, sinh câu trả lời qua Ollama và các transport MCP đều tắt mặc định. Để tắt preview sau khi dùng, dừng API bằng Ctrl+C rồi chạy `RAG_LITE_ENABLED=false pnpm dev:api`.
 
 Nếu database local chưa chạy, khởi động một lần bằng `pnpm db:up` trước hai terminal trên.
 

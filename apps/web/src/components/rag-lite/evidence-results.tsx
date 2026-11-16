@@ -3,7 +3,7 @@
 import type { RefObject } from "react";
 import { OriginLink } from "@/components/documents/document-link";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult } from "@/lib/rag-lite";
+import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult, type RagSearchMode } from "@/lib/rag-lite";
 import styles from "./rag-lite.module.css";
 
 function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
@@ -74,22 +74,13 @@ function DocumentCard({ citations }: { citations: RagCitation[] }) {
   </article>;
 }
 
-function revealCitation(id: string) {
-  const target = document.getElementById(id);
-  for (let parent = target?.parentElement; parent; parent = parent.parentElement) {
-    if (parent instanceof HTMLDetailsElement) parent.open = true;
-  }
-  target?.scrollIntoView({ block: "center", behavior: "smooth" });
-  target?.focus({ preventScroll: true });
-}
-
-export function EvidenceResults({ result, headingRef, onCorpus, onPage }: {
-  result: RagResult; headingRef: RefObject<HTMLHeadingElement | null>; onCorpus?: () => void; onPage: (page: number) => void;
+export function EvidenceResults({ result, mode, headingRef, onCorpus, onPage }: {
+  result: RagResult; mode: RagSearchMode; headingRef: RefObject<HTMLHeadingElement | null>; onCorpus?: () => void; onPage: (page: number) => void;
 }) {
   const attributes = result.citations.filter(c => c.kind === "technical_attribute");
   const documents = groupDocuments(result.citations);
   const retrievalIssue = criticalRetrievalIssue(result);
-  const feedback = searchFeedback(result);
+  const feedback = searchFeedback(result, mode);
   const paging = result.pagination;
   const reasonText = result.reason_codes?.map(evidenceReasonText).filter(Boolean).join(" ");
   return <section className={styles.results} aria-label="Search results" aria-describedby={reasonText ? "search-reason-details" : undefined}>
@@ -102,11 +93,14 @@ export function EvidenceResults({ result, headingRef, onCorpus, onPage }: {
         <span>Corpus-wide; no asset attribution.</span>
       </div>}
     </header>
-    {result.status === "ANSWERED" && result.answer && <div className={`panel ${styles.answer}`}>
-      {result.answer.split(/(\[[^\]]+\])/g).map((part, i) => {
+    {result.status === "ANSWERED" && result.answer && result.citations.length > 0 && <div className={`panel ${styles.answer}`}>
+      <h3>Grounded answer</h3>
+      <p>{result.answer.split(/(\[[^\]]+\])/g).map((part, i) => {
         const c = result.citations.find(citation => part === `[${citation.citation_id}]`);
-        return c ? <a className="text-link" key={i} href={`#${c.citation_id}`} onClick={() => revealCitation(c.citation_id)}>[{result.citations.indexOf(c) + 1}]</a> : part;
-      })}
+        if (!c) return part;
+        const kind = c.kind === "technical_attribute" ? "evidence" : "original";
+        return <EvidenceLink citation={c} kind={kind} key={i}>[{result.citations.indexOf(c) + 1}]</EvidenceLink>;
+      })}</p>
     </div>}
     {attributes.length > 0 && <div className={styles.attributeGrid}>{attributes.map(c => <AttributeCard key={c.citation_id} citation={c} />)}</div>}
     {documents.map(group => <DocumentCard key={group.documentId} citations={group.citations} />)}

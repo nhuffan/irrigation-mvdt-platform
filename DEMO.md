@@ -88,3 +88,7 @@ Stage13.1 đã kiểm tra trực tiếp năm reference, chọn đúng từng c�
 **Dừng:** Không mở wizard, chạy freeze, questionnaire, Intake/corpus pagination hay thêm live query trong tuyến5 phút. Phương pháp nghiên cứu chi tiết nằm trên slide học thuật và trong [protocol](research/evaluation/protocol.md), không phải thao tác chứng minh đã hoàn tất nghiên cứu.
 
 Sau buổi demo, chỉ Ctrl+C các web/API do bạn khởi chạy; giữ service có sẵn và database volume. Kết quả stage và giới hạn được lưu tại [STAGE_OUTPUTS.md](STAGE_OUTPUTS.md).
+
+## Minh họa bổ sung cho AI + MCP
+
+Chuẩn bị client `stdio` và grant riêng theo [cấu hình AI Research](research/ai-poc/README.md#local-mcp-client). Dùng dữ liệu tổng hợp cho buổi trình bày hoặc nguồn đã có quyền chia sẻ với client. Chạy `get_asset_details`, `get_research_coverage`, `search_evidence` và `get_document_provenance` cho cùng tài sản, đối chiếu record hoặc trang PDF gốc, rồi thử một UUID ngoài phạm vi để thấy kết quả bị từ chối. Khi model local và nguồn được cấp quyền xử lý, dùng **Grounded answer** trên AI Research và mở citation. Khi provider lỗi, chỉ ra bằng chứng vẫn còn trong kết quả. Tuyến trình bày chính ở trên sử dụng **Evidence only**.

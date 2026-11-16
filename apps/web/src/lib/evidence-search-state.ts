@@ -1,3 +1,5 @@
+import type { RagSearchMode } from "./rag-lite";
+
 /** Persist only a validated search request. Results are always rechecked against live evidence. */
 export type EvidenceSearchState = {
   assetId: string; allDocs: boolean; question: string;
@@ -37,6 +39,18 @@ export function evidenceSearchUrl(href: string, state: EvidenceSearchState | nul
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+export function evidenceQueryPayload(state: EvidenceSearchState, mode: RagSearchMode = "evidence_only") {
+  return {
+    question: state.question,
+    asset_id: state.allDocs ? null : state.assetId,
+    all_authorized_docs: state.allDocs,
+    mode,
+    query_type: state.queryType,
+    ...(state.attributeKey ? { attribute_key: state.attributeKey } : {}),
+    ...(mode === "grounded_answer" ? { top_k: 5 } : { page: state.page, page_size: 5 }),
+  };
+}
+
 type HierarchyAsset = { id: string; parent_asset_id: string | null };
 /** Retain exact UUID selection while grouping the existing small hierarchy. */
 export function evidenceAssetGroups<T extends HierarchyAsset>(assets: T[]): { parent: T; children: T[] }[] {
@@ -60,5 +74,6 @@ export function evidenceSearchFromUrl(href: string, assetIds: string[]): Evidenc
 export function evidenceRequestError(status: number): string {
   return status === 429 ? "Search limit reached. Wait a minute, then retry."
     : status === 404 ? "This experimental search is currently disabled."
+    : status === 504 ? "The request timed out. Check the local connection and retry."
     : "Search could not be completed. Check the local connection and retry.";
 }

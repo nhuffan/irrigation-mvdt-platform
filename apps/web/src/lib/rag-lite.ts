@@ -24,6 +24,8 @@ export type RagCitation = {
   authority: string | null;
 };
 
+export type RagSearchMode = "evidence_only" | "grounded_answer";
+
 export type RagResult = {
   status: "ANSWERED" | "RETRIEVAL_ONLY" | "NOT_ENOUGH_EVIDENCE" | "GENERATION_UNAVAILABLE";
   answer: string | null;
@@ -139,16 +141,20 @@ export function metadataLabel(value: string | null | undefined): string {
 
 
 /** One outcome per search; full diagnostics remain available on demand. */
-export function searchFeedback(result: RagResult): { title: string; description: string } {
+export function searchFeedback(result: RagResult, mode: RagSearchMode = "evidence_only"): { title: string; description: string } {
   const count = result.pagination?.total_results ?? result.citations.length;
+  const generationUnavailable = result.status === "GENERATION_UNAVAILABLE";
+  const needsEvidence = mode === "grounded_answer" && result.status === "NOT_ENOUGH_EVIDENCE";
+  const generationIssue = generationUnavailable ? "Grounded answer unavailable." : needsEvidence ? "There is insufficient evidence for a grounded answer." : "";
   if (criticalRetrievalIssue(result)) return {
     title: count ? `${count} ${count === 1 ? "reference" : "references"} · incomplete` : "Documents unavailable",
-    description: count ? "Some documents could not be searched. Available references are shown below." : "Verify the original files and local index, then retry.",
+    description: [generationIssue, count ? "Some documents could not be searched. Available references are shown below." : "Verify the original files and local index, then retry."].filter(Boolean).join(" "),
   };
   if (count) return {
     title: `${count} ${count === 1 ? "reference" : "references"}`,
-    description: result.status === "GENERATION_UNAVAILABLE" ? "AI summary unavailable; original evidence is shown below." : "",
+    description: generationIssue ? `${generationIssue} The original evidence is shown below.` : "",
   };
+  if (generationUnavailable) return { title: "Grounded answer unavailable", description: "Search evidence to inspect the original records and documents." };
   const codes = result.reason_codes ?? [];
   if (codes.includes("OUT_OF_SCOPE")) return { title: "Outside search scope", description: "Search covers historical evidence, not current condition or operating advice." };
   if (codes.includes("SCOPE_MISMATCH")) return { title: "Check the selected asset", description: "Select the exact asset or component named in your question." };
@@ -159,7 +165,7 @@ export function searchFeedback(result: RagResult): { title: string; description:
   if (codes.includes("EXTRACTION_LIMITED") && !codes.includes("NO_MATCH")) return { title: "No searchable match", description: "The linked originals have limited extracted text." };
   if (codes.includes("NO_SCOPED_PASSAGE") && !codes.includes("NO_MATCH")) return { title: "No reviewed PDF passages", description: "The linked original has no reviewed passage for this exact asset. Try a reviewed field or search all authorized PDFs." };
   if (codes.includes("NO_REVIEWED_ATTRIBUTE")) return { title: "No reviewed fields", description: "No reviewed technical fields are available for this asset." };
-  return { title: "No matches", description: "Try fewer keywords or wording from the original document." };
+  return { title: needsEvidence ? "Not enough evidence" : "No matches", description: "Try fewer keywords or wording from the original document." };
 }
 
 
