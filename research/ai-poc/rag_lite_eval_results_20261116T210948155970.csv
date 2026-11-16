@@ -1,0 +1,9 @@
+case_id,status,passed,latency_ms,hit_at_5,exact_value_unit_asset,citation_count,resolvable_citations,citation_ids,hit_at_1,hit_at_3,returned_pdf_pages,grounded_content,irrelevant_passages,expected_answer_text_matched,inline_citations_bound,expected_reasons_present,exact_asset_attribution,returned_reasons
+GA-MD1,ANSWERED,True,2560.914,True,True,1,1,attr-7e6f08e6-7b86-5e24-861b-968ea40a184a-43d198f0ca546051,True,True,,True,0,True,True,,,
+GA-MD2,ANSWERED,True,752.833,True,True,1,1,attr-34605ef8-23e1-5e67-a699-91cd6d846d7a-871f21835b67bd12,True,True,,True,0,True,True,,,
+GA-MD3,ANSWERED,True,696.385,True,True,1,1,attr-fda8a762-0568-57bb-93a6-9c6838d09c3c-b7d72ef7842d9b2d,True,True,,True,0,True,True,,,
+GA-MD4,ANSWERED,True,778.614,True,True,1,1,attr-f5d38ee9-ae2f-5f06-8ed9-b53612d848ec-503815ea42284fa3,True,True,,True,0,True,True,,,
+GA-MA01,ANSWERED,True,792.201,True,True,1,1,attr-50476406-5a9c-51e3-85c8-3a062122333f-7c3c16a03f0aeba3,True,True,,True,0,True,True,True,True,
+GA-BOUNDARY,NOT_ENOUGH_EVIDENCE,True,7.237,,,0,0,,,,,,,,,,,
+GA-MA12,NOT_ENOUGH_EVIDENCE,True,7.046,,,0,0,,,,,,,,,True,True,OUT_OF_SCOPE
+GA-N1,NOT_ENOUGH_EVIDENCE,True,6.432,,,0,0,,,,,,,,,,,
