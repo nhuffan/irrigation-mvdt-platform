@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     rag_lite_allowlist_path: Path | None = None
     rag_lite_index_dir: Path = Path(__file__).resolve().parents[4] / "storage/rag-lite"
     rag_lite_max_context_chars: int = 12000
+    # Opt-in re-ranking of admitted PDF passages; never widens the evidence set.
+    rag_hybrid_enabled: bool = False
 
     rag_generation_enabled: bool = False
     rag_provider: str = "none"

@@ -48,5 +48,6 @@ jobs:
           tests/test_rag_lite_citations.py
           tests/test_rag_lite_answer_policy.py
           tests/test_rag_lite_query.py
+          tests/test_rag_lite_hybrid.py
       - name: Scripted grounded-answer guardrail evaluation
         run: uv run python -m scripts.evaluate_rag_generation --output "$RUNNER_TEMP/guardrails.csv"

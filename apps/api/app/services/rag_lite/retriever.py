@@ -12,6 +12,7 @@ from app.models.data_source import DataSource
 from app.models.media import Document
 from app.schemas.rag_lite import Citation, RagPagination
 from app.services.om_service import list_records
+from app.services.rag_lite import hybrid
 from app.services.rag_lite.answer import respond
 from app.services.rag_lite.indexer import digest, inspect_document, load_allowlist
 from app.services.rag_lite.sections import scoped_chunks
@@ -497,6 +498,8 @@ def retrieve(
                 continue
             candidates.append((doc, chunk, tokens(chunk["text"])))
     ranked = rank_document_chunks(candidates, search_question, query_tokens)
+    if getattr(settings, "rag_hybrid_enabled", False):
+        ranked = hybrid.rerank(ranked, search_question)
     limitations.append(
         "PDF search requires all search keywords; exact normalized phrases rank first. "
         "Explicit query diacritics constrain matches; unaccented words remain "

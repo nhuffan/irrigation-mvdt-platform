@@ -46,6 +46,10 @@ The preview shows **Grounded answer** when model readiness and the reservoir gra
 - **Private corpus (needs model + grant):** [rag_lite_generation_cases.csv](rag_lite_generation_cases.csv) reuses verified Main Dam/multi-asset cases in `grounded_answer` mode with `expected_answer_text`. Run it with `scripts/evaluate_rag_lite.py --cases` only when a local model and a model-processing grant for those records exist. Without a model, supported cases correctly return `GENERATION_UNAVAILABLE` with evidence and are reported as failures.
 - Citation validity and these checks do not establish factual or engineering correctness; groundedness still needs human review.
 
+## Optional hybrid re-ranking
+
+`RAG_HYBRID_ENABLED=true` re-orders PDF passages that the keyword search already admitted, using local deterministic character n-gram vectors and reciprocal rank fusion inside each exact-phrase tier. It never adds, removes or rescopes evidence and needs no model or network. It is OFF by default: on the fixed cohorts it changed no rank (see Stage 21 in `STAGE_OUTPUTS.md`). Compare from `apps/api` with `RAG_LITE_ALLOWLIST_PATH=... uv run python -m scripts.compare_rag_hybrid --output <new.csv>`; it uses a read-only transaction.
+
 ## Optional remote MCP transport
 
 The standalone `app.mcp.remote:app` starts with `/mcp` disabled. For an authorized deployment, configure `MVDT_MCP_REMOTE_ENABLED=true`, the exact HTTPS URL ending in `/mcp`, the trusted issuer, its RS256 PEM public key and a separate remote disclosure grant using the variables in `apps/api/.env.example`. The reverse proxy must preserve the public Host and trusted HTTPS scheme. Apply shared rate and connection limits at the proxy and keep the original-content API private. Use the issuer's current public signing key and restart the resource server after key rotation.
