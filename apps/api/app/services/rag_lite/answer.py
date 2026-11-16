@@ -4,7 +4,11 @@ import re
 from app.schemas.rag_lite import Citation, RagQuery, RagResponse
 from app.services.rag_lite.citations import validate_generation
 from app.services.rag_lite.providers import Provider
-from app.services.rag_lite.vocabulary import normalize_numbers, numeric_literals
+from app.services.rag_lite.vocabulary import (
+    folded,
+    normalize_numbers,
+    numeric_literals,
+)
 
 LIMITATIONS = [
     "Experimental future work — human verification required",
@@ -29,6 +33,20 @@ MEASUREMENT = re.compile(
     r"(?![\w/])",
     re.IGNORECASE,
 )
+
+# Post-check for the content policy. Historical evidence cannot support claims
+# about the present, safety, predictions or recommended actions, so such an
+# answer fails closed to the retrieval evidence. Matching is on folded text.
+UNSUPPORTED_CLAIM = re.compile(
+    r"\b(?:current|currently|now|today|real[ -]?time|at present|presently"
+    r"|safe|unsafe|safety|recommend\w*|should|must|predict\w*|forecast\w*"
+    r"|will (?:fail|collapse|overflow)"
+    r"|hien tai|hien nay|an toan|khuyen nghi|du bao|du doan)\b"
+)
+
+
+def unsupported_claim(text: str) -> bool:
+    return bool(UNSUPPORTED_CLAIM.search(folded(text)))
 
 
 def assertion_numbers(text: str) -> set[str]:
@@ -131,6 +149,8 @@ def generate_answer(
             supporting_text
         ) or measurements(assertion) - measurements(supporting_text):
             raise ValueError("Unsupported numeric literal or unit")
+        if unsupported_claim(assertion):
+            raise ValueError("Answer exceeds historical evidence scope")
     except (RuntimeError, ValueError, TypeError, TimeoutError, OSError):
         return generation_unavailable(result)
     result.answer = text

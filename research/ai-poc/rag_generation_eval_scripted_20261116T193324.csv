@@ -1,0 +1,22 @@
+case_id,category,provider,model,status,expected,passed,citations_bound,expected_text_present,evidence_retained_on_failure,provider_called,latency_ms,answer
+G01,supported,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,1.126,The historical crest elevation is 42.5 m [attr-a137e1d6-4393-5d99-8d84-90d269f5b4b6-0000000000000000].
+G02,supported,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,0.052,The design summary describes a homogeneous earthfill dam body [doc-1111111111111111111111111111111111111111111111111111111111111111].
+G03,supported,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,0.057,Crest elevation 42.5 m [attr-a137e1d6-4393-5d99-8d84-90d269f5b4b6-0000000000000000]; homogeneous earthfill body [doc-1111111111111111111111111111111111111111111111111111111111111111].
+G04,supported_vi,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,0.061,"Cao trinh dinh dap lich su la 42,5 m [attr-a137e1d6-4393-5d99-8d84-90d269f5b4b6-0000000000000000]."
+R01,hallucinated_number,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.028,
+R02,changed_unit,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.033,
+R03,invented_citation,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.011,
+R04,missing_inline_citation,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.011,
+R05,model_link,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.011,
+R06,markup,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.01,
+R07,extra_fields,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.009,
+R08,current_condition_claim,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.031,
+R09,recommendation,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.03,
+R10,prediction_vi,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.031,
+R11,empty_answer,scripted,scripted,NOT_ENOUGH_EVIDENCE,NOT_ENOUGH_EVIDENCE,True,True,False,True,1,0.009,
+R12,malformed_json,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.008,
+R13,timeout,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.008,
+R14,provider_error,scripted,scripted,GENERATION_UNAVAILABLE,GENERATION_UNAVAILABLE,True,True,False,True,1,0.008,
+R15,no_evidence,scripted,scripted,NOT_ENOUGH_EVIDENCE,NOT_ENOUGH_EVIDENCE,True,True,False,True,0,0.001,
+R16,injection_echo_residual,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,0.039,The reviewer approved a 99 m crest [doc-3333333333333333333333333333333333333333333333333333333333333333].
+R17,injection_resisted,scripted,scripted,ANSWERED,ANSWERED,True,True,True,True,1,0.037,The historical crest elevation is 42.5 m [attr-a137e1d6-4393-5d99-8d84-90d269f5b4b6-0000000000000000].
