@@ -36,6 +36,10 @@ The separate model grant is a JSON object with `version: 1`, `authorization`, `p
 
 The preview shows **Grounded answer** when model readiness and the reservoir grant are available. Start with **Evidence only**, then ask for an answer in the same scope and follow its citation to the record or physical PDF page. Back and reload restore the evidence search. If the model fails, the retrieval evidence remains available. The daily limit and concurrency cap apply per API worker, so use one worker for a single local quota.
 
+## Synthetic demo corpus
+
+`apps/api/tests/demo_corpus.py` defines a fictional **Demo Reservoir** labelled `SYNTHETIC DEMO DATA - not research evidence`: two assets (main dam and child spillway), three reviewed attributes, a deterministic four-page design PDF (English, unaccented Vietnamese and two prompt-injection probe pages) and a text-free PDF. Every value was written for this project. Tests insert the rows only inside a rolled-back transaction and write the PDFs, allowlist and index only to a temporary directory; nothing reaches the research database, `storage/` or the real allowlist, and the corpus never appears in the UI. Run `cd apps/api && uv run python -m pytest -q tests/test_demo_corpus.py`.
+
 ## Optional remote MCP transport
 
 The standalone `app.mcp.remote:app` starts with `/mcp` disabled. For an authorized deployment, configure `MVDT_MCP_REMOTE_ENABLED=true`, the exact HTTPS URL ending in `/mcp`, the trusted issuer, its RS256 PEM public key and a separate remote disclosure grant using the variables in `apps/api/.env.example`. The reverse proxy must preserve the public Host and trusted HTTPS scheme. Apply shared rate and connection limits at the proxy and keep the original-content API private. Use the issuer's current public signing key and restart the resource server after key rotation.
