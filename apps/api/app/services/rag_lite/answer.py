@@ -23,8 +23,11 @@ SYSTEM_INSTRUCTIONS = (
     "values, units and verification statuses. An unverified source stays unverified. "
     "Do not assert current conditions, infer missing observations, predict failure, "
     "or recommend engineering or operating actions. "
-    "Return JSON with answer and citation_ids, using [citation_id] inline for each "
-    "claim. Do not supply URLs or markup. "
+    "Return JSON with answer and citation_ids. Put the evidence citation_id in "
+    "square brackets right after each claim it supports, and list every cited id "
+    "in citation_ids. Do not supply URLs or markup. "
+    'Example: {"answer":"The historical crest length is 860 m [E1].",'
+    '"citation_ids":["E1"]}. '
     'If the evidence does not support an answer, return {"answer":"","citation_ids":[]}.'
 )
 MEASUREMENT = re.compile(
@@ -47,6 +50,33 @@ UNSUPPORTED_CLAIM = re.compile(
 
 def unsupported_claim(text: str) -> bool:
     return bool(UNSUPPORTED_CLAIM.search(folded(text)))
+
+
+def resolve_aliases(output, aliases: dict[str, str]):
+    """Map short evidence aliases (E1, E2...) back to server-issued citation IDs.
+
+    Small local models copy short labels far more reliably than long hashes.
+    Only exact known aliases are translated; anything else is left for
+    ``validate_generation`` to reject.
+    """
+    if not isinstance(output, dict) or set(output) != {"answer", "citation_ids"}:
+        return output
+    answer, ids = output["answer"], output["citation_ids"]
+    if not isinstance(answer, str) or not isinstance(ids, list):
+        return output
+
+    def marker(match):
+        # A grouped marker such as [E1, E2] is expanded only when every part is
+        # a known alias; otherwise it is left untouched and fails validation.
+        parts = [part.strip() for part in match.group(1).split(",")]
+        if len(parts) > 1 and all(part in aliases for part in parts):
+            return "".join(f"[{aliases[part]}]" for part in parts)
+        return f"[{aliases.get(match.group(1), match.group(1))}]"
+
+    return {
+        "answer": re.sub(r"\[([^\]]+)\]", marker, answer),
+        "citation_ids": [aliases.get(i, i) if isinstance(i, str) else i for i in ids],
+    }
 
 
 def assertion_numbers(text: str) -> set[str]:
@@ -103,7 +133,7 @@ def generate_answer(
     bundle = []
     for citation in evidence:
         item = {
-            "citation_id": citation.citation_id,
+            "citation_id": f"E{len(bundle) + 1}",
             "excerpt": citation.excerpt,
             "source_code": citation.source_code,
             "locator": citation.locator,
@@ -120,6 +150,10 @@ def generate_answer(
         bundle.append(item)
     if not bundle:
         return generation_unavailable(result)
+    aliases = {
+        item["citation_id"]: citation.citation_id
+        for item, citation in zip(bundle, evidence, strict=False)
+    }
     prompt = json.dumps(
         [
             {"role": "system", "content": SYSTEM_INSTRUCTIONS},
@@ -134,11 +168,11 @@ def generate_answer(
         ensure_ascii=False,
     )
     try:
-        output = provider.generate(prompt, timeout=timeout)
+        output = resolve_aliases(provider.generate(prompt, timeout=timeout), aliases)
         if output == {"answer": "", "citation_ids": []}:
             result.status = "NOT_ENOUGH_EVIDENCE"
             return result
-        allowed_ids = {item["citation_id"] for item in bundle}
+        allowed_ids = set(aliases.values())
         bounded = [c for c in evidence if c.citation_id in allowed_ids]
         text, citations = validate_generation(output, bounded)
         supporting_text = "\n".join(

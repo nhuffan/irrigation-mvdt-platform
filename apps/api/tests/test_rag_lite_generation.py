@@ -235,7 +235,9 @@ def test_generation_failure_retains_all_retrieval(scope, provider, outcome, expe
     assert "sensitive" not in result.model_dump_json()
     if provider.calls:
         assert len(provider.calls[0]["evidence"]) == 1
-        assert provider.calls[0]["evidence"][0]["citation_id"] == record.citation_id
+        # The model sees a short alias, never the server-issued citation ID.
+        assert provider.calls[0]["evidence"][0]["citation_id"] == "E1"
+        assert record.citation_id not in json.dumps(provider.calls[0])
 
 
 def test_daily_and_concurrency_budgets(scope, provider):

@@ -47,3 +47,35 @@ def test_scripted_guardrail_evaluation_passes(tmp_path, monkeypatch):
     by_id = {row["case_id"]: row for row in rows}
     assert by_id["R15"]["provider_called"] == "0"
     assert by_id["R16"]["status"] == "ANSWERED"  # documented residual risk
+
+
+def test_aliases_map_back_to_server_ids_and_unknown_labels_stay_invalid():
+    from app.services.rag_lite.answer import resolve_aliases
+
+    aliases = {"E1": "attr-real", "E2": "doc-real"}
+    assert resolve_aliases(
+        {"answer": "42.5 m [E1]; earthfill [E2].", "citation_ids": ["E1", "E2"]},
+        aliases,
+    ) == {
+        "answer": "42.5 m [attr-real]; earthfill [doc-real].",
+        "citation_ids": ["attr-real", "doc-real"],
+    }
+    assert resolve_aliases({"answer": "x [E9]", "citation_ids": ["E9"]}, aliases) == {
+        "answer": "x [E9]",
+        "citation_ids": ["E9"],
+    }
+    assert (
+        resolve_aliases(
+            {"answer": "42.5 m and earthfill [E1, E2].", "citation_ids": ["E1", "E2"]},
+            aliases,
+        )["answer"]
+        == "42.5 m and earthfill [attr-real][doc-real]."
+    )
+    assert (
+        resolve_aliases({"answer": "x [E1,E9]", "citation_ids": ["E1"]}, aliases)[
+            "answer"
+        ]
+        == "x [E1,E9]"
+    )
+    malformed = {"answer": "x", "citation_ids": ["E1"], "url": "y"}
+    assert resolve_aliases(malformed, aliases) is malformed
