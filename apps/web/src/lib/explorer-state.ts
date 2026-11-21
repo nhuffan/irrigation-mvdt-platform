@@ -1,7 +1,8 @@
 import type { Asset } from "../types/asset";
 import type { ExplorerData, ExplorerRecords } from "./explorer-data";
+import { RECORD_CODE_PREFIX } from "./site-scope.ts";
 export function dataset(asset: Asset) {
-  return asset.asset_code.startsWith("RS-") ? "research" : asset.asset_code.startsWith("DEV-") ? "development" : "other";
+  return asset.asset_code.startsWith(RECORD_CODE_PREFIX) ? "research" : asset.asset_code.startsWith("DEV-") ? "development" : "other";
 }
 export function selectedAsset(assets: Asset[], id: string | null) {
   return assets.find(a => a.id === id);

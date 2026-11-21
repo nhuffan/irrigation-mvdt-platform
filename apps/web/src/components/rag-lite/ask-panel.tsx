@@ -4,7 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { Asset } from "@/types/asset";
 import { assetDisplayName } from "@/lib/asset-display";
 import { evidenceDisplayText } from "@/lib/evidence-display";
-import type { RagCoverage, RagDemo, RagResult, RagSearchMode } from "@/lib/rag-lite";
+import { GUARDRAIL_QUESTIONS, type RagCoverage, type RagDemo, type RagResult, type RagSearchMode } from "@/lib/rag-lite";
 import { evidenceAssetGroups, evidenceQueryPayload, evidenceSearchUrl, evidenceSearchFromUrl, evidenceRequestError, type EvidenceSearchState } from "@/lib/evidence-search-state";
 import { SearchCoverage } from "./search-coverage";
 import { EvidenceResults } from "./evidence-results";
@@ -197,6 +197,10 @@ export function AskPanel({ assets, generationAvailable, initialAssetId, initialS
             {demos.length > 0 && !allDocs && <details className={styles.suggestions}>
               <summary>Suggested questions</summary>
               <div>{demos.map(demo => <button type="button" key={`${demo.query_type ?? "attribute"}:${demo.question}`} disabled={busy} onClick={() => { setQueryType(demo.query_type ?? "attribute"); void ask({ value: demo.question, attributeKey: demo.attribute_key ?? undefined, requestedType: demo.query_type ?? "attribute", mode }); }}>{demo.query_type === "document" ? "PDF · " : ""}{evidenceDisplayText(demo.attribute_label ?? demo.question)}</button>)}</div>
+            </details>}
+            {generationAvailable && !allDocs && <details className={styles.suggestions}>
+              <summary>Try the guardrails</summary>
+              <div>{GUARDRAIL_QUESTIONS.map(text => <button type="button" key={text} disabled={busy} onClick={() => { setSelectedMode("grounded_answer"); setQueryType("auto"); void ask({ value: text, requestedType: "auto", mode: "grounded_answer" }); }}>{text}</button>)}</div>
             </details>}
           </div>
           <div className={styles.searchActions}>

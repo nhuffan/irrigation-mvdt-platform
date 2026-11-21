@@ -4,6 +4,7 @@ import type { RefObject } from "react";
 import { OriginLink } from "@/components/documents/document-link";
 import { evidenceDisplayText } from "@/lib/evidence-display";
 import { citationHref, criticalRetrievalIssue, displayValue, evidenceReasonText, metadataLabel, groupDocuments, searchFeedback, paginationItems, type RagCitation, type RagResult, type RagSearchMode } from "@/lib/rag-lite";
+import { AnswerTraceView } from "./answer-trace";
 import styles from "./rag-lite.module.css";
 
 function EvidenceDetails({ citation: c }: { citation: RagCitation }) {
@@ -102,6 +103,7 @@ export function EvidenceResults({ result, mode, headingRef, onCorpus, onPage }: 
         return <EvidenceLink citation={c} kind={kind} key={i}>[{result.citations.indexOf(c) + 1}]</EvidenceLink>;
       })}</p>
     </div>}
+    {mode === "grounded_answer" && result.trace && <AnswerTraceView trace={result.trace} />}
     {attributes.length > 0 && <div className={styles.attributeGrid}>{attributes.map(c => <AttributeCard key={c.citation_id} citation={c} />)}</div>}
     {documents.map(group => <DocumentCard key={group.documentId} citations={group.citations} />)}
     {paging && paging.total_pages > 1 && <nav className={styles.pagination} aria-label="Search result pages">

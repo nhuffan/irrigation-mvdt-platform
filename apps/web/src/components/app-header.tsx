@@ -1,5 +1,5 @@
 "use client";
-import { RESERVOIR_HREF } from "@/lib/site-scope";
+import { RESERVOIR_HREF, SYNTHETIC_DEMO } from "@/lib/site-scope";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 export function AppHeader() {
@@ -20,7 +20,8 @@ export function AppHeader() {
           {[
             [RESERVOIR_HREF, "Overview"],
             ["/map", "GIS Map"],
-            ["/methodology", "Methodology & Evidence"],
+            // The research methodology belongs to the private research deployment.
+            ...(SYNTHETIC_DEMO ? [] : [["/methodology", "Methodology & Evidence"]]),
             [`${RESERVOIR_HREF}/3d`, "3D"],
             ["/ai-research-preview", "AI Research"],
           ].map(([href, label]) => (

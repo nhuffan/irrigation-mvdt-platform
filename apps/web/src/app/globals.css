@@ -1358,3 +1358,5 @@ h3, h4, h5, h6, summary, .workspace-toolbar strong, .map-context-heading { font-
 /* Keep asset-map recovery and reset controls clear of the navigation buttons. */
 .asset-map-frame .map-reset { top: 146px; }
 .asset-map-frame .basemap-notice { top: auto; bottom: 100px; max-width: calc(100% - 88px); margin: 0; }
+
+.demo-banner { margin: 0; padding: 8px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #5b3d00; background: #fff3d6; border-bottom: 1px solid #f0d9a0; }

@@ -5,9 +5,14 @@ import { MethodologyEvidenceDetail } from "@/components/methodology/methodology-
 import { MethodologyOverview } from "@/components/methodology/methodology-overview";
 import { MethodologyDisclosure } from "@/components/methodology/methodology-disclosure";
 import { getResearchSummary } from "@/lib/research-summary";
+import { SYNTHETIC_DEMO } from "@/lib/site-scope";
 export const dynamic = "force-dynamic";
 
 export default async function MethodologyPage() {
+  if (SYNTHETIC_DEMO) return <main className="page-shell methodology-page">
+    <PageHeader eyebrow="Research" title="Methodology & Evidence"
+      description="The research methodology and its evidence gates run on the private research deployment. This public demo holds synthetic data only." />
+  </main>;
   const summary = await getResearchSummary();
   const workflow = summary.workflow;
   return <main className="page-shell methodology-page">
