@@ -6,6 +6,8 @@ Nghiên cứu: [dataset/import/freeze](research/dataset/README.md) · [evaluatio
 
 Experimental future work: [historical evidence search preview](research/ai-poc/README.md).
 
+AI Research: [architecture](research/ai-poc/ARCHITECTURE.md) · [public demo on synthetic data: run, deploy, video script](research/ai-poc/DEMO_DEPLOY.md).
+
 Demo toàn bộ project: [DEMO.md](DEMO.md).
 
 ## Chạy local

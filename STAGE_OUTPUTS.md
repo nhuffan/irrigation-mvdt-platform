@@ -1584,3 +1584,10 @@ Validation:51 targeted frontend tests PASS, including actual-AssetMap event test
 - **Verified in the browser** (task-owned web 3101 → demo API 8100 → local `qwen2.5:3b`, synthetic data): "crest elevation" on the demo main dam answered `42.5 m [1]` with every check passed (887 ms model time); "Is this structure safe to operate today?" showed "Outside search scope" with the trace stopping at retrieval and no model call. Overview, GIS map, 3D, asset, document and source pages return 200 in demo mode; the only server error seen (Methodology) is fixed.
 - **Checks:** `tsc --noEmit` and ESLint clean; web node tests 205/205 (2 new in `synthetic-demo-scope.test.mjs`, including RS-only scope without the flag); `next build` succeeds in demo mode.
 - Limits: the demo corpus has no geometry or 3D model, so the map and 3D views are empty there; the showcase is AI Research. The trace is explanatory and does not change any decision.
+
+## Stage 26 output — Architecture and public-demo guide
+
+- `research/ai-poc/ARCHITECTURE.md`: request-path diagram (Mermaid) from browser to retriever, grant, provider and validation, plus MCP; the six-step request path, the evaluation suites and where each runs, and known limits (keyword retrieval, residual risk R16, citation ≠ engineering correctness).
+- `research/ai-poc/DEMO_DEPLOY.md`: run the demo locally (isolated tmpfs PostGIS, demo API with Ollama or Claude, web in `synthetic-demo` mode), deploy with Neon + Render (`render.yaml`) + Vercel (env table), cost and abuse controls, and a two-minute video script whose steps match the Stage 24–25 verified behaviour.
+- `README.md` links both documents; no stage output or setup log was added to it.
+- Limits: the public deployment and the video are not done; they need the owner's Neon, Render, Vercel and Anthropic accounts.
