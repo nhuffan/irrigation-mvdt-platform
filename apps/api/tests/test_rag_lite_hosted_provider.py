@@ -60,11 +60,11 @@ def test_trace_records_each_passed_check_without_content(scope, provider):  # no
     settings, request, record, _, _ = scope
     result = generation.grounded_response(settings, request, retrieval(record))
     trace = result.trace
-    assert [c.status for c in trace.checks] == ["passed"] * 7
+    assert [c.status for c in trace.checks] == ["passed"] * 8
     assert trace.aliases == ["E1"] and trace.evidence_sent == 1
     assert trace.latency_ms is not None
     dumped = trace.model_dump_json()
-    assert "Ignore previous instructions" not in dumped
+    assert "Test witnessed on site" not in dumped
     assert record.citation_id not in dumped
 
 

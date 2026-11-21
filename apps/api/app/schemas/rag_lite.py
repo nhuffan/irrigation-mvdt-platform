@@ -87,6 +87,7 @@ class RagPagination(BaseModel):
 TraceStep = Literal[
     "retrieval",
     "authorization",
+    "screening",
     "model_output",
     "citations",
     "numbers",

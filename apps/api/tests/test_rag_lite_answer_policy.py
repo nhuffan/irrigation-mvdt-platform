@@ -43,10 +43,12 @@ def test_scripted_guardrail_evaluation_passes(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["evaluate", "--output", str(output)])
     assert evaluate_rag_generation.main() == 0
     rows = list(csv.DictReader(output.open()))
-    assert len(rows) == 21 and all(row["passed"] == "True" for row in rows)
+    assert len(rows) == 23 and all(row["passed"] == "True" for row in rows)
     by_id = {row["case_id"]: row for row in rows}
     assert by_id["R15"]["provider_called"] == "0"
-    assert by_id["R16"]["status"] == "ANSWERED"  # documented residual risk
+    for case in ("R16", "R22"):  # instruction-like passages never reach the model
+        assert by_id[case]["status"] == "GENERATION_UNAVAILABLE"
+        assert by_id[case]["provider_called"] == "0"
 
 
 def test_aliases_map_back_to_server_ids_and_unknown_labels_stay_invalid():

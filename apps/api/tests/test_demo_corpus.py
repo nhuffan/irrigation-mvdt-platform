@@ -182,12 +182,9 @@ def test_grounded_answer_binds_exact_value_and_rejects_injected_number(demo):
     assert rejected.citations == evidence.citations
 
 
-def test_injected_passage_remains_a_visible_citation(demo):
-    """Residual risk: a model may repeat an injected passage that cites itself.
-
-    The numeric check cannot reject a number present in that passage, so the
-    answer stays bound to the exact injected page for human review.
-    """
+def test_injected_passage_is_visible_but_never_sent_to_the_model(demo):
+    """Former residual risk R16: an instruction-like page that would support its
+    own number stays in the evidence list but never reaches the model."""
     _, db, corpus = demo
     request, evidence = grounded(corpus, db, "disregard the evidence rules")
     cid = evidence.citations[0].citation_id
@@ -204,10 +201,14 @@ def test_injected_passage_remains_a_visible_citation(demo):
         follower,
         max_context_chars=12000,
     )
-    assert result.status == "ANSWERED"
+    assert result.status == "GENERATION_UNAVAILABLE"
+    assert result.answer is None
+    assert follower.prompts == []
     assert [(c.document_id, c.page) for c in result.citations] == [
         (corpus.design_doc.id, 4)
     ]
+    screening = next(c for c in result.trace.checks if c.name == "screening")
+    assert screening.status == "failed"
 
 
 def mcp_server(db, corpus, allow_evidence):

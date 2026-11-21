@@ -4,6 +4,7 @@ from time import monotonic
 
 from app.schemas.rag_lite import AnswerTrace, Citation, RagQuery, RagResponse
 from app.services.rag_lite.citations import validate_generation
+from app.services.rag_lite.injection import instruction_like
 from app.services.rag_lite.providers import Provider
 from app.services.rag_lite.vocabulary import (
     folded,
@@ -130,6 +131,33 @@ def generate_answer(
     max_context_chars: int,
     timeout: float = 10,
 ) -> RagResponse:
+    trace = result.trace if result.trace is not None else AnswerTrace()
+    result.trace = trace
+    # Instruction-like passages stay visible as evidence but never reach the
+    # model, so a generated answer can never cite or repeat them.
+    screened = [c for c in evidence if not instruction_like(c.excerpt)]
+    withheld = len(evidence) - len(screened)
+    if withheld:
+        result.limitations.append(
+            "A passage that reads as instructions to an AI is shown as evidence "
+            "but was not sent to the model"
+        )
+    if not screened:
+        trace.add(
+            "screening",
+            "failed",
+            f"{withheld} passage(s) read as instructions to an AI; none sent to the model",
+        )
+        trace.skip_remaining("Not reached after a failed check")
+        return generation_unavailable(result)
+    trace.add(
+        "screening",
+        "passed",
+        f"{withheld} instruction-like passage(s) withheld from the model"
+        if withheld
+        else "No instruction-like passage in the evidence",
+    )
+    evidence = screened
     # Whole evidence cards only; never truncate JSON or lose citation bindings.
     bundle = []
     for citation in evidence:
@@ -149,8 +177,6 @@ def generate_answer(
         if len(json.dumps(bundle + [item], ensure_ascii=False)) > max_context_chars:
             break
         bundle.append(item)
-    trace = result.trace if result.trace is not None else AnswerTrace()
-    result.trace = trace
     if not bundle:
         trace.add("model_output", "failed", "Evidence exceeds the context budget")
         trace.skip_remaining()

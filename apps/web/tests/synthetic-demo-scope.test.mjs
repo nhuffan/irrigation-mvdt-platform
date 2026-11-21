@@ -11,6 +11,6 @@ test('research deployment shows only RS- records unless the synthetic demo flag 
 });
 
 test('every answer-trace step has a label and guardrail questions stay generic', () => {
-  assert.deepEqual(Object.keys(TRACE_STEP_LABELS), ['retrieval', 'authorization', 'model_output', 'citations', 'numbers', 'units', 'content_policy']);
+  assert.deepEqual(Object.keys(TRACE_STEP_LABELS), ['retrieval', 'authorization', 'screening', 'model_output', 'citations', 'numbers', 'units', 'content_policy']);
   for (const question of GUARDRAIL_QUESTIONS) assert.doesNotMatch(question, /dau tieng|dầu tiếng/i);
 });

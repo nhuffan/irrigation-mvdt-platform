@@ -26,7 +26,7 @@ export type RagCitation = {
 
 export type RagSearchMode = "evidence_only" | "grounded_answer";
 
-export type TraceStep = "retrieval" | "authorization" | "model_output" | "citations" | "numbers" | "units" | "content_policy";
+export type TraceStep = "retrieval" | "authorization" | "screening" | "model_output" | "citations" | "numbers" | "units" | "content_policy";
 
 /** Content-free account of a grounded answer: checks, counts and timing only. */
 export type AnswerTrace = {
@@ -43,6 +43,7 @@ export type AnswerTrace = {
 export const TRACE_STEP_LABELS: Record<TraceStep, string> = {
   retrieval: "Retrieve admissible evidence",
   authorization: "Check the model-processing grant",
+  screening: "Withhold passages that read as instructions to an AI",
   model_output: "Generate a structured answer",
   citations: "Bind every citation to supplied evidence",
   numbers: "Check numbers against cited evidence",
