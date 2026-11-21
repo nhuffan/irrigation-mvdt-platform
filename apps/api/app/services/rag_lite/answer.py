@@ -1,7 +1,8 @@
 import json
 import re
+from time import monotonic
 
-from app.schemas.rag_lite import Citation, RagQuery, RagResponse
+from app.schemas.rag_lite import AnswerTrace, Citation, RagQuery, RagResponse
 from app.services.rag_lite.citations import validate_generation
 from app.services.rag_lite.providers import Provider
 from app.services.rag_lite.vocabulary import (
@@ -148,12 +149,17 @@ def generate_answer(
         if len(json.dumps(bundle + [item], ensure_ascii=False)) > max_context_chars:
             break
         bundle.append(item)
+    trace = result.trace if result.trace is not None else AnswerTrace()
+    result.trace = trace
     if not bundle:
+        trace.add("model_output", "failed", "Evidence exceeds the context budget")
+        trace.skip_remaining()
         return generation_unavailable(result)
     aliases = {
         item["citation_id"]: citation.citation_id
         for item, citation in zip(bundle, evidence, strict=False)
     }
+    trace.evidence_sent, trace.aliases = len(bundle), list(aliases)
     prompt = json.dumps(
         [
             {"role": "system", "content": SYSTEM_INSTRUCTIONS},
@@ -167,25 +173,65 @@ def generate_answer(
         ],
         ensure_ascii=False,
     )
+    step = "model_output"
+    started = monotonic()
     try:
-        output = resolve_aliases(provider.generate(prompt, timeout=timeout), aliases)
+        raw = provider.generate(prompt, timeout=timeout)
+        trace.latency_ms = round(1000 * (monotonic() - started))
+        output = resolve_aliases(raw, aliases)
         if output == {"answer": "", "citation_ids": []}:
+            trace.add(
+                "model_output",
+                "passed",
+                "Model reported that the evidence does not answer the question",
+            )
+            trace.skip_remaining("No answer to check")
             result.status = "NOT_ENOUGH_EVIDENCE"
             return result
+        trace.add("model_output", "passed", "Structured JSON answer received")
+        step = "citations"
         allowed_ids = set(aliases.values())
         bounded = [c for c in evidence if c.citation_id in allowed_ids]
         text, citations = validate_generation(output, bounded)
+        trace.add(
+            "citations",
+            "passed",
+            f"{len(citations)} citation(s), each bound to supplied evidence",
+        )
         supporting_text = "\n".join(
             f"{c.excerpt}\n{c.source_date or ''}\n{c.locator}" for c in citations
         )
         assertion = re.sub(r"\[[^\]]+\]", "", text)
-        if assertion_numbers(assertion) - assertion_numbers(
-            supporting_text
-        ) or measurements(assertion) - measurements(supporting_text):
-            raise ValueError("Unsupported numeric literal or unit")
+        step = "numbers"
+        if assertion_numbers(assertion) - assertion_numbers(supporting_text):
+            raise ValueError("A number in the answer is absent from cited evidence")
+        trace.add("numbers", "passed", "Every number appears in cited evidence")
+        step = "units"
+        if measurements(assertion) - measurements(supporting_text):
+            raise ValueError("A value/unit pair is absent from cited evidence")
+        trace.add("units", "passed", "Every value/unit pair matches cited evidence")
+        step = "content_policy"
         if unsupported_claim(assertion):
-            raise ValueError("Answer exceeds historical evidence scope")
-    except (RuntimeError, ValueError, TypeError, TimeoutError, OSError):
+            raise ValueError(
+                "Present-condition, safety, advice or prediction claim rejected"
+            )
+        trace.add(
+            "content_policy",
+            "passed",
+            "No present-condition, safety, advice or prediction claim",
+        )
+    except (RuntimeError, ValueError, TypeError, TimeoutError, OSError) as error:
+        if trace.latency_ms is None:
+            trace.latency_ms = round(1000 * (monotonic() - started))
+        detail = (
+            str(error)
+            if step in {"numbers", "units", "content_policy"}
+            else "Model unavailable or returned an invalid response"
+            if step == "model_output"
+            else "Unknown, missing or misplaced citation"
+        )
+        trace.add(step, "failed", detail)
+        trace.skip_remaining("Not reached after a failed check")
         return generation_unavailable(result)
     result.answer = text
     result.citations = citations

@@ -84,6 +84,50 @@ class RagPagination(BaseModel):
     total_pages: int
 
 
+TraceStep = Literal[
+    "retrieval",
+    "authorization",
+    "model_output",
+    "citations",
+    "numbers",
+    "units",
+    "content_policy",
+]
+TRACE_STEPS: tuple[TraceStep, ...] = TraceStep.__args__
+
+
+class TraceCheck(BaseModel):
+    name: TraceStep
+    status: Literal["passed", "failed", "skipped"]
+    detail: str
+
+
+class AnswerTrace(BaseModel):
+    """Content-free account of how a grounded answer was (or was not) produced.
+
+    Holds counts, aliases, check names and timings only: never the prompt,
+    evidence text or raw model output.
+    """
+
+    attribute_evidence: int = 0
+    passage_evidence: int = 0
+    provider: str | None = None
+    model: str | None = None
+    evidence_sent: int = 0
+    aliases: list[str] = Field(default_factory=list)
+    latency_ms: int | None = None
+    checks: list[TraceCheck] = Field(default_factory=list)
+
+    def add(self, name: TraceStep, status, detail: str) -> None:
+        self.checks.append(TraceCheck(name=name, status=status, detail=detail))
+
+    def skip_remaining(self, detail: str = "Not reached") -> None:
+        done = {check.name for check in self.checks}
+        for name in TRACE_STEPS:
+            if name not in done:
+                self.add(name, "skipped", detail)
+
+
 class RagResponse(BaseModel):
     status: Literal[
         "ANSWERED", "RETRIEVAL_ONLY", "NOT_ENOUGH_EVIDENCE", "GENERATION_UNAVAILABLE"
@@ -94,6 +138,7 @@ class RagResponse(BaseModel):
     limitations: list[str] = Field(default_factory=list)
     reason_codes: list[EvidenceReason] = Field(default_factory=list)
     pagination: RagPagination | None = None
+    trace: AnswerTrace | None = None
 
 
 class RagCoverageDiagnostics(BaseModel):

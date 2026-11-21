@@ -1,0 +1,30 @@
+# Render Blueprint for the public demo API (SYNTHETIC Demo Reservoir only).
+# The web app deploys separately (Vercel); see research/ai-poc/DEMO_DEPLOY.md.
+services:
+  - type: web
+    name: mvdt-demo-api
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/v1/health
+    autoDeploy: false
+    envVars:
+      # Isolated demo database with PostGIS (e.g. Neon), as
+      # postgresql+psycopg://USER:PASSWORD@HOST/DB?sslmode=require
+      - key: DATABASE_URL
+        sync: false
+      # Public web origin, e.g. https://your-demo.vercel.app
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: RAG_GENERATION_ENABLED
+        value: "true"
+      - key: RAG_PROVIDER
+        value: anthropic
+      - key: RAG_ANTHROPIC_MODEL
+        value: claude-haiku-5-5
+      - key: RAG_GENERATION_DAILY_LIMIT
+        value: "200"

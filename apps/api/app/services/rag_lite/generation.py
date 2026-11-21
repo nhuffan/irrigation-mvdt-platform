@@ -1,4 +1,4 @@
-"""Local model authorization and process-local generation budgets."""
+"""Model-processing authorization and process-local generation budgets."""
 
 import logging
 from datetime import UTC, datetime
@@ -10,10 +10,10 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.core.config import Settings
-from app.schemas.rag_lite import Citation, RagQuery, RagResponse
+from app.core.config import Settings, generation_model
+from app.schemas.rag_lite import AnswerTrace, Citation, RagQuery, RagResponse
 from app.services.rag_lite.answer import generate_answer, generation_unavailable
-from app.services.rag_lite.providers import provider_for
+from app.services.rag_lite.providers import CLOUD_PROVIDERS, provider_for
 
 logger = logging.getLogger(__name__)
 Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
@@ -37,8 +37,10 @@ class GenerationAuthorization(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
     version: Literal[1]
     authorization: str = Field(min_length=1, max_length=1000)
-    provider: Literal["ollama"]
+    provider: Literal["ollama", "anthropic"]
     model: str = Field(min_length=1, max_length=137)
+    # A hosted provider is only ever granted for fictional demo data.
+    data_classification: Literal["PRIVATE", "SYNTHETIC_DEMO"] = "PRIVATE"
     reservoir_id: UUID
     documents: list[AuthorizedDocument] = Field(default_factory=list, max_length=256)
     records: list[AuthorizedRecord] = Field(default_factory=list, max_length=256)
@@ -82,16 +84,22 @@ def read_authorization(path: Path | None) -> GenerationAuthorization | None:
 def authorized_provider(settings: Settings, reservoir_id: UUID | None):
     if not settings.rag_lite_enabled or not settings.rag_generation_enabled:
         return None
-    provider = provider_for(settings.rag_provider, settings.rag_ollama_model)
+    model = generation_model(settings)
+    provider = provider_for(settings.rag_provider, model)
     if provider is None:
         return None
     grant = read_authorization(settings.rag_generation_authorization_path)
     if (
         grant is None
         or grant.provider != settings.rag_provider
-        or grant.model != settings.rag_ollama_model
+        or grant.model != model
         or (reservoir_id is not None and grant.reservoir_id != reservoir_id)
     ):
+        return None
+    if settings.rag_provider in CLOUD_PROVIDERS and (
+        settings.app_env != "demo" or grant.data_classification != "SYNTHETIC_DEMO"
+    ):
+        # Evidence leaves the machine: never for private research data.
         return None
     return provider, grant
 
@@ -131,19 +139,61 @@ def generation_available(settings: Settings, reservoir_id: UUID | None) -> bool:
 def grounded_response(
     settings: Settings, request: RagQuery, result: RagResponse
 ) -> RagResponse:
-    if request.mode == "evidence_only" or not result.citations:
+    if request.mode == "evidence_only":
         return result
+    trace = AnswerTrace(
+        attribute_evidence=sum(
+            c.kind == "technical_attribute" for c in result.citations
+        ),
+        passage_evidence=sum(c.kind == "document_chunk" for c in result.citations),
+    )
+    result.trace = trace
+    if not result.citations:
+        trace.add(
+            "retrieval",
+            "failed",
+            "No admissible evidence in this scope; the model is not called",
+        )
+        trace.skip_remaining()
+        return result
+    trace.add(
+        "retrieval", "passed", f"{len(result.citations)} evidence item(s) admitted"
+    )
     configured = authorized_provider(settings, request.reservoir_id)
     if configured is None:
+        trace.add(
+            "authorization",
+            "failed",
+            "No model-processing grant for this provider, model and reservoir",
+        )
+        trace.skip_remaining()
         return generation_unavailable(result)
     provider, grant = configured
+    trace.provider, trace.model = settings.rag_provider, generation_model(settings)
     evidence = grant.eligible(result.citations)
-    if (
-        not evidence
-        or not provider.ready()
-        or not budget.acquire(settings.rag_generation_daily_limit, 1)
-    ):
+    if not evidence:
+        trace.add(
+            "authorization",
+            "failed",
+            "None of the returned evidence is covered by the model-processing grant",
+        )
+        trace.skip_remaining()
         return generation_unavailable(result)
+    if not provider.ready() or not budget.acquire(
+        settings.rag_generation_daily_limit, 1
+    ):
+        trace.add(
+            "authorization",
+            "failed",
+            "Model not ready, or the daily generation limit is reached",
+        )
+        trace.skip_remaining()
+        return generation_unavailable(result)
+    trace.add(
+        "authorization",
+        "passed",
+        f"{len(evidence)} of {len(result.citations)} item(s) covered by the grant",
+    )
 
     request_id = uuid4()
     started = monotonic()
@@ -161,7 +211,7 @@ def grounded_response(
         logger.info(
             "RAG generation id=%s model=%s reservoir=%s sources=%s status=%s elapsed_ms=%d",
             request_id,
-            settings.rag_ollama_model,
+            generation_model(settings),
             request.reservoir_id,
             sorted({str(item.source_id) for item in evidence}),
             result.status,

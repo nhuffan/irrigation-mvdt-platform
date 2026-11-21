@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import os
 import re
 from functools import lru_cache
 from threading import Lock
@@ -143,8 +144,73 @@ class OllamaProvider:
             raise RuntimeError("Local model generation unavailable") from None
 
 
+# Claude structured outputs accept no string/array length constraints; the
+# server-side validator still enforces every answer and citation rule.
+CLOUD_RESPONSE_SCHEMA = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "answer": {"type": "string"},
+        "citation_ids": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["answer", "citation_ids"],
+}
+CLOUD_PROVIDERS = frozenset({"anthropic"})
+
+
+class AnthropicProvider:
+    """Hosted Claude model. Only ever authorized for SYNTHETIC demo evidence."""
+
+    def __init__(self, model: str):
+        self.model = model
+
+    def ready(self) -> bool:
+        return bool(os.environ.get("ANTHROPIC_API_KEY"))
+
+    def generate(self, prompt: str, *, timeout: float) -> dict:
+        import anthropic
+
+        try:
+            messages = json.loads(prompt)
+            system = "\n".join(m["content"] for m in messages if m["role"] == "system")
+            turns = [m for m in messages if m["role"] == "user"]
+            client = anthropic.Anthropic(timeout=timeout, max_retries=1)
+            response = client.messages.create(
+                model=self.model,
+                max_tokens=2048,
+                system=system,
+                messages=turns,
+                output_config={
+                    "effort": "low",
+                    "format": {"type": "json_schema", "schema": CLOUD_RESPONSE_SCHEMA},
+                },
+            )
+            if response.stop_reason != "end_turn":
+                raise ValueError("Incomplete or refused model completion")
+            text = next(
+                block.text for block in response.content if block.type == "text"
+            )
+            result = json.loads(text)
+            if not isinstance(result, dict):
+                raise TypeError("Invalid model response")
+            return result
+        except (
+            anthropic.APIError,
+            StopIteration,
+            KeyError,
+            ValueError,
+            TypeError,
+            RecursionError,
+        ):
+            raise RuntimeError("Hosted model generation unavailable") from None
+
+
 @lru_cache(maxsize=8)
-def provider_for(provider: str, model: str) -> OllamaProvider | None:
+def provider_for(provider: str, model: str):
+    if provider == "anthropic":
+        if re.fullmatch(r"claude-[a-z0-9][a-z0-9-]{0,62}", model):
+            return AnthropicProvider(model)
+        return None
     # A single local model name/tag, with no endpoint or cloud selection.
     if (
         provider != "ollama"

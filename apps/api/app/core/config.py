@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     rag_generation_enabled: bool = False
     rag_provider: str = "none"
     rag_ollama_model: str = ""
+    # Hosted model for the isolated SYNTHETIC demo only (APP_ENV=demo).
+    rag_anthropic_model: str = "claude-haiku-5-5"
     rag_generation_authorization_path: Path | None = None
     rag_generation_daily_limit: int = Field(default=20, ge=1, le=200)
     rag_generation_timeout_seconds: float = Field(default=8, ge=1, le=10)
@@ -42,6 +44,12 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+
+def generation_model(config: Settings) -> str:
+    if config.rag_provider == "anthropic":
+        return config.rag_anthropic_model
+    return config.rag_ollama_model
 
 
 settings = Settings()

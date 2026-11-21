@@ -49,5 +49,19 @@ jobs:
           tests/test_rag_lite_answer_policy.py
           tests/test_rag_lite_query.py
           tests/test_rag_lite_hybrid.py
+          tests/test_rag_lite_hosted_provider.py
       - name: Scripted grounded-answer guardrail evaluation
         run: uv run python -m scripts.evaluate_rag_generation --output "$RUNNER_TEMP/guardrails.csv"
+      - name: Seed the synthetic public demo twice (idempotent)
+        env:
+          APP_ENV: demo
+          STORAGE_ROOT: ${{ runner.temp }}/demo/storage
+          RAG_LITE_ALLOWLIST_PATH: ${{ runner.temp }}/demo/storage/rag-lite/allowlist.json
+          RAG_LITE_INDEX_DIR: ${{ runner.temp }}/demo/storage/rag-lite
+          RAG_PROVIDER: anthropic
+          RAG_GENERATION_AUTHORIZATION_PATH: ${{ runner.temp }}/demo/storage/rag-lite/model-grant.json
+        run: |
+          uv run python -m scripts.seed_demo
+          uv run python -m scripts.seed_demo | grep '"rows_created": false'
+      - name: Build the public demo image
+        run: docker build -t mvdt-demo-api:ci .
