@@ -165,7 +165,9 @@ class AnthropicProvider:
         self.model = model
 
     def ready(self) -> bool:
-        return bool(os.environ.get("ANTHROPIC_API_KEY"))
+        # A placeholder such as "none" means generation is deliberately off;
+        # the site then offers evidence-only search instead of failing answers.
+        return os.environ.get("ANTHROPIC_API_KEY", "").startswith("sk-ant-")
 
     def generate(self, prompt: str, *, timeout: float) -> dict:
         import anthropic

@@ -168,5 +168,7 @@ def test_claude_model_names_are_validated(monkeypatch):
     assert providers.provider_for("anthropic", "http://evil") is None
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     assert providers.provider_for("anthropic", "claude-haiku-5-5").ready() is False
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "none")
+    assert providers.provider_for("anthropic", "claude-haiku-5-5").ready() is False
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-test-only")
     assert providers.provider_for("anthropic", "claude-haiku-5-5").ready() is True
