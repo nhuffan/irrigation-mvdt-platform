@@ -246,7 +246,7 @@ def test_mcp_metadata_only_grant_withholds_evidence(demo):
             details = await client.call_tool("get_asset_details", asset)
             payload = details.structured_content
             assert payload["asset"]["code"] == "DEMO-MAIN-DAM"
-            assert payload["asset"]["reviewed_direct_attribute_count"] == 2
+            assert payload["asset"]["reviewed_direct_attribute_count"] == 4
             assert payload["citations"] == []
 
             provenance = await client.call_tool(
@@ -295,3 +295,28 @@ def test_mcp_evidence_grant_matches_http_without_links(demo):
             )
 
     asyncio.run(check())
+
+
+def test_demo_corpus_has_map_3d_and_om_content(demo):
+    """The public demo shows every workspace view with synthetic data."""
+    import struct as _struct
+
+    from app.demo.corpus import GLB_NODES, build_glb
+    from app.models.asset_condition import AssetCondition
+    from app.models.media import ModelAssetLink
+
+    _, db, corpus = demo
+    assets = db.query(type(corpus.main_dam)).filter_by(
+        reservoir_id=corpus.reservoir.id
+    )
+    assert assets.count() == 4 and all(a.geometry is not None for a in assets)
+    links = db.query(ModelAssetLink).filter_by(reservoir_id=corpus.reservoir.id).all()
+    assert {link.object_key for link in links} == {key for key, *_ in GLB_NODES}
+    glb = build_glb()
+    magic, version, length = _struct.unpack("<III", glb[:12])
+    assert (magic, version, length) == (0x46546C67, 2, len(glb))
+    statuses = {
+        c.verification_status
+        for c in db.query(AssetCondition).filter_by(asset_id=corpus.main_dam.id)
+    }
+    assert statuses == {"VERIFIED", "UNVERIFIED"}

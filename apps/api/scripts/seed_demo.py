@@ -22,9 +22,9 @@ from app.demo.corpus import (
     LABEL,
     RECORD_SOURCES,
     RESERVOIR_ID,
-    build_pdf,
     demo_provenance,
     insert_demo_rows,
+    location_sidecar,
 )
 from app.models.asset import Asset
 from app.models.media import Document
@@ -61,8 +61,14 @@ def main() -> int:
                 "use an isolated demo database"
             )
         created = db.get(Reservoir, RESERVOIR_ID) is None
-        if created:
-            insert_demo_rows(db)
+        # Merge keeps reruns idempotent and upgrades an existing demo database.
+        rows = insert_demo_rows(db)
+        files = dict(rows.files)
+        locations = location_sidecar(rows.assets)
+    atomic_json(
+        settings.asset_locations_path or settings.storage_root / "asset_locations.json",
+        locations,
+    )
 
     with SessionLocal() as db:
         documents = list(
@@ -72,12 +78,8 @@ def main() -> int:
                 .order_by(Document.id)
             )
         )
-        files = {
-            f"demo/{code.lower()}.pdf": build_pdf(pages)
-            for _, code, pages in DOCUMENT_FILES
-        }
-        for doc in documents:
-            storage.store(doc.storage_key, files[doc.storage_key])
+        for key, data in files.items():
+            storage.store(key, data)
 
         assets = list(
             db.scalars(select(Asset).where(Asset.reservoir_id == RESERVOIR_ID))
@@ -153,6 +155,8 @@ def main() -> int:
             "reservoir_id": str(RESERVOIR_ID),
             "rows_created": created,
             "documents": len(documents),
+            "assets": len(assets),
+            "model_files": sum(key.endswith(".glb") for key in files),
             "reviewed_records": len(citations),
             "grant": bool(grant_path),
             "label": LABEL,
